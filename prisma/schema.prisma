@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quotes Quote[]
+}
+
+model Customer {
+  id          String    @id @default(cuid())
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime
+  iban        String?
+  email       String?
+  phone       String?
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  addresses Address[]
+  quotes    Quote[]
+}
+
+enum AddressType {
+  CORRESPONDENCE
+  DELIVERY
+}
+
+model Address {
+  id          String      @id @default(cuid())
+  type        AddressType
+  street      String
+  houseNumber String
+  postalCode  String
+  city        String
+  country     String      @default("NL")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  defaultQty  Float?
+  unitPrice   Float
+  vatRate     Float    @default(21)
+  imageUrl    String?
+  notes       String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  quoteLines QuoteLine[]
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Quote {
+  id          String      @id @default(cuid())
+  quoteNumber String      @unique
+  status      QuoteStatus @default(DRAFT)
+  title         String
+  notes         String?
+  includedItems String?
+  validUntil    DateTime?
+
+  discountAmount Float @default(0)
+  subtotal       Float @default(0)
+  vatTotal       Float @default(0)
+  total          Float @default(0)
+
+  publicToken String @unique @default(uuid())
+
+  sentAt     DateTime?
+  acceptedAt DateTime?
+  rejectedAt DateTime?
+  archivedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+
+  createdById String
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  lines      QuoteLine[]
+  acceptance QuoteAcceptance?
+}
+
+model QuoteLine {
+  id          String   @id @default(cuid())
+  sortOrder   Int      @default(0)
+  name        String
+  description String?
+  quantity    Float
+  unitPrice   Float
+  vatRate     Float
+  lineTotal   Float
+  createdAt   DateTime @default(now())
+
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+model QuoteAcceptance {
+  id            String   @id @default(cuid())
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime
+  iban          String?
+  agreedToTerms Boolean  @default(false)
+  signatureData String
+  acceptedAt    DateTime @default(now())
+  ipAddress     String?
+
+  quoteId String @unique
+  quote   Quote  @relation(fields: [quoteId], references: [id])
+}
