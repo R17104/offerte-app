@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/db'
 import { PageContainer, PageHeader, Stat, Card, CardHeader, Badge, Divider } from '@/components/ui'
 import { formatCurrency, formatDate, STATUS_META } from '@/lib/utils'

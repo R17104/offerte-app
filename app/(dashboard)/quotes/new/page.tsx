@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/db'
 import { PageContainer, PageHeader } from '@/components/ui'
 import QuoteLineEditor from '@/components/quotes/QuoteLineEditor'

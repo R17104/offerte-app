@@ -17,7 +17,7 @@ const sections = [
   {
     title: 'Externe financiering en voorwaarden',
     content: [
-      'Indien deze offerte onder voorbehoud van financiering wordt ondertekend, zal Trefzeker Adviesgroep drie financieringsopties aandragen. Lukt financiering niet, dan wordt — in overleg — een technisch vergelijkbaar alternatief binnen het beschikbare budget aangeboden.',
+      'Indien deze offerte onder voorbehoud van financiering wordt ondertekend, zal Bespaarhulp Friesland drie financieringsopties aandragen. Lukt financiering niet, dan wordt — in overleg — een technisch vergelijkbaar alternatief binnen het beschikbare budget aangeboden.',
       'Bij onvoldoende medewerking aan het financieringsproces behouden wij ons het recht voor om een vergoeding in rekening te brengen voor de gemaakte advies- en voorbereidingstijd.',
       'Indien na al deze stappen zwart-op-wit wordt aangetoond dat financiering structureel niet mogelijk is (bijvoorbeeld door een BKR-registratie of aantoonbare negatieve kredietwaardigheid), kan de klant kosteloos van de overeenkomst afzien.',
     ],
@@ -63,7 +63,7 @@ const sections = [
   {
     title: 'Energieleveranciers',
     content: [
-      'De AlphaESS batterij heeft koppeling met dynamische energieleveranciers zoals Next Energy, frank energie, Hegg en Tibber, zodat u optimaal kunt profiteren van dynamische tarieven en energiemarktkoppelingen.',
+      'Onze slimme batterijen hebben koppeling met dynamische energieleveranciers zoals Next Energy, frank energie, Hegg en Tibber, zodat u optimaal kunt profiteren van dynamische tarieven en energiemarktkoppelingen.',
       'Let op: veel traditionele energieleveranciers zijn (nog) niet compatibel met een batterij. Ze kunnen het systeem niet aansturen of uitlezen, waardoor u geen voordeel heeft van uw investering. In de praktijk is overstappen dus bijna altijd nodig om écht rendement te behalen.',
     ],
   },
