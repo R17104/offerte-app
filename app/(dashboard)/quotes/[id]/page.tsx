@@ -40,7 +40,7 @@ export default async function QuoteDetailPage({ params }: Props) {
   const publicUrl = `/offerte/${quote.publicToken}`
   const isArchived = !!quote.archivedAt
   const isAccepted = quote.status === 'ACCEPTED'
-  const canEdit = ['DRAFT', 'SENT'].includes(quote.status)
+  const canEdit = true
 
   return (
     <PageContainer>

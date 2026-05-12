@@ -7,7 +7,32 @@ import QuoteEditForm from '@/components/quotes/QuoteEditForm'
 
 type Props = { params: Promise<{ id: string }> }
 
-const EDITABLE_STATUSES = ['DRAFT', 'SENT']
+const STATUS_WARNINGS: Record<string, { text: string; color: string; bg: string; border: string }> = {
+  SENT: {
+    text: 'Deze offerte heeft status Verstuurd. Wijzigingen zijn direct zichtbaar op de publieke offertepagina van de klant.',
+    color: '#60a5fa',
+    bg: 'rgba(59,130,246,0.08)',
+    border: 'rgba(59,130,246,0.2)',
+  },
+  ACCEPTED: {
+    text: '⚠️ Deze offerte is geaccepteerd en ondertekend door de klant. Bewerk alleen als je zeker weet wat je doet — wijzigingen zijn direct zichtbaar op de publieke offertepagina.',
+    color: '#f59e0b',
+    bg: 'rgba(245,158,11,0.08)',
+    border: 'rgba(245,158,11,0.25)',
+  },
+  REJECTED: {
+    text: 'Deze offerte is afgewezen. Je kunt de inhoud nog bewerken.',
+    color: '#9ca3af',
+    bg: 'var(--bg-elevated)',
+    border: 'var(--border)',
+  },
+  EXPIRED: {
+    text: 'Deze offerte is verlopen. Je kunt de inhoud nog bewerken.',
+    color: '#9ca3af',
+    bg: 'var(--bg-elevated)',
+    border: 'var(--border)',
+  },
+}
 
 export default async function QuoteEditPage({ params }: Props) {
   const { id } = await params
@@ -24,7 +49,8 @@ export default async function QuoteEditPage({ params }: Props) {
   ])
 
   if (!quote) notFound()
-  if (!EDITABLE_STATUSES.includes(quote.status)) notFound()
+
+  const warning = STATUS_WARNINGS[quote.status]
 
   return (
     <PageContainer>
@@ -33,17 +59,17 @@ export default async function QuoteEditPage({ params }: Props) {
         back={{ href: `/quotes/${id}`, label: quote.quoteNumber }}
       />
 
-      {quote.status === 'SENT' && (
+      {warning && (
         <div style={{
-          background: 'rgba(59,130,246,0.08)',
-          border: '1px solid rgba(59,130,246,0.2)',
+          background: warning.bg,
+          border: `1px solid ${warning.border}`,
           borderRadius: 8,
           padding: '10px 16px',
           fontSize: 13,
-          color: '#60a5fa',
+          color: warning.color,
           marginBottom: 20,
         }}>
-          Let op: deze offerte heeft status <strong>Verstuurd</strong>. Wijzigingen zijn direct zichtbaar op de publieke offertepagina van de klant.
+          {warning.text}
         </div>
       )}
 
