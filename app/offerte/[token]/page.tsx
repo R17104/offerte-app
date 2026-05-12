@@ -257,14 +257,33 @@ export default async function PublicQuotePage({ params }: Props) {
 
         {/* Already finalized */}
         {quote.status === 'ACCEPTED' && (
-          <div style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: 8, padding: '16px 20px', marginBottom: 32, fontFamily: 'system-ui, sans-serif' }}>
+          <div style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: 8, padding: '20px 24px', marginBottom: 32, fontFamily: 'system-ui, sans-serif' }}>
             <p style={{ fontSize: 14, fontWeight: 600, color: '#15803d' }}>
               ✓ Deze offerte is geaccepteerd op {formatDate(quote.acceptedAt)}
             </p>
             {quote.acceptance && (
-              <p style={{ fontSize: 13, color: '#166534', marginTop: 4 }}>
-                Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}
-              </p>
+              <>
+                <p style={{ fontSize: 13, color: '#166534', marginTop: 4 }}>
+                  Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}
+                  {quote.acceptance.dateOfBirth && (
+                    <span style={{ color: '#4ade80', marginLeft: 8 }}>· geb. {formatDate(quote.acceptance.dateOfBirth)}</span>
+                  )}
+                </p>
+                {quote.acceptance.signatureData && (
+                  <div style={{ marginTop: 16 }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+                      Handtekening
+                    </p>
+                    <div style={{ background: '#fff', border: '1px solid #86efac', borderRadius: 8, padding: '12px 16px', display: 'inline-block' }}>
+                      <img
+                        src={quote.acceptance.signatureData}
+                        alt="Handtekening"
+                        style={{ display: 'block', maxWidth: 320, height: 'auto' }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

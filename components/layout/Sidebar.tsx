@@ -16,6 +16,7 @@ const nav = [
       { href: '/customers', label: 'Klanten', icon: IconUsers },
       { href: '/products', label: 'Producten', icon: IconBox },
       { href: '/quotes', label: 'Offertes', icon: IconDoc },
+      { href: '/getekende-offertes', label: 'Getekende offertes', icon: IconSigned },
     ],
   },
 ]
@@ -179,6 +180,18 @@ function IconDoc({ size = 16, color = 'currentColor' }) {
     <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
       <rect x="2" y="1" width="12" height="14" rx="2" stroke={color} strokeWidth="1.3" />
       <path d="M5 5h6M5 8h6M5 11h4" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconSigned({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <rect x="2" y="1" width="12" height="14" rx="2" stroke={color} strokeWidth="1.3" />
+      <path d="M5 5h6M5 8h3" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M4.5 12c.5-.8 1-1.5 1.8-1.2.8.3.4 1.2 1 1.2s1-.8 1.7-1" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12.5" cy="12.5" r="2.5" fill={color} opacity=".15" stroke={color} strokeWidth="1.2" />
+      <path d="M11.5 12.5l.7.7 1.3-1.2" stroke={color} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
