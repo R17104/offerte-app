@@ -305,7 +305,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )}
 
         {/* Terms & Conditions */}
-        <TermsAndConditions />
+        <TermsAndConditions text={quote.termsText} />
 
         {/* Acceptance form */}
         {canInteract && (

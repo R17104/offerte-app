@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateQuote, type QuoteLineInput, type UpdateQuoteInput } from '@/lib/actions/quote.actions'
 import { formatCurrency, calculateQuoteTotals, formatDateInput } from '@/lib/utils'
+import { DEFAULT_TERMS_TEXT } from '@/components/quotes/TermsAndConditions'
 
 type Product = {
   id: string
@@ -29,6 +30,7 @@ type Props = {
     title: string
     notes: string | null
     includedItems: string | null
+    termsText: string | null
     validUntil: Date | null
     discountAmount: number
     lines: ExistingLine[]
@@ -70,6 +72,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
   const [title, setTitle] = useState(initialData.title)
   const [notes, setNotes] = useState(initialData.notes ?? '')
   const [includedItems, setIncludedItems] = useState(initialData.includedItems ?? '')
+  const [termsText, setTermsText] = useState(initialData.termsText ?? DEFAULT_TERMS_TEXT)
   const [validUntil, setValidUntil] = useState(formatDateInput(initialData.validUntil))
   const [discountAmount, setDiscountAmount] = useState(initialData.discountAmount)
   const [lines, setLines] = useState<Line[]>(
@@ -116,6 +119,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         title,
         notes: notes || undefined,
         includedItems: includedItems || undefined,
+        termsText: termsText || undefined,
         validUntil: validUntil || undefined,
         discountAmount,
         lines: lines.map((l): QuoteLineInput => ({
@@ -197,6 +201,28 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
             />
             <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
               Gebruik - voor opsommingspunten.
+            </span>
+          </div>
+
+          <div style={{ ...s.field, gridColumn: '1 / -1' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label style={s.label}>Algemene voorwaarden &amp; garanties</label>
+              <button
+                type="button"
+                onClick={() => setTermsText(DEFAULT_TERMS_TEXT)}
+                style={{ fontSize: 11, color: 'var(--text-tertiary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                Standaard herstellen
+              </button>
+            </div>
+            <textarea
+              value={termsText}
+              onChange={(e) => setTermsText(e.target.value)}
+              rows={18}
+              style={{ ...s.input, resize: 'vertical', fontFamily: 'var(--font-mono)', fontSize: 12 }}
+            />
+            <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
+              Elke sectie gescheiden door een lege regel. Eerste regel = titel van de sectie, overige regels = inhoud.
             </span>
           </div>
         </div>

@@ -79,6 +79,7 @@ export default async function QuoteEditPage({ params }: Props) {
           title: quote.title,
           notes: quote.notes,
           includedItems: quote.includedItems,
+          termsText: quote.termsText,
           validUntil: quote.validUntil,
           discountAmount: quote.discountAmount,
           lines: quote.lines.map((l) => ({

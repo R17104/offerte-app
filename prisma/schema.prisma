@@ -93,6 +93,8 @@ model Quote {
 
   publicToken String @unique @default(uuid())
 
+  termsText  String?
+
   sentAt     DateTime?
   acceptedAt DateTime?
   rejectedAt DateTime?
