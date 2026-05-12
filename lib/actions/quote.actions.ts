@@ -104,6 +104,58 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
   return { id: quote.id }
 }
 
+export type UpdateQuoteInput = {
+  title: string
+  notes?: string
+  includedItems?: string
+  validUntil?: string
+  discountAmount: number
+  lines: QuoteLineInput[]
+}
+
+export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Promise<void> {
+  const { title, notes, includedItems, validUntil, discountAmount, lines } = input
+
+  if (!title || lines.length === 0) {
+    throw new Error('Titel en minimaal één productregel zijn verplicht')
+  }
+
+  const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, discountAmount)
+
+  await prisma.$transaction([
+    prisma.quoteLine.deleteMany({ where: { quoteId } }),
+    prisma.quote.update({
+      where: { id: quoteId },
+      data: {
+        title,
+        notes: notes || null,
+        includedItems: includedItems || null,
+        validUntil: validUntil ? new Date(validUntil) : null,
+        discountAmount,
+        subtotal,
+        vatTotal,
+        total,
+        lines: {
+          create: lines.map((l, i) => ({
+            sortOrder: i,
+            name: l.name,
+            description: l.description || null,
+            quantity: l.quantity,
+            unitPrice: l.unitPrice,
+            vatRate: l.vatRate,
+            lineTotal: l.quantity * l.unitPrice * (1 + l.vatRate / 100),
+            productId: l.productId || null,
+          })),
+        },
+      },
+    }),
+  ])
+
+  revalidatePath(`/quotes/${quoteId}`)
+  revalidatePath('/quotes')
+  redirect(`/quotes/${quoteId}`)
+}
+
 export async function updateQuoteStatus(quoteId: string, status: string) {
   const allowed = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED']
   if (!allowed.includes(status)) throw new Error('Ongeldige status')
