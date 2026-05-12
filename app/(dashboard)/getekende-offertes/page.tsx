@@ -77,7 +77,6 @@ export default async function GetekendeOffertesPage() {
                         href={`/offerte/${q.publicToken}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
                         style={{
                           fontSize: 13,
                           color: 'var(--accent)',
