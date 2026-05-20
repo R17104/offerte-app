@@ -3,8 +3,11 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { verifySession } from '@/lib/dal'
 
 export async function createProduct(formData: FormData) {
+  const { userId } = await verifySession()
+
   const name        = formData.get('name') as string
   const description = formData.get('description') as string | null
   const unitPrice   = parseFloat(formData.get('unitPrice') as string)
@@ -25,6 +28,7 @@ export async function createProduct(formData: FormData) {
       defaultQty,
       notes: notes || null,
       active: true,
+      userId,
     },
   })
 
@@ -33,6 +37,8 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
+  const { userId } = await verifySession()
+
   const name        = formData.get('name') as string
   const description = formData.get('description') as string | null
   const unitPrice   = parseFloat(formData.get('unitPrice') as string)
@@ -46,7 +52,7 @@ export async function updateProduct(id: string, formData: FormData) {
   }
 
   await prisma.product.update({
-    where: { id },
+    where: { id, userId },
     data: {
       name,
       description: description || null,

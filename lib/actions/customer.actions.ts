@@ -3,10 +3,13 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { verifySession } from '@/lib/dal'
 
 // ── Create ────────────────────────────────────────────────────────────────────
 
 export async function createCustomer(formData: FormData) {
+  const { userId } = await verifySession()
+
   const firstName   = formData.get('firstName') as string
   const lastName    = formData.get('lastName') as string
   const dateOfBirth = formData.get('dateOfBirth') as string
@@ -30,6 +33,7 @@ export async function createCustomer(formData: FormData) {
       email: email || null,
       phone: phone || null,
       iban: iban || null,
+      userId,
       addresses:
         street && city
           ? {
@@ -53,6 +57,8 @@ export async function createCustomer(formData: FormData) {
 // ── Update ────────────────────────────────────────────────────────────────────
 
 export async function updateCustomer(id: string, formData: FormData) {
+  const { userId } = await verifySession()
+
   const firstName   = formData.get('firstName') as string
   const lastName    = formData.get('lastName') as string
   const email       = formData.get('email') as string | null
@@ -69,7 +75,7 @@ export async function updateCustomer(id: string, formData: FormData) {
   }
 
   await prisma.customer.update({
-    where: { id },
+    where: { id, userId },
     data: {
       firstName,
       lastName,
@@ -115,8 +121,9 @@ export async function updateCustomer(id: string, formData: FormData) {
 // ── Archive / unarchive ───────────────────────────────────────────────────────
 
 export async function archiveCustomer(id: string) {
+  const { userId } = await verifySession()
   await prisma.customer.update({
-    where: { id },
+    where: { id, userId },
     data: { archivedAt: new Date() },
   })
   revalidatePath('/customers')
@@ -124,8 +131,9 @@ export async function archiveCustomer(id: string) {
 }
 
 export async function unarchiveCustomer(id: string) {
+  const { userId } = await verifySession()
   await prisma.customer.update({
-    where: { id },
+    where: { id, userId },
     data: { archivedAt: null },
   })
   revalidatePath('/customers')
@@ -135,21 +143,26 @@ export async function unarchiveCustomer(id: string) {
 // ── Delete ────────────────────────────────────────────────────────────────────
 
 export async function deleteCustomer(id: string) {
-  // Collect all quote IDs for this customer
+  const { userId } = await verifySession()
+
+  const customer = await prisma.customer.findUnique({
+    where: { id, userId },
+    select: { id: true },
+  })
+  if (!customer) throw new Error('Klant niet gevonden')
+
   const quotes = await prisma.quote.findMany({
     where: { customerId: id },
     select: { id: true },
   })
   const quoteIds = quotes.map((q) => q.id)
 
-  // Delete in correct order (foreign key constraints)
   if (quoteIds.length > 0) {
     await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: quoteIds } } })
     await prisma.quoteLine.deleteMany({ where: { quoteId: { in: quoteIds } } })
     await prisma.quote.deleteMany({ where: { id: { in: quoteIds } } })
   }
 
-  // Addresses cascade automatically via onDelete: Cascade
   await prisma.customer.delete({ where: { id } })
 
   revalidatePath('/customers')

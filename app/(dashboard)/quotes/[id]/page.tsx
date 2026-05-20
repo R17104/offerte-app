@@ -10,6 +10,7 @@ import {
 } from '@/components/ui'
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
+import { verifySession } from '@/lib/dal'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -22,10 +23,11 @@ const TRANSITIONS: Record<string, { status: string; label: string; danger?: bool
 }
 
 export default async function QuoteDetailPage({ params }: Props) {
+  const { userId } = await verifySession()
   const { id } = await params
 
   const quote = await prisma.quote.findUnique({
-    where: { id },
+    where: { id, createdById: userId },
     include: {
       customer: { include: { addresses: { where: { type: 'CORRESPONDENCE' }, take: 1 } } },
       lines: { orderBy: { sortOrder: 'asc' } },
@@ -40,7 +42,6 @@ export default async function QuoteDetailPage({ params }: Props) {
   const publicUrl = `/offerte/${quote.publicToken}`
   const isArchived = !!quote.archivedAt
   const isAccepted = quote.status === 'ACCEPTED'
-  const canEdit = true
 
   return (
     <PageContainer>
@@ -76,11 +77,9 @@ export default async function QuoteDetailPage({ params }: Props) {
         back={{ href: isArchived ? '/quotes?archived=1' : '/quotes', label: 'Offertes' }}
         action={
           <div style={{ display: 'flex', gap: 10 }}>
-            {canEdit && (
-              <SecondaryButton href={`/quotes/${id}/edit`} style={{ fontSize: 12.5, padding: '6px 12px' }}>
-                Bewerken
-              </SecondaryButton>
-            )}
+            <SecondaryButton href={`/quotes/${id}/edit`} style={{ fontSize: 12.5, padding: '6px 12px' }}>
+              Bewerken
+            </SecondaryButton>
             <SecondaryButton href={publicUrl} style={{ fontSize: 12.5, padding: '6px 12px' }}>
               Publieke link ↗
             </SecondaryButton>

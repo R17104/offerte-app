@@ -9,23 +9,27 @@ import {
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import { archiveCustomer, unarchiveCustomer } from '@/lib/actions/customer.actions'
 import { formatDate } from '@/lib/utils'
+import { verifySession } from '@/lib/dal'
 
 type Props = { searchParams: Promise<{ archived?: string }> }
 
 export default async function CustomersPage({ searchParams }: Props) {
+  const { userId } = await verifySession()
   const { archived } = await searchParams
   const showArchived = archived === '1'
 
   const [customers, archivedCount] = await Promise.all([
     prisma.customer.findMany({
-      where: showArchived ? { archivedAt: { not: null } } : { archivedAt: null },
+      where: showArchived
+        ? { userId, archivedAt: { not: null } }
+        : { userId, archivedAt: null },
       orderBy: { createdAt: 'desc' },
       include: {
         addresses: { where: { type: 'CORRESPONDENCE' }, take: 1 },
         _count: { select: { quotes: true } },
       },
     }),
-    prisma.customer.count({ where: { archivedAt: { not: null } } }),
+    prisma.customer.count({ where: { userId, archivedAt: { not: null } } }),
   ])
 
   return (

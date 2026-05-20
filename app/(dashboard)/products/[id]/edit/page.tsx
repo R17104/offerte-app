@@ -7,12 +7,15 @@ import {
   PageContainer, PageHeader, Card, FormGroup, Input, Textarea, Select,
   PrimaryButton, SecondaryButton,
 } from '@/components/ui'
+import { verifySession } from '@/lib/dal'
 
 type Props = { params: Promise<{ id: string }> }
 
 export default async function EditProductPage({ params }: Props) {
+  const { userId } = await verifySession()
   const { id } = await params
-  const product = await prisma.product.findUnique({ where: { id } })
+
+  const product = await prisma.product.findUnique({ where: { id, userId } })
   if (!product) notFound()
 
   const action = updateProduct.bind(null, product.id)

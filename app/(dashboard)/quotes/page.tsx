@@ -9,23 +9,27 @@ import {
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import { archiveQuote, unarchiveQuote } from '@/lib/actions/quote.actions'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
+import { verifySession } from '@/lib/dal'
 
 type Props = { searchParams: Promise<{ archived?: string }> }
 
 export default async function QuotesPage({ searchParams }: Props) {
+  const { userId } = await verifySession()
   const { archived } = await searchParams
   const showArchived = archived === '1'
 
   const [quotes, archivedCount] = await Promise.all([
     prisma.quote.findMany({
-      where: showArchived ? { archivedAt: { not: null } } : { archivedAt: null },
+      where: showArchived
+        ? { createdById: userId, archivedAt: { not: null } }
+        : { createdById: userId, archivedAt: null },
       orderBy: { createdAt: 'desc' },
       include: {
         customer: true,
         _count: { select: { lines: true } },
       },
     }),
-    prisma.quote.count({ where: { archivedAt: { not: null } } }),
+    prisma.quote.count({ where: { createdById: userId, archivedAt: { not: null } } }),
   ])
 
   return (

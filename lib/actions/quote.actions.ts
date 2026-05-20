@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { calculateQuoteTotals } from '@/lib/utils'
+import { verifySession } from '@/lib/dal'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -14,16 +15,6 @@ async function generateQuoteNumber(): Promise<string> {
   })
   const seq = String(count + 1).padStart(4, '0')
   return `OFT-${year}-${seq}`
-}
-
-async function getOrCreateSystemUser(): Promise<string> {
-  const email = 'system@placeholder.local'
-  const user = await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: { email, name: 'System' },
-  })
-  return user.id
 }
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -60,6 +51,7 @@ export type AcceptQuoteInput = {
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 export async function createQuote(input: CreateQuoteInput): Promise<{ id: string }> {
+  const { userId } = await verifySession()
   const { customerId, title, notes, includedItems, validUntil, discountAmount, lines } = input
 
   if (!title || lines.length === 0) {
@@ -67,10 +59,7 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
   }
 
   const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, discountAmount)
-  const [quoteNumber, createdById] = await Promise.all([
-    generateQuoteNumber(),
-    getOrCreateSystemUser(),
-  ])
+  const quoteNumber = await generateQuoteNumber()
 
   const quote = await prisma.quote.create({
     data: {
@@ -85,7 +74,7 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
       total,
       status: 'DRAFT',
       customerId,
-      createdById,
+      createdById: userId,
       lines: {
         create: lines.map((l, i) => ({
           sortOrder: i,
@@ -115,11 +104,18 @@ export type UpdateQuoteInput = {
 }
 
 export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Promise<void> {
+  const { userId } = await verifySession()
   const { title, notes, includedItems, termsText, validUntil, discountAmount, lines } = input
 
   if (!title || lines.length === 0) {
     throw new Error('Titel en minimaal één productregel zijn verplicht')
   }
+
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId, createdById: userId },
+    select: { id: true },
+  })
+  if (!quote) throw new Error('Offerte niet gevonden')
 
   const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, discountAmount)
 
@@ -159,8 +155,16 @@ export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Pro
 }
 
 export async function updateQuoteStatus(quoteId: string, status: string) {
+  const { userId } = await verifySession()
+
   const allowed = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED']
   if (!allowed.includes(status)) throw new Error('Ongeldige status')
+
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId, createdById: userId },
+    select: { id: true },
+  })
+  if (!quote) throw new Error('Offerte niet gevonden')
 
   const data: Record<string, unknown> = { status }
   if (status === 'SENT')     data.sentAt     = new Date()
@@ -216,8 +220,9 @@ export async function acceptQuoteByToken(token: string, input: AcceptQuoteInput)
 // ── Archive / unarchive ───────────────────────────────────────────────────────
 
 export async function archiveQuote(id: string) {
+  const { userId } = await verifySession()
   await prisma.quote.update({
-    where: { id },
+    where: { id, createdById: userId },
     data: { archivedAt: new Date() },
   })
   revalidatePath('/quotes')
@@ -225,8 +230,9 @@ export async function archiveQuote(id: string) {
 }
 
 export async function unarchiveQuote(id: string) {
+  const { userId } = await verifySession()
   await prisma.quote.update({
-    where: { id },
+    where: { id, createdById: userId },
     data: { archivedAt: null },
   })
   revalidatePath('/quotes')
@@ -236,8 +242,14 @@ export async function unarchiveQuote(id: string) {
 // ── Delete ────────────────────────────────────────────────────────────────────
 
 export async function deleteQuote(id: string) {
-  // QuoteLines and QuoteAcceptance cascade on delete (onDelete: Cascade / Restrict)
-  // QuoteAcceptance has RESTRICT — delete it first if present
+  const { userId } = await verifySession()
+
+  const quote = await prisma.quote.findUnique({
+    where: { id, createdById: userId },
+    select: { id: true },
+  })
+  if (!quote) throw new Error('Offerte niet gevonden')
+
   await prisma.quoteAcceptance.deleteMany({ where: { quoteId: id } })
   await prisma.quoteLine.deleteMany({ where: { quoteId: id } })
   await prisma.quote.delete({ where: { id } })

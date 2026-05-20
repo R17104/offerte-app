@@ -8,14 +8,16 @@ import {
   PrimaryButton, SecondaryButton,
 } from '@/components/ui'
 import { formatDateInput } from '@/lib/utils'
+import { verifySession } from '@/lib/dal'
 
 type Props = { params: Promise<{ id: string }> }
 
 export default async function EditCustomerPage({ params }: Props) {
+  const { userId } = await verifySession()
   const { id } = await params
 
   const customer = await prisma.customer.findUnique({
-    where: { id },
+    where: { id, userId },
     include: { addresses: true },
   })
 

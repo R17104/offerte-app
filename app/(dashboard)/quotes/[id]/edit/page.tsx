@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { PageContainer, PageHeader } from '@/components/ui'
 import QuoteEditForm from '@/components/quotes/QuoteEditForm'
+import { verifySession } from '@/lib/dal'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -35,15 +36,16 @@ const STATUS_WARNINGS: Record<string, { text: string; color: string; bg: string;
 }
 
 export default async function QuoteEditPage({ params }: Props) {
+  const { userId } = await verifySession()
   const { id } = await params
 
   const [quote, products] = await Promise.all([
     prisma.quote.findUnique({
-      where: { id },
+      where: { id, createdById: userId },
       include: { lines: { orderBy: { sortOrder: 'asc' } } },
     }),
     prisma.product.findMany({
-      where: { active: true },
+      where: { userId, active: true },
       orderBy: { name: 'asc' },
     }),
   ])

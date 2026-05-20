@@ -6,9 +6,13 @@ import {
   Card, Table, Thead, Tbody, Tr, Th, Td, EmptyState, Badge,
 } from '@/components/ui'
 import { formatCurrency } from '@/lib/utils'
+import { verifySession } from '@/lib/dal'
 
 export default async function ProductsPage() {
+  const { userId } = await verifySession()
+
   const products = await prisma.product.findMany({
+    where: { userId },
     orderBy: { name: 'asc' },
     include: { _count: { select: { quoteLines: true } } },
   })
