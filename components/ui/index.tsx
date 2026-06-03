@@ -5,7 +5,7 @@ import { CSSProperties, ReactNode } from 'react'
 
 export function PageContainer({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
-    <div style={{ maxWidth: 1060, margin: '0 auto', padding: '32px 28px', ...style }}>
+    <div className="page-container" style={{ maxWidth: 1060, margin: '0 auto', ...style }}>
       {children}
     </div>
   )

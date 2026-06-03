@@ -13,7 +13,7 @@ export default function NewCustomerPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Card>
             <p style={{ fontWeight: 600, marginBottom: 16, fontSize: 13.5 }}>Persoonsgegevens</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="r-grid-2" style={{ display: 'grid', gap: 14 }}>
               <FormGroup label="Voornaam" required>
                 <Input name="firstName" placeholder="Jan" required />
               </FormGroup>
@@ -37,7 +37,7 @@ export default function NewCustomerPage() {
 
           <Card>
             <p style={{ fontWeight: 600, marginBottom: 16, fontSize: 13.5 }}>Correspondentieadres</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="r-grid-2" style={{ display: 'grid', gap: 14 }}>
               <FormGroup label="Straatnaam" style={{ gridColumn: '1 / -1' } as React.CSSProperties}>
                 <Input name="street" placeholder="Hoofdstraat" />
               </FormGroup>

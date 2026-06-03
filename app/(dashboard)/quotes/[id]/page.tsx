@@ -87,7 +87,7 @@ export default async function QuoteDetailPage({ params }: Props) {
         }
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 16, alignItems: 'start' }}>
+      <div className="r-grid-detail" style={{ display: 'grid', gap: 16 }}>
         {/* Main */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Lines */}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 const nav = [
   {
@@ -23,15 +24,39 @@ const nav = [
 
 export default function Sidebar() {
   const path = usePathname()
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => { setOpen(false) }, [path])
 
   return (
+    <>
+      {/* Hamburger toggle (mobile only) */}
+      <button className="hamburger-btn" onClick={() => setOpen((v) => !v)} aria-label="Menu">
+        {open ? (
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        ) : (
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+            <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        )}
+      </button>
+
+      {/* Overlay (mobile only) */}
+      <div
+        className={`sidebar-overlay${open ? ' overlay-open' : ''}`}
+        onClick={() => setOpen(false)}
+      />
+
     <aside
+      className={`sidebar${open ? ' sidebar-open' : ''}`}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         bottom: 0,
-        width: 'var(--sidebar-w)',
+        width: 220,
         background: 'var(--bg-surface)',
         borderRight: '1px solid var(--border)',
         display: 'flex',
@@ -141,6 +166,7 @@ export default function Sidebar() {
         v0.1.0 — beta
       </div>
     </aside>
+    </>
   )
 }
 

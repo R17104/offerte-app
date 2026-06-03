@@ -7,6 +7,7 @@ export default async function Topbar() {
 
   return (
     <header
+      className="topbar"
       style={{
         position: 'fixed',
         top: 0,
@@ -17,7 +18,6 @@ export default async function Topbar() {
         borderBottom: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 28px',
         zIndex: 40,
         gap: 12,
       }}

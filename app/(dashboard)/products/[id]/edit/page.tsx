@@ -46,7 +46,7 @@ export default async function EditProductPage({ params }: Props) {
 
           <Card>
             <p style={{ fontWeight: 600, marginBottom: 16, fontSize: 13.5 }}>Prijsinformatie</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+            <div className="r-grid-3" style={{ display: 'grid', gap: 14 }}>
               <FormGroup label="Eenheidsprijs (excl. BTW)" required>
                 <Input
                   name="unitPrice"
