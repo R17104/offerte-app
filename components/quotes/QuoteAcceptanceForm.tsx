@@ -86,21 +86,23 @@ export default function QuoteAcceptanceForm({ token, customerName }: Props) {
   if (!selectedType) {
     return (
       <div className="no-print">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {OPTIONS.map((opt) => (
             <button
               key={opt.type}
               onClick={() => setSelectedType(opt.type)}
               style={{
+                flex: 1,
+                minWidth: 160,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'flex-start',
-                padding: '16px 20px',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                padding: '18px 16px',
                 borderRadius: 10,
                 cursor: 'pointer',
-                textAlign: 'left',
+                textAlign: 'center',
                 fontFamily: 'var(--font-sans)',
-                width: '100%',
                 transition: 'opacity 0.15s',
                 ...(opt.style === 'primary' ? {
                   background: '#0a5c35',
@@ -117,8 +119,8 @@ export default function QuoteAcceptanceForm({ token, customerName }: Props) {
                 }),
               }}
             >
-              <span style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{opt.label}</span>
-              <span style={{ fontSize: 13, opacity: 0.7, lineHeight: 1.4 }}>{opt.description}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, marginBottom: 6, lineHeight: 1.3 }}>{opt.label}</span>
+              <span style={{ fontSize: 11.5, opacity: 0.65, lineHeight: 1.45 }}>{opt.description}</span>
             </button>
           ))}
         </div>
