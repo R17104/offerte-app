@@ -46,6 +46,7 @@ export type EnergyProfile = {
   gasTariff: number
   feedInCostTariff: number
   emsAnnualRevenueEur: number
+  currentMonthlyBill: number
   numPersons?: number | null
   houseType?: HouseType | null
   buildYear?: number | null

@@ -20,6 +20,7 @@ export type EnergyState = {
   gasTariff: string
   feedInCostTariff: string
   emsAnnualRevenueEur: string
+  currentMonthlyBill: string
   numPersons: string
   houseType: string
   buildYear: string
@@ -43,6 +44,7 @@ export const DEFAULT_ENERGY_STATE: EnergyState = {
   gasTariff: '1.10',
   feedInCostTariff: '0.02',
   emsAnnualRevenueEur: '0',
+  currentMonthlyBill: '0',
   numPersons: '',
   houseType: '',
   buildYear: '',
@@ -361,6 +363,14 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                 onChange={(e) => onChange({ emsAnnualRevenueEur: e.target.value })}
                 style={s.input} />
               <p style={s.hint}>Alpha ESS EMS handelt automatisch — schat in op basis van batterijgrootte</p>
+            </div>
+            <div>
+              <label style={s.label}>Huidig termijnbedrag klant (€/maand)</label>
+              <input type="number" min="0" step="10"
+                value={state.currentMonthlyBill}
+                onChange={(e) => onChange({ currentMonthlyBill: e.target.value })}
+                style={s.input} />
+              <p style={s.hint}>Huidig maandbedrag bij energieleverancier — gebruikt voor de salderingspagina</p>
             </div>
           </div>
         </div>

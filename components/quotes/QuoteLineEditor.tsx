@@ -121,6 +121,7 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
         gasTariff: parseFloat(energy.gasTariff) || 1.10,
         feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0.02,
         emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
+        currentMonthlyBill: parseFloat(energy.currentMonthlyBill) || 0,
         numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
         houseType: energy.houseType ? energy.houseType as EnergyProfile['houseType'] : null,
         buildYear: energy.buildYear ? parseInt(energy.buildYear) : null,

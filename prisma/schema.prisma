@@ -180,6 +180,9 @@ model Quote {
   // EMS / onbalansmarkt
   emsAnnualRevenueEur Float @default(0)   // Verwachte jaarlijkse EMS/onbalans opbrengst (€)
 
+  // Huidig termijnbedrag klant
+  currentMonthlyBill Float @default(0)    // Huidig maandelijks termijnbedrag energieleverancier (€)
+
   // Schatting-inputs (alternatief voor handmatige invoer)
   numPersons   Int?
   houseType    HouseType?

@@ -107,7 +107,14 @@ export default async function PublicQuotePage({ params }: Props) {
     minHeight: 1040,
   }
 
+  const showSalderingPage = quote.hasSolarPanels && feedbackKwh > 0 && solarKwh > 0
+  const currentMonthlyBill = quote.currentMonthlyBill ?? 0
+  const monthlyBill2027 = currentMonthlyBill > 0
+    ? Math.round(currentMonthlyBill + saldingMonthlyExtra)
+    : 0
+
   const pageCount = 1
+    + (showSalderingPage ? 1 : 0)
     + (showBespaarplan ? 2 : 0)
     + 1 // installatie
     + 1 // investering
@@ -277,7 +284,160 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 2 — SITUATIE-ANALYSE
+            PAGINA 2 — SALDERINGSREGELING
+        ══════════════════════════════════════════════════════════════════ */}
+        {showSalderingPage && (() => { const p = nextPage(); return (
+        <div className="doc-page" style={PAGE}>
+
+          {/* Dark header */}
+          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Energiebeleid Nederland
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', marginBottom: 6 }}>
+              Het einde van de salderingsregeling
+            </h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
+              Wat verandert er in 2027 — en wat betekent dat concreet voor uw energierekening?
+            </p>
+          </div>
+
+          {/* Context tekst */}
+          <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Achtergrond</p>
+                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 14 }}>
+                  Nederland was jarenlang een van de <strong>weinige landen ter wereld</strong> met een volledige salderingsregeling voor zonnepanelen. Iedere kWh die u terugleverde aan het net, mocht u direct verrekenen met uw verbruik — alsof u de stroom zelf had opgeslagen.
+                </p>
+                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85 }}>
+                  Dat was uniek. De meeste Europese landen hanteren al jaren een veel lager teruglevertarief. Per <strong>1 januari 2027</strong> volgt Nederland dat voorbeeld. De salderingsregeling stopt, en teruggeleverde stroom wordt voortaan uitbetaald tegen het lage teruglevertarief van circa €{quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh — in plaats van verrekend tegen uw stroomtarief van €{quote.electricityTariff.toFixed(2).replace('.', ',')}/kWh.
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Tijdlijn</p>
+                {[
+                  { year: 'Tot 2023', text: 'Volledige saldering — 100% verrekening', done: true },
+                  { year: '2023–2027', text: 'Afbouw saldering via staffel', done: true },
+                  { year: '1 jan 2027', text: 'Saldering vervalt volledig', done: false, highlight: true },
+                  { year: 'Na 2027', text: `Teruglevering uitbetaald à €${quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh`, done: false },
+                ].map((item) => (
+                  <div key={item.year} style={{ display: 'flex', gap: 16, marginBottom: 14, alignItems: 'flex-start' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.highlight ? '#2563eb' : item.done ? '#9ca3af' : '#e5e7eb', border: item.highlight ? 'none' : '2px solid #d1d5db', marginTop: 5, flexShrink: 0 }} />
+                    <div>
+                      <p style={{ fontSize: 12, fontWeight: 700, color: item.highlight ? '#2563eb' : '#6b7280' }}>{item.year}</p>
+                      <p style={{ fontSize: 13.5, color: item.highlight ? '#111827' : '#374151', fontWeight: item.highlight ? 600 : 400 }}>{item.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Wat betekent dit voor jou */}
+          <div style={{ padding: '44px 52px', flex: 1 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 28 }}>Wat betekent dit voor u?</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
+
+              {/* Cirkeldiagram */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 20, alignSelf: 'flex-start' }}>Uw jaarlijkse stroomsituatie</p>
+                {(() => {
+                  const r = 88
+                  const cx = 110
+                  const cy = 110
+                  const circ = 2 * Math.PI * r
+                  const feedPct = solarKwh > 0 ? feedbackKwh / solarKwh : 0
+                  const selfPct = solarKwh > 0 ? (solarKwh - feedbackKwh) / solarKwh : 0
+                  const feedDash = feedPct * circ
+                  const selfDash = selfPct * circ
+                  const selfOffset = -circ * 0.25
+                  const feedOffset = selfOffset - selfDash
+                  return (
+                    <svg width={220} height={220} viewBox="0 0 220 220">
+                      {/* Achtergrond ring */}
+                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={22} />
+                      {/* Zelf gebruik — blauw */}
+                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2563eb" strokeWidth={22}
+                        strokeDasharray={`${selfDash} ${circ - selfDash}`}
+                        strokeDashoffset={selfOffset}
+                        strokeLinecap="butt" />
+                      {/* Teruglevering — grijs */}
+                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#cbd5e1" strokeWidth={22}
+                        strokeDasharray={`${feedDash} ${circ - feedDash}`}
+                        strokeDashoffset={feedOffset}
+                        strokeLinecap="butt" />
+                      {/* Midden tekst */}
+                      <text x={cx} y={cy - 10} textAnchor="middle" fontSize={13} fill="#6b7280">Totale opwek</text>
+                      <text x={cx} y={cy + 10} textAnchor="middle" fontSize={18} fontWeight="bold" fill="#111827">{solarKwh.toLocaleString('nl-NL')}</text>
+                      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={12} fill="#9ca3af">kWh / jaar</text>
+                    </svg>
+                  )
+                })()}
+                <div style={{ display: 'flex', gap: 20, marginTop: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: 3, background: '#2563eb' }} />
+                    <span style={{ fontSize: 12, color: '#374151' }}>Eigen gebruik ({Math.round((solarKwh - feedbackKwh) / solarKwh * 100)}%)</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: 3, background: '#cbd5e1' }} />
+                    <span style={{ fontSize: 12, color: '#374151' }}>Teruglevering ({Math.round(feedbackKwh / solarKwh * 100)}%)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rekensom */}
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 20 }}>Gevolg voor uw termijnbedrag</p>
+                <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+                  <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5e7eb' }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Berekening</p>
+                    {[
+                      { label: 'Teruglevering per jaar', value: `${feedbackKwh.toLocaleString('nl-NL')} kWh` },
+                      { label: 'Huidig salderingsvoordeel', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.electricityTariff.toFixed(2).replace('.', ',')}` },
+                      { label: 'Uitbetaling na 2027', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedbackTariff.toFixed(2).replace('.', ',')}` },
+                      { label: 'Verschil per jaar', value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}` },
+                      { label: 'Verschil per maand', value: `€${saldingMonthlyExtra}` },
+                    ].map((row, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid #f1f5f9', fontSize: 13, color: '#374151' }}>
+                        <span>{row.label}</span>
+                        <span style={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {currentMonthlyBill > 0 ? (
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <div style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '16px' }}>
+                      <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6 }}>Huidig termijnbedrag</p>
+                      <p style={{ fontSize: 26, fontWeight: 800, color: '#374151' }}>€{currentMonthlyBill}</p>
+                      <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>per maand</p>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', fontSize: 22, color: '#9ca3af' }}>→</div>
+                    <div style={{ flex: 1, background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '16px' }}>
+                      <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6 }}>Na 2027 (zonder actie)</p>
+                      <p style={{ fontSize: 26, fontWeight: 800, color: '#b91c1c' }}>€{monthlyBill2027}</p>
+                      <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>per maand</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ background: '#fef9c3', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 16px' }}>
+                    <p style={{ fontSize: 13, color: '#92400e' }}>
+                      Uw maandelijkse termijnstijging bedraagt <strong>€{saldingMonthlyExtra} per maand</strong> na 2027.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 3 — SITUATIE-ANALYSE
         ══════════════════════════════════════════════════════════════════ */}
         {showBespaarplan && (() => { const p = nextPage(); return (
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>

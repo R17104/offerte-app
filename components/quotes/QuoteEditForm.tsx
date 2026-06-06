@@ -52,6 +52,7 @@ type Props = {
     gasTariff: number
     feedInCostTariff: number
     emsAnnualRevenueEur: number
+    currentMonthlyBill: number
     numPersons: number | null
     houseType: string | null
     buildYear: number | null
@@ -119,6 +120,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
     gasTariff: String(initialData.gasTariff),
     feedInCostTariff: String(initialData.feedInCostTariff),
     emsAnnualRevenueEur: String(initialData.emsAnnualRevenueEur),
+    currentMonthlyBill: String(initialData.currentMonthlyBill),
     numPersons: initialData.numPersons != null ? String(initialData.numPersons) : '',
     houseType: initialData.houseType ?? '',
     buildYear: initialData.buildYear != null ? String(initialData.buildYear) : '',
@@ -178,6 +180,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         gasTariff: parseFloat(energy.gasTariff) || 1.10,
         feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0.02,
         emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
+        currentMonthlyBill: parseFloat(energy.currentMonthlyBill) || 0,
         numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
         houseType: energy.houseType ? energy.houseType as EnergyProfile['houseType'] : null,
         buildYear: energy.buildYear ? parseInt(energy.buildYear) : null,
