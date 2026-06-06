@@ -80,6 +80,7 @@ export default async function QuoteEditPage({ params }: Props) {
         initialData={{
           title: quote.title,
           notes: quote.notes,
+          introText: quote.introText,
           includedItems: quote.includedItems,
           termsText: quote.termsText,
           validUntil: quote.validUntil,

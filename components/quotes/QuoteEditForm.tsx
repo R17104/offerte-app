@@ -30,6 +30,7 @@ type Props = {
   initialData: {
     title: string
     notes: string | null
+    introText: string | null
     includedItems: string | null
     termsText: string | null
     validUntil: Date | null
@@ -92,6 +93,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
   const router = useRouter()
   const [title, setTitle] = useState(initialData.title)
   const [notes, setNotes] = useState(initialData.notes ?? '')
+  const [introText, setIntroText] = useState(initialData.introText ?? '')
   const [includedItems, setIncludedItems] = useState(initialData.includedItems ?? '')
   const [termsText, setTermsText] = useState(initialData.termsText ?? DEFAULT_TERMS_TEXT)
   const [validUntil, setValidUntil] = useState(formatDateInput(initialData.validUntil))
@@ -184,6 +186,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
       const input: UpdateQuoteInput = {
         title,
         notes: notes || undefined,
+        introText: introText || undefined,
         includedItems: includedItems || undefined,
         termsText: termsText || undefined,
         validUntil: validUntil || undefined,
@@ -248,6 +251,19 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
               placeholder="0.00"
               style={s.input}
             />
+          </div>
+          <div style={{ ...s.field, gridColumn: '1 / -1' }}>
+            <label style={s.label}>Begeleidende brief tekst</label>
+            <textarea
+              value={introText}
+              onChange={(e) => setIntroText(e.target.value)}
+              rows={7}
+              placeholder="Hartelijk dank voor uw aanvraag bij Bespaarhulp Friesland. Bij deze ontvangt u uw persoonlijk maatwerkaanbod voor onze thuisbatterij op het adres..."
+              style={{ ...s.input, resize: 'vertical' }}
+            />
+            <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
+              Tekst voor de begeleidende brief bovenin de offerte. Gebruik lege regels voor nieuwe alinea's. Laat leeg voor een standaard tekst.
+            </span>
           </div>
           <div style={{ ...s.field, gridColumn: '1 / -1' }}>
             <label style={s.label}>Notities (intern)</label>

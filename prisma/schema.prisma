@@ -137,6 +137,7 @@ model Quote {
   status      QuoteStatus @default(DRAFT)
   title       String
   notes       String?
+  introText   String?
   includedItems String?
   validUntil    DateTime?
 

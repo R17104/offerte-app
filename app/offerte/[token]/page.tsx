@@ -9,24 +9,19 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 
 type Props = { params: Promise<{ token: string }> }
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  BATTERY: '🔋', SOLAR: '☀️', HEAT_PUMP: '♨️', CHARGER: '⚡', EMERGENCY_POWER: '🔌',
-}
-
 const font = '"DM Sans", system-ui, sans-serif'
 const green = '#0a5c35'
 const gold = '#f5c442'
 
-// ── Congestion data for chart ──────────────────────────────────────────────
 const CONGESTION = [
-  { year: '2020', pct: 8,  label: '8%' },
-  { year: '2021', pct: 20, label: '20%' },
-  { year: '2022', pct: 35, label: '35%' },
-  { year: '2023', pct: 51, label: '51%' },
-  { year: '2024', pct: 64, label: '64%' },
-  { year: '2025', pct: 74, label: '74%' },
-  { year: '2026', pct: 82, label: '82%' },
-  { year: '2027', pct: 89, label: '89%' },
+  { year: '2020', pct: 8 },
+  { year: '2021', pct: 20 },
+  { year: '2022', pct: 35 },
+  { year: '2023', pct: 51 },
+  { year: '2024', pct: 64 },
+  { year: '2025', pct: 74 },
+  { year: '2026', pct: 82 },
+  { year: '2027', pct: 89 },
 ]
 
 export default async function PublicQuotePage({ params }: Props) {
@@ -49,6 +44,7 @@ export default async function PublicQuotePage({ params }: Props) {
         },
       },
       acceptance: true,
+      createdBy: { select: { name: true } },
     },
   })
 
@@ -57,6 +53,8 @@ export default async function PublicQuotePage({ params }: Props) {
   const canInteract = ['DRAFT', 'SENT'].includes(quote.status)
   const addr = quote.customer.addresses[0]
   const customerName = `${quote.customer.firstName} ${quote.customer.lastName}`
+  const addrLine = addr ? `${addr.street} ${addr.houseNumber}, ${addr.postalCode} ${addr.city}` : ''
+  const signatoryName = quote.createdBy?.name ?? 'Bespaarhulp Friesland'
 
   // ── Energie data ──────────────────────────────────────────────────────────
   const feedbackKwh   = quote.electricityFeedbackKwh ?? 0
@@ -64,17 +62,11 @@ export default async function PublicQuotePage({ params }: Props) {
   const solarKwh      = quote.solarProductionKwh ?? 0
   const directUseKwh  = Math.max(0, solarKwh - feedbackKwh)
 
-  // Sectie 1: Saldering — wat kost het als je niets doet
-  // Na 2027: feedbackKwh terug naar net levert bijna niets op, maar je koopt het
-  // wel in. Rekening stijgt met feedbackKwh × tarief.
   const saldingYearlyExtra  = Math.round(feedbackKwh * quote.electricityTariff)
   const saldingMonthlyExtra = Math.round(saldingYearlyExtra / 12)
   const feedbackIncomeLow   = Math.round(feedbackKwh * quote.feedbackTariff)
-
-  // Sectie 2: Terugleverkosten — nu al kosten die je vermijdt met batterij
   const feedInYearlyCost    = Math.round(feedbackKwh * quote.feedInCostTariff)
 
-  // Sectie 3: EMS — batterijcapaciteit en onbalansmarkt opbrengst
   const totalBatteryKwh = quote.lines
     .filter(l => l.product?.category === 'BATTERY')
     .reduce((sum, l) => sum + (l.product?.capacityKwh ?? 0) * l.quantity, 0)
@@ -83,32 +75,71 @@ export default async function PublicQuotePage({ params }: Props) {
     ? Math.round(quote.emsAnnualRevenueEur)
     : 0
 
-  // Sectie 4: Woningwaarde — schatting op basis van woningtype
-  const homeValueMap: Record<string, number> = {
-    APARTMENT: 280_000, TERRACED: 360_000, CORNER: 420_000, DETACHED: 620_000,
-  }
-  const estimatedHomeValue = quote.houseType ? (homeValueMap[quote.houseType] ?? 400_000) : 400_000
-  const homeLow  = Math.round(estimatedHomeValue * 0.03)
-  const homeHigh = Math.round(estimatedHomeValue * 0.08)
-
-  // Totaal jaarlijks voordeel
-  const totalYearlyBenefit = saldingYearlyExtra + feedInYearlyCost + emsRevenue
+  const totalYearlyBenefit  = saldingYearlyExtra + feedInYearlyCost + emsRevenue
   const totalMonthlyBenefit = Math.round(totalYearlyBenefit / 12)
 
   const showBespaarplan = quote.hasSolarPanels || emsRevenue > 0 || feedbackKwh > 0 || totalBatteryKwh > 0
 
-  return (
-    <div style={{ fontFamily: font, background: '#f5f7f5', minHeight: '100vh', color: '#111827' }}>
+  // ── Page footer helper ────────────────────────────────────────────────────
+  const PageFooter = ({ n, total }: { n: number; total: number }) => (
+    <div style={{ background: green, padding: '16px 52px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+      <div style={{ display: 'flex', gap: 28 }}>
+        {[
+          { v: '250+', l: 'installaties' },
+          { v: '4,8/5', l: 'beoordeling' },
+          { v: 'KVK', l: '71128174' },
+        ].map(b => (
+          <div key={b.v}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{b.v} </span>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>{b.l}</span>
+          </div>
+        ))}
+      </div>
+      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Pagina {n} / {total} · {quote.quoteNumber}</p>
+    </div>
+  )
 
-      {/* ── Nav ──────────────────────────────────────────────────────────── */}
+  // ── Page wrapper ─────────────────────────────────────────────────────────
+  const PAGE: React.CSSProperties = {
+    maxWidth: 840, margin: '0 auto 28px', background: '#fff',
+    boxShadow: '0 4px 28px rgba(0,0,0,0.22)',
+    overflow: 'hidden', display: 'flex', flexDirection: 'column',
+    minHeight: 1040,
+  }
+
+  const pageCount = 1
+    + (showBespaarplan ? 2 : 0)
+    + 1 // installatie
+    + 1 // investering
+    + 1 // ondertekening
+
+  let pg = 0
+  const nextPage = () => ++pg
+
+  return (
+    <div style={{ fontFamily: font, background: '#d4d4d4', minHeight: '100vh', color: '#111827' }}>
+
+      {/* Print styles */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          .no-print { display: none !important; }
+          .doc-page { box-shadow: none !important; page-break-after: always; margin-bottom: 0 !important; }
+          body { background: white !important; }
+        }
+        @media (max-width: 900px) {
+          .lh { padding-left: 24px !important; padding-right: 24px !important; }
+          .li { padding: 32px 28px !important; }
+        }
+      ` }} />
+
+      {/* ── Nav ────────────────────────────────────────────────────────────── */}
       <div className="no-print" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: '#fff', borderBottom: '1px solid #e5e7eb',
-        padding: '10px 24px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <svg width="28" height="26" viewBox="0 0 36 34" fill="none">
+          <svg width="26" height="24" viewBox="0 0 36 34" fill="none">
             <rect x="10" y="4" width="3.5" height="6" rx="0.5" fill={gold}/>
             <path d="M0 15L18 2L36 15H0Z" fill={gold}/>
             <rect x="2" y="15" width="32" height="19" rx="1.5" fill={green}/>
@@ -117,78 +148,163 @@ export default async function PublicQuotePage({ params }: Props) {
             <circle cx="28" cy="22" r="4.5" fill={gold}/>
             <circle cx="26.5" cy="20.5" r="3" fill={green}/>
           </svg>
-          <span style={{ fontWeight: 700, fontSize: 14, color: green }}>
+          <span style={{ fontWeight: 700, fontSize: 13.5, color: green }}>
             Bespaarhulp<span style={{ color: gold }}> Friesland</span>
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 12.5, color: '#6b7280' }}>#{quote.quoteNumber}</span>
+          <span style={{ fontSize: 12, color: '#9ca3af' }}>#{quote.quoteNumber}</span>
           <PrintButton />
         </div>
       </div>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div style={{
-        background: `linear-gradient(135deg, ${green} 0%, #0d7a47 100%)`,
-        padding: '56px 24px 64px', textAlign: 'center',
-      }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: gold, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
-          Persoonlijk energieplan
-        </p>
-        <h1 style={{ fontSize: 34, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', marginBottom: 8 }}>
-          Uw energieplan,<br /><span style={{ color: gold }}>op maat gemaakt</span>
-        </h1>
-        <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Voor {customerName}</p>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
-          {quote.quoteNumber} · {formatDate(quote.createdAt)}
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
-          {[
-            { icon: '🏠', label: '250+ installaties', sub: 'in Friesland' },
-            { icon: '⭐', label: '4,8 / 5', sub: 'beoordeling' },
-            { icon: '🏦', label: 'Warmtefonds & SVn', sub: 'financiering' },
-            { icon: '📋', label: 'BTW-teruggave', sub: 'wij regelen het' },
-          ].map((b) => (
-            <div key={b.label} style={{
-              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 12, padding: '10px 16px', textAlign: 'center', minWidth: 120,
-            }}>
-              <div style={{ fontSize: 18, marginBottom: 4 }}>{b.icon}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{b.label}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>{b.sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ── Document ───────────────────────────────────────────────────────── */}
+      <div style={{ paddingTop: 32, paddingBottom: 60, paddingLeft: 16, paddingRight: 16 }}>
 
-      {/* ── Bespaarplan ─────────────────────────────────────────────────── */}
-      {showBespaarplan && (
-        <>
-          {/* Header */}
-          <div style={{ background: '#fff', padding: '52px 24px 0', borderTop: '1px solid #e5e7eb' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
-                Situatie-analyse
-              </p>
-              <h2 style={{ fontSize: 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', marginBottom: 10 }}>
-                De energiemarkt verandert
-              </h2>
-              <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, maxWidth: 620, marginBottom: 44 }}>
-                Drie ontwikkelingen beïnvloeden uw energiekosten de komende jaren direct. Hieronder vindt u een analyse op basis van uw persoonlijke situatie.
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 1 — BEGELEIDENDE BRIEF
+        ══════════════════════════════════════════════════════════════════ */}
+        {(() => { const p = nextPage(); return (
+        <div className="doc-page" style={PAGE}>
+
+          {/* Letterhead */}
+          <div className="lh" style={{ background: green, padding: '28px 52px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <svg width="36" height="34" viewBox="0 0 36 34" fill="none">
+                <rect x="10" y="4" width="3.5" height="6" rx="0.5" fill={gold}/>
+                <path d="M0 15L18 2L36 15H0Z" fill={gold}/>
+                <rect x="2" y="15" width="32" height="19" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+                <rect x="5" y="18" width="6" height="6" rx="0.5" fill={gold} opacity="0.7"/>
+                <rect x="14" y="18" width="6" height="6" rx="0.5" fill={gold} opacity="0.7"/>
+                <circle cx="28" cy="22" r="4.5" fill={gold}/>
+                <circle cx="26.5" cy="20.5" r="3" fill={green}/>
+              </svg>
+              <div>
+                <p style={{ fontSize: 17, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+                  Bespaarhulp <span style={{ color: gold }}>Friesland</span>
+                </p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                  Sjouke van der Kooistrjitte 15 · 9088BB Wirdum
+                </p>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>06-24992098</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>info@bespaarhulpfriesland.nl</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>KVK 71128174</p>
+            </div>
+          </div>
+
+          {/* Letter body */}
+          <div className="li" style={{ padding: '52px 64px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+            {/* Date + reference — right aligned */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 44 }}>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 13.5, color: '#374151' }}>
+                  {formatDate(quote.createdAt)}
+                </p>
+                <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>
+                  Offertenummer: <strong style={{ color: '#374151' }}>{quote.quoteNumber}</strong>
+                </p>
+                {quote.validUntil && (
+                  <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>
+                    Geldig tot: {formatDate(quote.validUntil)}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Recipient address */}
+            <div style={{ marginBottom: 40 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 2 }}>{customerName}</p>
+              {addr && (
+                <>
+                  <p style={{ fontSize: 13.5, color: '#374151' }}>{addr.street} {addr.houseNumber}</p>
+                  <p style={{ fontSize: 13.5, color: '#374151' }}>{addr.postalCode} {addr.city}</p>
+                </>
+              )}
+            </div>
+
+            {/* Subject */}
+            <div style={{ marginBottom: 32, paddingBottom: 16, borderBottom: '1px solid #e5e7eb' }}>
+              <p style={{ fontSize: 13.5, color: '#374151' }}>
+                <strong>Betreft:</strong> {quote.title}
               </p>
             </div>
+
+            {/* Salutation */}
+            <p style={{ fontSize: 14.5, marginBottom: 22 }}>
+              Beste {quote.customer.lastName},
+            </p>
+
+            {/* Body */}
+            {quote.introText ? (
+              <div style={{ flex: 1 }}>
+                {quote.introText.split(/\n\n+/).map((para, i) => (
+                  <p key={i} style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 16 }}>
+                    {para.replace(/\n/g, ' ')}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 16 }}>
+                  Hartelijk dank voor uw aanvraag bij Bespaarhulp Friesland. Bij deze ontvangt u uw persoonlijk maatwerkaanbod
+                  voor <strong>{quote.title}</strong>{addrLine ? ` op het adres ${addrLine}` : ''}.
+                </p>
+                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 16 }}>
+                  Wij hebben uw situatie zorgvuldig doorgerekend en stellen een oplossing voor die optimaal aansluit bij uw
+                  woonsituatie en energieverbruik. In deze offerte vindt u een volledig overzicht van het aanbod, inclusief
+                  een persoonlijke situatie-analyse en transparante prijsopbouw.
+                </p>
+                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 16 }}>
+                  Voor vragen staat ons team voor u klaar via 06-24992098 of info@bespaarhulpfriesland.nl.
+                </p>
+              </div>
+            )}
+
+            {/* Closing */}
+            <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1px solid #f3f4f6' }}>
+              <p style={{ fontSize: 14, color: '#374151', marginBottom: 20 }}>Met vriendelijke groet,</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{signatoryName}</p>
+              <p style={{ fontSize: 13, color: '#6b7280' }}>Bespaarhulp Friesland</p>
+            </div>
+          </div>
+
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 2 — SITUATIE-ANALYSE
+        ══════════════════════════════════════════════════════════════════ */}
+        {showBespaarplan && (() => { const p = nextPage(); return (
+        <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
+
+          {/* Page header */}
+          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Situatie-analyse
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', marginBottom: 6 }}>
+              De energiemarkt verandert
+            </h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
+              Drie ontwikkelingen beïnvloeden uw energiekosten de komende jaren direct — op basis van uw persoonlijke situatie.
+            </p>
           </div>
 
           {/* S1 — Saldering */}
           {quote.hasSolarPanels && feedbackKwh > 0 && (
-            <div style={{ background: '#fff', padding: '0 24px 52px' }}>
-              <div style={{ maxWidth: 760, margin: '0 auto', borderTop: '2px solid #2563eb', paddingTop: 28 }}>
+            <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
+              <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                   Energiemarktrisico 1 — Afschaffing saldering
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                   <div>
-                    <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 8 }}>Jaarlijkse kostenstijging na 2027</p>
+                    <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Jaarlijkse kostenstijging na 2027</p>
                     <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
                       +€{saldingYearlyExtra.toLocaleString('nl-NL')}
                     </p>
@@ -198,16 +314,16 @@ export default async function PublicQuotePage({ params }: Props) {
                         Waarde teruggeleverde stroom ({feedbackKwh.toLocaleString('nl-NL')} kWh/jr)
                       </p>
                       {[
-                        { label: 'Nu — via saldering', value: saldingYearlyExtra, max: saldingYearlyExtra },
-                        { label: `Na 2027 — teruglevertarief`, value: feedbackIncomeLow, max: saldingYearlyExtra },
+                        { label: 'Nu — via saldering', value: saldingYearlyExtra, shade: '#94a3b8' },
+                        { label: 'Na 2027 — teruglevertarief', value: feedbackIncomeLow, shade: '#cbd5e1' },
                       ].map((bar, i) => (
-                        <div key={bar.label} style={{ marginBottom: 10 }}>
+                        <div key={i} style={{ marginBottom: 10 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                             <span style={{ fontSize: 12, color: '#374151' }}>{bar.label}</span>
                             <span style={{ fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>€{bar.value.toLocaleString('nl-NL')}</span>
                           </div>
                           <div style={{ height: 8, background: '#f1f5f9', borderRadius: 3 }}>
-                            <div style={{ height: '100%', width: `${Math.round(bar.value / bar.max * 100)}%`, background: i === 0 ? '#94a3b8' : '#cbd5e1', borderRadius: 3 }} />
+                            <div style={{ height: '100%', width: `${Math.round(bar.value / Math.max(saldingYearlyExtra, 1) * 100)}%`, background: bar.shade, borderRadius: 3 }} />
                           </div>
                         </div>
                       ))}
@@ -240,15 +356,15 @@ export default async function PublicQuotePage({ params }: Props) {
           )}
 
           {/* S2 — Terugleverkosten */}
-          {quote.hasSolarPanels && feedbackKwh > 0 && feedInYearlyCost > 0 && (
-            <div style={{ background: '#f8f9fa', padding: '52px 24px' }}>
-              <div style={{ maxWidth: 760, margin: '0 auto', borderTop: '2px solid #2563eb', paddingTop: 28 }}>
+          {quote.hasSolarPanels && feedInYearlyCost > 0 && (
+            <div style={{ padding: '44px 52px', background: '#f8f9fa', borderBottom: '1px solid #e5e7eb' }}>
+              <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                   Energiemarktrisico 2 — Terugleverkosten
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                   <div>
-                    <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 8 }}>Jaarlijkse kosten — nu al</p>
+                    <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Jaarlijkse kosten — nu al</p>
                     <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
                       €{feedInYearlyCost.toLocaleString('nl-NL')}
                     </p>
@@ -256,17 +372,14 @@ export default async function PublicQuotePage({ params }: Props) {
                     <div style={{ marginTop: 24, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '14px 16px' }}>
                       <div style={{ fontSize: 13, color: '#374151', fontVariantNumeric: 'tabular-nums' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 6 }}>
-                          <span>Teruglevering per jaar</span>
-                          <span style={{ fontWeight: 600 }}>{feedbackKwh.toLocaleString('nl-NL')} kWh</span>
+                          <span>Teruglevering per jaar</span><span style={{ fontWeight: 600 }}>{feedbackKwh.toLocaleString('nl-NL')} kWh</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 8 }}>
-                          <span>Tarief terugleverkosten</span>
-                          <span style={{ fontWeight: 600 }}>€{quote.feedInCostTariff.toFixed(3).replace('.', ',')}/kWh</span>
+                          <span>Tarief</span><span style={{ fontWeight: 600 }}>€{quote.feedInCostTariff.toFixed(3).replace('.', ',')}/kWh</span>
                         </div>
                       </div>
                       <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
-                        <span>Jaarlijkse kosten</span>
-                        <span style={{ color: '#2563eb' }}>€{feedInYearlyCost.toLocaleString('nl-NL')}</span>
+                        <span>Kosten per jaar</span><span style={{ color: '#2563eb' }}>€{feedInYearlyCost.toLocaleString('nl-NL')}</span>
                       </div>
                     </div>
                   </div>
@@ -281,54 +394,40 @@ export default async function PublicQuotePage({ params }: Props) {
           )}
 
           {/* S3 — Netcongestie & EMS */}
-          <div style={{ background: '#fff', padding: '52px 24px' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto', borderTop: '2px solid #2563eb', paddingTop: 28 }}>
+          <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
+            <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                 Marktachtergrond — Netcongestie & onbalansmarkt
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                 <div>
-                  <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 8 }}>Netgebieden met congestie</p>
+                  <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Netgebieden met congestie</p>
                   <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>74%</p>
                   <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>2025 · Bron: Netbeheer Nederland</p>
                   <div style={{ marginTop: 24 }}>
-                    <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
-                      % netgebieden met congestie (2020–2027)
-                    </p>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 10 }}>% netgebieden met congestie (2020–2027)</p>
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 70 }}>
                       {CONGESTION.map((d) => (
                         <div key={d.year} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                          <div style={{
-                            width: '100%',
-                            height: `${Math.round(d.pct * 0.68)}px`,
-                            background: d.year >= '2026' ? '#93c5fd' : d.year >= '2025' ? '#2563eb' : '#cbd5e1',
-                            borderRadius: '2px 2px 0 0',
-                          }} />
+                          <div style={{ width: '100%', height: `${Math.round(d.pct * 0.68)}px`, background: d.year >= '2026' ? '#93c5fd' : d.year >= '2025' ? '#2563eb' : '#cbd5e1', borderRadius: '2px 2px 0 0' }} />
                           <span style={{ fontSize: 8, color: '#9ca3af' }}>{d.year.slice(2)}</span>
                         </div>
                       ))}
                     </div>
-                    <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 6 }}>
-                      Netbeheer Nederland / TenneT · lichtblauwe balken = prognose
-                    </p>
+                    <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 6 }}>Netbeheer Nederland / TenneT · lichtblauw = prognose</p>
                   </div>
                 </div>
                 <div style={{ paddingTop: 4 }}>
                   <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.8, marginBottom: 14 }}>
                     <strong>74%</strong> van de Nederlandse netgebieden kampt met congestie. Netbeheerders schatten dat er <strong>€180 miljard nodig is</strong> om het stroomnet toekomstbestendig te maken (Netbeheer Nederland, 2024).
                   </p>
-                  <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.8, marginBottom: 20 }}>
-                    Door deze schaarste heeft lokale opslagcapaciteit financiële waarde: EMS-systemen handelen op de <strong>onbalansmarkt</strong>, waar netbeheerders stroom inkopen om de netfrequentie (50 Hz) stabiel te houden.
-                  </p>
                   <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: 10, padding: '14px 16px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 10 }}>EMS-opbrengst — illustratief voorbeeld</p>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151', marginBottom: 6 }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>EMS-opbrengst — illustratief voorbeeld</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
                       <span>Alpha ESS 9,3 kWh batterij</span>
-                      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>€1.314/jaar</span>
+                      <span style={{ fontWeight: 700 }}>€1.314/jaar</span>
                     </div>
-                    <p style={{ fontSize: 11, color: '#9ca3af', lineHeight: 1.5 }}>
-                      Gemiddelde op basis van de Alpha ESS-vloot over de afgelopen 3 jaar. Werkelijke opbrengst kan afwijken.
-                    </p>
+                    <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 8, lineHeight: 1.5 }}>Gemiddelde op basis van de Alpha ESS-vloot over de afgelopen 3 jaar.</p>
                   </div>
                 </div>
               </div>
@@ -336,20 +435,18 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* S4 — Woningwaarde */}
-          <div style={{ background: '#f8f9fa', padding: '52px 24px' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto', borderTop: '2px solid #2563eb', paddingTop: 28 }}>
+          <div style={{ padding: '44px 52px', background: '#f8f9fa' }}>
+            <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                 Vastgoedprestatie — Energielabel & woningwaarde
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                 <div>
-                  <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 8 }}>Waardeverschil label A vs. D</p>
+                  <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Waardeverschil label A vs. D</p>
                   <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>+14%</p>
                   <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Bron: PBL / Calcasa 2023</p>
                   <div style={{ marginTop: 24 }}>
-                    <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
-                      Relatieve woningwaarde per energielabel
-                    </p>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 10 }}>Relatieve woningwaarde per energielabel</p>
                     {[
                       { label: 'A', pct: 100, accent: true },
                       { label: 'B', pct: 97 },
@@ -371,293 +468,391 @@ export default async function PublicQuotePage({ params }: Props) {
                 </div>
                 <div style={{ paddingTop: 4 }}>
                   <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.8, marginBottom: 14 }}>
-                    Woningen met energielabel A zijn gemiddeld <strong>14% meer waard</strong> dan vergelijkbare woningen met label D, en circa <strong>28% meer</strong> dan label G (PBL Planbureau voor de Leefomgeving, 2023).
+                    Woningen met energielabel A zijn gemiddeld <strong>14% meer waard</strong> dan vergelijkbare woningen met label D, en circa <strong>28% meer</strong> dan label G (PBL, 2023).
                   </p>
                   <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.8 }}>
                     Een thuisbatterij gecombineerd met zonnepanelen kan uw energielabel met <strong>1 tot 3 klassen</strong> verbeteren.
                   </p>
                   <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 16, lineHeight: 1.6 }}>
-                    Bron: PBL Planbureau voor de Leefomgeving · NVM Woningmarktrapport 2023 · Calcasa Woningwaardemeter
+                    Bron: PBL Planbureau voor de Leefomgeving · NVM Woningmarktrapport 2023 · Calcasa
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Battery reveal */}
-          <div style={{ background: '#fff', padding: '52px 24px', borderTop: '1px solid #e5e7eb' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
-                Het antwoord
-              </p>
-              <h2 style={{ fontSize: 26, fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', marginBottom: 8 }}>
-                Hoe de thuisbatterij inspeelt op elke ontwikkeling
-              </h2>
-              <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.7, maxWidth: 600, marginBottom: 32 }}>
-                Elk van de bovenstaande ontwikkelingen heeft een directe financiële impact. Hieronder de respons op elk punt.
-              </p>
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
 
-              <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-                {((): { title: string; desc: string; value: string | null; note?: boolean }[] => [
-                  ...(quote.hasSolarPanels && feedbackKwh > 0 && saldingYearlyExtra > 0 ? [{
-                    title: 'Afschaffing saldering (2027)',
-                    desc: 'Batterij slaat overdag overschot op — geen teruglevering, geen tariefverlies na 2027.',
-                    value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr`,
-                  }] : []),
-                  ...(feedInYearlyCost > 0 ? [{
-                    title: 'Terugleverkosten',
-                    desc: 'Nul teruglevering betekent nul terugleverkosten.',
-                    value: `€${feedInYearlyCost.toLocaleString('nl-NL')}/jr`,
-                  }] : []),
-                  {
-                    title: 'Netcongestie / onbalansmarkt',
-                    desc: emsRevenue > 0
-                      ? 'Uw Alpha ESS EMS handelt automatisch op de onbalansmarkt.'
-                      : 'Voorbeeld: 9,3 kWh Alpha ESS genereert gemiddeld €1.314/jr via de onbalansmarkt.*',
-                    value: emsRevenue > 0 ? `€${emsRevenue.toLocaleString('nl-NL')}/jr` : '€1.314/jr*',
-                  },
-                  {
-                    title: 'Energielabel & woningwaarde',
-                    desc: 'Beter energielabel verhoogt de marktwaarde van uw woning structureel.',
-                    value: '+14–28%',
-                    note: true,
-                  },
-                ])().map((row, i, arr) => (
-                  <div key={row.title} style={{
-                    display: 'grid', gridTemplateColumns: '1fr auto',
-                    gap: 16, alignItems: 'center',
-                    padding: '16px 20px',
-                    background: i % 2 === 0 ? '#fff' : '#f8f9fa',
-                    borderBottom: i < arr.length - 1 ? '1px solid #e5e7eb' : 'none',
-                  }}>
-                    <div>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', marginBottom: 3 }}>{row.title}</p>
-                      <p style={{ fontSize: 13, color: '#6b7280' }}>{row.desc}</p>
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 3 — HET ANTWOORD
+        ══════════════════════════════════════════════════════════════════ */}
+        {showBespaarplan && (() => { const p = nextPage(); return (
+        <div className="doc-page" style={PAGE}>
+
+          {/* Dark header */}
+          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Het antwoord
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', marginBottom: 6 }}>
+              Hoe de thuisbatterij inspeelt op elke ontwikkeling
+            </h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
+              Elk van de bovenstaande ontwikkelingen heeft een directe financiële impact. Hieronder de respons op elk punt.
+            </p>
+          </div>
+
+          {/* Table */}
+          <div style={{ padding: '44px 52px' }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', marginBottom: 28 }}>
+              {((): { title: string; desc: string; value: string | null; note?: boolean }[] => [
+                ...(quote.hasSolarPanels && feedbackKwh > 0 && saldingYearlyExtra > 0 ? [{
+                  title: 'Afschaffing saldering (2027)',
+                  desc: 'Batterij slaat overdag overschot op — geen teruglevering, geen tariefverlies na 2027.',
+                  value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr`,
+                }] : []),
+                ...(feedInYearlyCost > 0 ? [{
+                  title: 'Terugleverkosten',
+                  desc: 'Nul teruglevering betekent nul terugleverkosten.',
+                  value: `€${feedInYearlyCost.toLocaleString('nl-NL')}/jr`,
+                }] : []),
+                {
+                  title: 'Netcongestie / onbalansmarkt',
+                  desc: emsRevenue > 0
+                    ? 'Uw Alpha ESS EMS handelt automatisch op de onbalansmarkt.'
+                    : 'Voorbeeld: 9,3 kWh Alpha ESS genereert gemiddeld €1.314/jr via de onbalansmarkt.*',
+                  value: emsRevenue > 0 ? `€${emsRevenue.toLocaleString('nl-NL')}/jr` : '€1.314/jr*',
+                },
+                {
+                  title: 'Energielabel & woningwaarde',
+                  desc: 'Beter energielabel verhoogt de marktwaarde van uw woning structureel.',
+                  value: '+14–28%', note: true,
+                },
+              ])().map((row, i, arr) => (
+                <div key={row.title} style={{
+                  display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, alignItems: 'center',
+                  padding: '18px 24px',
+                  background: i % 2 === 0 ? '#fff' : '#f8f9fa',
+                  borderBottom: i < arr.length - 1 ? '1px solid #e5e7eb' : 'none',
+                }}>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', marginBottom: 3 }}>{row.title}</p>
+                    <p style={{ fontSize: 13, color: '#6b7280' }}>{row.desc}</p>
+                  </div>
+                  {row.value && (
+                    <p style={{ fontSize: 16, fontWeight: 700, color: row.note ? '#374151' : '#2563eb', whiteSpace: 'nowrap' }}>{row.value}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {totalYearlyBenefit > 0 && (
+              <div style={{ background: '#111827', borderRadius: 14, padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
+                <div>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Totaal financieel voordeel per jaar</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+                    {[
+                      quote.hasSolarPanels && saldingYearlyExtra > 0 ? 'saldering' : null,
+                      feedInYearlyCost > 0 ? 'terugleverkosten' : null,
+                      emsRevenue > 0 ? 'EMS' : null,
+                    ].filter(Boolean).join(' + ')}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: 44, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                    €{totalYearlyBenefit.toLocaleString('nl-NL')}
+                  </p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>= €{totalMonthlyBenefit}/maand</p>
+                </div>
+              </div>
+            )}
+
+            {emsRevenue === 0 && (
+              <p style={{ fontSize: 11.5, color: '#9ca3af', lineHeight: 1.6 }}>
+                * Gemiddelde op basis van de Alpha ESS-vloot over de afgelopen 3 jaar. Werkelijke opbrengst is afhankelijk van marktprijzen.
+              </p>
+            )}
+          </div>
+
+          {/* Decorative fill */}
+          <div style={{ flex: 1, background: `linear-gradient(135deg, ${green} 0%, #052e1a 100%)`, padding: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 32, flexWrap: 'wrap' }}>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 700, color: gold, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>
+                Energie-onafhankelijkheid begint hier
+              </p>
+              <p style={{ fontSize: 32, fontWeight: 800, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.02em', maxWidth: 340 }}>
+                Slim opslaan,<br />meer besparen.
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[
+                { n: '250+', l: 'installaties in Friesland' },
+                { n: '10 jr', l: 'garantie Alpha ESS' },
+                { n: 'UL9540A', l: 'veiligheidskeurmerk' },
+              ].map(b => (
+                <div key={b.n} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                  <p style={{ fontSize: 18, fontWeight: 800, color: gold, minWidth: 80 }}>{b.n}</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{b.l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 4 — UW INSTALLATIE
+        ══════════════════════════════════════════════════════════════════ */}
+        {(() => { const p = nextPage(); return (
+        <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
+
+          {/* Header */}
+          <div style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Uw installatie
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+              {quote.title}
+            </h2>
+          </div>
+
+          {/* Products */}
+          <div style={{ padding: '36px 52px', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+              {quote.lines.map((line) => {
+                const p2 = line.product
+                return (
+                  <div key={line.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden', display: 'flex' }}>
+                    <div style={{ width: 140, minWidth: 140, background: p2?.imageUrl ? '#f9fafb' : '#f0faf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {p2?.imageUrl
+                        ? <img src={p2.imageUrl} alt={line.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : <span style={{ fontSize: 40 }}>
+                            {p2?.category === 'BATTERY' ? '🔋' : p2?.category === 'SOLAR' ? '☀️' : p2?.category === 'HEAT_PUMP' ? '♨️' : p2?.category === 'CHARGER' ? '⚡' : '📦'}
+                          </span>
+                      }
                     </div>
-                    {row.value && (
-                      <p style={{ fontSize: 15, fontWeight: 700, color: row.note ? '#374151' : '#2563eb', whiteSpace: 'nowrap' }}>{row.value}</p>
-                    )}
+                    <div style={{ flex: 1, padding: '20px 24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
+                        <div>
+                          <p style={{ fontWeight: 700, fontSize: 15.5, marginBottom: 3 }}>
+                            {line.quantity > 1 && <span style={{ color: green, marginRight: 6 }}>{line.quantity}×</span>}
+                            {line.name}
+                          </p>
+                          {line.description && <p style={{ fontSize: 13, color: '#6b7280' }}>{line.description}</p>}
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <p style={{ fontWeight: 700, fontSize: 16, fontVariantNumeric: 'tabular-nums' }}>
+                            {formatCurrency(line.quantity * line.unitPrice * (1 + line.vatRate / 100))}
+                          </p>
+                          <p style={{ fontSize: 11.5, color: '#9ca3af' }}>incl. BTW</p>
+                        </div>
+                      </div>
+                      {p2 && (
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          {p2.capacityKwh && <span style={{ background: '#f0faf4', color: green, fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>{p2.capacityKwh} kWh</span>}
+                          {p2.powerKw && <span style={{ background: '#f0faf4', color: green, fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>{p2.powerKw} kW</span>}
+                          {p2.warrantyYears && <span style={{ background: '#f9fafb', color: '#6b7280', fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>{p2.warrantyYears} jaar garantie</span>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {quote.includedItems && (
+              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '22px 24px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Dit is inbegrepen</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {quote.includedItems.split('\n').map((l, i) => {
+                    const t = l.trim()
+                    if (!t) return null
+                    if (t.startsWith('-')) return (
+                      <div key={i} style={{ display: 'flex', gap: 10 }}>
+                        <span style={{ color: green, fontWeight: 700 }}>✓</span>
+                        <span style={{ fontSize: 13.5, color: '#374151' }}>{t.replace(/^-\s*/, '')}</span>
+                      </div>
+                    )
+                    return <p key={i} style={{ fontWeight: 700, fontSize: 14 }}>{t}</p>
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 5 — INVESTERING
+        ══════════════════════════════════════════════════════════════════ */}
+        {(() => { const p = nextPage(); return (
+        <div className="doc-page" style={PAGE}>
+
+          {/* Header */}
+          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Investering
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+              Transparante prijsopbouw
+            </h2>
+          </div>
+
+          <div style={{ padding: '44px 52px', flex: 1 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start', marginBottom: 36 }}>
+              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
+                {quote.lines.map((line, i) => (
+                  <div key={line.id} style={{ padding: '14px 20px', borderBottom: i < quote.lines.length - 1 ? '1px solid #e5e7eb' : 'none', display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center' }}>
+                    <div>
+                      <p style={{ fontSize: 13.5, fontWeight: 600 }}>{line.name}</p>
+                      {line.description && <p style={{ fontSize: 12, color: '#9ca3af' }}>{line.description}</p>}
+                    </div>
+                    <span style={{ fontSize: 13, color: '#6b7280' }}>{line.quantity}×</span>
+                    <span style={{ fontSize: 13.5, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(line.lineTotal)}</span>
                   </div>
                 ))}
               </div>
 
-              {totalYearlyBenefit > 0 && (
-                <div style={{ background: '#111827', borderRadius: 14, padding: '24px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
-                  <div>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Totaal financieel voordeel per jaar</p>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-                      {[
-                        quote.hasSolarPanels && feedbackKwh > 0 && saldingYearlyExtra > 0 ? 'saldering' : null,
-                        feedInYearlyCost > 0 ? 'terugleverkosten' : null,
-                        emsRevenue > 0 ? 'EMS' : null,
-                      ].filter(Boolean).join(' + ')}
-                    </p>
+              <div style={{ background: green, borderRadius: 12, padding: '24px', color: '#fff' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Totaal</p>
+                {[
+                  { label: 'Subtotaal', value: formatCurrency(quote.subtotal) },
+                  ...(quote.discountAmount > 0 ? [{ label: 'Korting', value: `- ${formatCurrency(quote.discountAmount)}` }] : []),
+                  { label: 'BTW', value: formatCurrency(quote.vatTotal) },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: 13.5, borderBottom: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)' }}>
+                    <span>{label}</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>{value}</span>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: 40, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.02em' }}>
-                      €{totalYearlyBenefit.toLocaleString('nl-NL')}
-                    </p>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>= €{totalMonthlyBenefit}/maand</p>
-                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 0 0', fontSize: 20, fontWeight: 800 }}>
+                  <span>Totaal</span>
+                  <span style={{ color: gold, fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(quote.total)}</span>
                 </div>
-              )}
-
-              {emsRevenue === 0 && (
-                <p style={{ fontSize: 11.5, color: '#9ca3af', lineHeight: 1.6 }}>
-                  * Gemiddelde op basis van de Alpha ESS-vloot over de afgelopen 3 jaar. Werkelijke opbrengst is afhankelijk van marktprijzen en kan hiervan afwijken.
-                </p>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ── Producten ────────────────────────────────────────────────────── */}
-      <div style={{ background: '#f5f7f5', padding: '48px 24px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: green, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Uw installatie</p>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#111827', letterSpacing: '-0.01em', marginBottom: 24 }}>{quote.title}</h2>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {quote.lines.map((line) => {
-              const p = line.product
-              const emoji = p?.category ? (CATEGORY_EMOJI[p.category] ?? '📦') : '📦'
-              return (
-                <div key={line.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 16, overflow: 'hidden', display: 'flex' }}>
-                  <div style={{ width: 120, minWidth: 120, background: p?.imageUrl ? '#f9fafb' : '#f0faf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {p?.imageUrl
-                      ? <img src={p.imageUrl} alt={line.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : <span style={{ fontSize: 36 }}>{emoji}</span>
-                    }
+                {quote.subsidyAmount > 0 && (
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)', fontSize: 12.5, color: 'rgba(255,255,255,0.65)' }}>
+                    <p>Na subsidie: <strong style={{ color: gold }}>{formatCurrency(Math.max(0, quote.total - quote.subsidyAmount))}</strong></p>
                   </div>
-                  <div style={{ flex: 1, padding: '18px 20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                      <div>
-                        <p style={{ fontWeight: 700, fontSize: 15, marginBottom: 3 }}>
-                          {line.quantity > 1 && <span style={{ color: green, marginRight: 6 }}>{line.quantity}×</span>}
-                          {line.name}
-                        </p>
-                        {line.description && <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 10 }}>{line.description}</p>}
-                      </div>
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p style={{ fontWeight: 700, fontSize: 16, fontVariantNumeric: 'tabular-nums' }}>
-                          {formatCurrency(line.quantity * line.unitPrice * (1 + line.vatRate / 100))}
-                        </p>
-                        <p style={{ fontSize: 11.5, color: '#9ca3af' }}>incl. BTW</p>
-                      </div>
-                    </div>
-                    {p && (
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {p.capacityKwh && <span style={{ background: '#f0faf4', color: green, fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>{p.capacityKwh} kWh</span>}
-                        {p.powerKw && <span style={{ background: '#f0faf4', color: green, fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>{p.powerKw} kW</span>}
-                        {p.warrantyYears && <span style={{ background: '#f9fafb', color: '#6b7280', fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>{p.warrantyYears} jaar garantie</span>}
-                        {p.savingsKwhYear && p.savingsKwhYear > 0 && <span style={{ background: '#f0faf4', color: '#166534', fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>↓ {(p.savingsKwhYear * line.quantity).toLocaleString('nl-NL')} kWh/jr</span>}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {quote.includedItems && (
-            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '22px 24px', marginTop: 20 }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Dit is inbegrepen</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {quote.includedItems.split('\n').map((l, i) => {
-                  const t = l.trim()
-                  if (!t) return null
-                  if (t.startsWith('-')) return (
-                    <div key={i} style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ color: green, fontWeight: 700 }}>✓</span>
-                      <span style={{ fontSize: 14, color: '#374151' }}>{t.replace(/^-\s*/, '')}</span>
-                    </div>
-                  )
-                  return <p key={i} style={{ fontWeight: 700, fontSize: 14 }}>{t}</p>
-                })}
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* ── Sociale bewijskracht ─────────────────────────────────────────── */}
-      <div style={{ background: green, padding: '48px 24px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 28 }}>250+ tevreden huishoudens gingen u voor</h2>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 28 }}>
-            {[
-              { icon: '⭐', title: '4,8/5', sub: 'gemiddeld' },
-              { icon: '🏠', title: '250+', sub: 'installaties' },
-              { icon: '🏦', title: 'Warmtefonds', sub: 'lage rente' },
-              { icon: '📋', title: 'BTW-teruggave', sub: 'wij regelen het' },
-            ].map((b) => (
-              <div key={b.title} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 14, padding: '18px 20px', minWidth: 130 }}>
-                <div style={{ fontSize: 20, marginBottom: 6 }}>{b.icon}</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: gold }}>{b.title}</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{b.sub}</div>
+            {/* Status banners */}
+            {quote.status === 'ACCEPTED' && (
+              <div style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#15803d' }}>Geaccepteerd op {formatDate(quote.acceptedAt)}</p>
+                {quote.acceptance && <p style={{ fontSize: 13, color: '#166534', marginTop: 4 }}>Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}</p>}
               </div>
-            ))}
+            )}
+            {quote.status === 'REJECTED' && (
+              <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#b91c1c' }}>Afgewezen op {formatDate(quote.rejectedAt)}</p>
+              </div>
+            )}
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '20px 24px', textAlign: 'left', maxWidth: 520, margin: '0 auto' }}>
-            <div style={{ display: 'flex', gap: 2, marginBottom: 8 }}>
-              {[1,2,3,4,5].map((s) => <span key={s} style={{ color: gold, fontSize: 16 }}>★</span>)}
-            </div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, fontStyle: 'italic' }}>
-              "Bespaarhulp Friesland heeft alles van A tot Z geregeld. De thuisbatterij werkt perfect en we merken het direct op onze energierekening."
+
+          {/* Social proof fill */}
+          <div style={{ background: '#f8f9fa', borderTop: '1px solid #e5e7eb', padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>
+              250+ tevreden huishoudens gingen u voor
             </p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 8 }}>— Familie de Jong, Leeuwarden</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Investeringsoverzicht ─────────────────────────────────────────── */}
-      <div style={{ background: '#fff', padding: '48px 24px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: green, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Investering</p>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#111827', letterSpacing: '-0.01em', marginBottom: 24 }}>Transparante prijsopbouw</h2>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start' }}>
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
-              {quote.lines.map((line) => (
-                <div key={line.id} style={{ padding: '12px 18px', borderBottom: '1px solid #e5e7eb', display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center' }}>
-                  <div>
-                    <p style={{ fontSize: 13.5, fontWeight: 600 }}>{line.name}</p>
-                    {line.description && <p style={{ fontSize: 12, color: '#9ca3af' }}>{line.description}</p>}
-                  </div>
-                  <span style={{ fontSize: 13, color: '#6b7280' }}>{line.quantity}×</span>
-                  <span style={{ fontSize: 13.5, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(line.lineTotal)}</span>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 24 }}>
+              {[
+                { title: '4,8/5', sub: 'gemiddelde beoordeling' },
+                { title: '250+', sub: 'installaties in Friesland' },
+                { title: 'Warmtefonds', sub: 'lage rente financiering' },
+                { title: 'BTW-teruggave', sub: 'wij regelen het volledig' },
+              ].map((b) => (
+                <div key={b.title} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '14px 20px', minWidth: 140, flex: 1 }}>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 3 }}>{b.title}</p>
+                  <p style={{ fontSize: 12, color: '#6b7280' }}>{b.sub}</p>
                 </div>
               ))}
             </div>
-
-            <div style={{ background: green, borderRadius: 14, padding: '22px', color: '#fff' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Totaal</p>
-              {[
-                { label: 'Subtotaal', value: formatCurrency(quote.subtotal) },
-                ...(quote.discountAmount > 0 ? [{ label: 'Korting', value: `- ${formatCurrency(quote.discountAmount)}` }] : []),
-                { label: 'BTW', value: formatCurrency(quote.vatTotal) },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: 13.5, borderBottom: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)' }}>
-                  <span>{label}</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>{value}</span>
-                </div>
-              ))}
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 0 0', fontSize: 20, fontWeight: 800 }}>
-                <span>Totaal</span>
-                <span style={{ color: gold, fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(quote.total)}</span>
+            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '18px 22px' }}>
+              <div style={{ display: 'flex', gap: 2, marginBottom: 8 }}>
+                {[1,2,3,4,5].map(s => <span key={s} style={{ color: gold, fontSize: 14 }}>★</span>)}
               </div>
-              {quote.subsidyAmount > 0 && (
-                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)', fontSize: 12.5, color: 'rgba(255,255,255,0.65)' }}>
-                  <p>Na subsidie: <strong style={{ color: gold }}>{formatCurrency(Math.max(0, quote.total - quote.subsidyAmount))}</strong></p>
+              <p style={{ fontSize: 13.5, color: '#374151', lineHeight: 1.6, fontStyle: 'italic' }}>
+                "Bespaarhulp Friesland heeft alles van A tot Z geregeld. De thuisbatterij werkt perfect en we merken het direct op onze energierekening."
+              </p>
+              <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>— Familie de Jong, Leeuwarden</p>
+            </div>
+          </div>
+
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 6 — ONDERTEKENING
+        ══════════════════════════════════════════════════════════════════ */}
+        {(() => { const p = nextPage(); return (
+        <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
+
+          {/* Header */}
+          <div style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Voorwaarden & akkoord
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+              {canInteract ? 'Offerte accepteren' : quote.status === 'ACCEPTED' ? 'Geaccepteerd' : 'Voorwaarden'}
+            </h2>
+          </div>
+
+          {/* Terms */}
+          {quote.termsText && (
+            <div style={{ padding: '36px 52px', borderBottom: canInteract ? '1px solid #e5e7eb' : 'none' }}>
+              <TermsAndConditions text={quote.termsText} />
+            </div>
+          )}
+
+          {/* Signed status */}
+          {quote.status === 'ACCEPTED' && quote.acceptance && (
+            <div style={{ padding: '32px 52px', background: '#f0fdf4', borderBottom: '1px solid #bbf7d0' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#15803d', marginBottom: 8 }}>
+                Geaccepteerd op {formatDate(quote.acceptedAt)}
+              </p>
+              <p style={{ fontSize: 13, color: '#166534', marginBottom: 16 }}>
+                Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}
+              </p>
+              {quote.acceptance.signatureData && (
+                <div style={{ display: 'inline-block', background: '#fff', border: '1px solid #86efac', borderRadius: 8, padding: '12px 16px' }}>
+                  <img src={quote.acceptance.signatureData} alt="Handtekening" style={{ display: 'block', maxWidth: 280, height: 'auto' }} />
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </div>
+          )}
 
-      {/* ── Status banners ────────────────────────────────────────────────── */}
-      {quote.status === 'ACCEPTED' && (
-        <div style={{ background: '#dcfce7', borderTop: '3px solid #16a34a', padding: '24px', textAlign: 'center' }}>
-          <p style={{ fontSize: 15, fontWeight: 700, color: '#15803d' }}>✓ Geaccepteerd op {formatDate(quote.acceptedAt)}</p>
-          {quote.acceptance && <p style={{ fontSize: 13, color: '#166534', marginTop: 4 }}>Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}</p>}
-          {quote.acceptance?.signatureData && (
-            <div style={{ marginTop: 16, display: 'inline-block', background: '#fff', border: '1px solid #86efac', borderRadius: 10, padding: '12px 16px' }}>
-              <img src={quote.acceptance.signatureData} alt="Handtekening" style={{ display: 'block', maxWidth: 300, height: 'auto' }} />
+          {/* Acceptance form */}
+          {canInteract && (
+            <div style={{ padding: '36px 52px', flex: 1 }}>
+              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24 }}>
+                Na acceptatie nemen wij binnen 24 uur contact op voor de planning van de installatie.
+              </p>
+              <QuoteAcceptanceForm token={token} customerName={customerName} />
             </div>
           )}
-        </div>
-      )}
-      {quote.status === 'REJECTED' && (
-        <div style={{ background: '#fee2e2', borderTop: '3px solid #ef4444', padding: '24px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#b91c1c' }}>✕ Afgewezen op {formatDate(quote.rejectedAt)}</p>
-        </div>
-      )}
 
-      {/* ── Voorwaarden ───────────────────────────────────────────────────── */}
-      <div style={{ background: '#f9fafb', padding: '40px 24px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          <TermsAndConditions text={quote.termsText} />
+          <PageFooter n={p} total={pageCount} />
         </div>
+        )})()}
+
       </div>
 
-      {/* ── Acceptatieformulier ───────────────────────────────────────────── */}
-      {canInteract && (
-        <div style={{ background: '#fff', borderTop: `3px solid ${green}`, padding: '48px 24px' }}>
-          <div style={{ maxWidth: 600, margin: '0 auto' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: green, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10, textAlign: 'center' }}>Klaar om te starten?</p>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#111827', marginBottom: 6, textAlign: 'center', letterSpacing: '-0.02em' }}>Offerte accepteren</h2>
-            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 28, textAlign: 'center' }}>Na acceptatie nemen wij binnen 24 uur contact op voor de planning.</p>
-            <QuoteAcceptanceForm token={token} customerName={customerName} />
-          </div>
-        </div>
-      )}
-
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <div style={{ background: green, padding: '24px', textAlign: 'center' }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Bespaarhulp <span style={{ color: gold }}>Friesland</span></p>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Sjouke van der Kooistrjitte 15 · 9088BB Wirdum · 06-24992098 · KVK 71128174</p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 6 }}>Offerte {quote.quoteNumber}</p>
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      <div style={{ background: '#111827', padding: '20px 24px', textAlign: 'center' }}>
+        <p style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+          Bespaarhulp <span style={{ color: gold }}>Friesland</span>
+        </p>
+        <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.45)' }}>
+          Sjouke van der Kooistrjitte 15 · 9088BB Wirdum · 06-24992098 · KVK 71128174
+        </p>
       </div>
     </div>
   )

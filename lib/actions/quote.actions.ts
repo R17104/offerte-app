@@ -123,6 +123,7 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
 export type UpdateQuoteInput = {
   title: string
   notes?: string
+  introText?: string
   includedItems?: string
   termsText?: string
   validUntil?: string
@@ -133,7 +134,7 @@ export type UpdateQuoteInput = {
 
 export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Promise<void> {
   const { userId } = await verifySession()
-  const { title, notes, includedItems, termsText, validUntil, discountAmount, lines, energy } = input
+  const { title, notes, introText, includedItems, termsText, validUntil, discountAmount, lines, energy } = input
 
   if (!title || lines.length === 0) {
     throw new Error('Titel en minimaal één productregel zijn verplicht')
@@ -154,6 +155,7 @@ export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Pro
       data: {
         title,
         notes: notes || null,
+        introText: introText || null,
         includedItems: includedItems || null,
         termsText: termsText || null,
         validUntil: validUntil ? new Date(validUntil) : null,
