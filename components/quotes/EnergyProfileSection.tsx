@@ -108,10 +108,12 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
     const gas      = parseFloat(state.gasUsageM3) || 0
     const gasTariff = parseFloat(state.gasTariff) || 1.10
     if (usage === 0 && gas === 0) return
+    const feedback    = parseFloat(state.electricityFeedbackKwh) || 0
+    const feedInCost  = parseFloat(state.feedInCostTariff) || 0.02
     const netElec = Math.max(0, usage - (state.hasSolarPanels ? solar : 0))
-    const monthly = Math.round(netElec * tariff / 12 + gas * gasTariff / 12)
+    const monthly = Math.round(netElec * tariff / 12 + gas * gasTariff / 12 + feedback * feedInCost / 12)
     onChange({ currentMonthlyBill: String(monthly) })
-  }, [state.electricityUsageKwh, state.solarProductionKwh, state.electricityTariff, state.gasUsageM3, state.gasTariff, state.hasSolarPanels, billManuallyEdited])
+  }, [state.electricityUsageKwh, state.solarProductionKwh, state.electricityTariff, state.gasUsageM3, state.gasTariff, state.hasSolarPanels, state.electricityFeedbackKwh, state.feedInCostTariff, billManuallyEdited])
 
   function runEstimate() {
     if (!state.numPersons || !state.houseType || !state.buildYear) return

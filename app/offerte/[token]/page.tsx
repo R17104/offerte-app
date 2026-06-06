@@ -109,8 +109,9 @@ export default async function PublicQuotePage({ params }: Props) {
 
   const showSalderingPage = quote.hasSolarPanels && feedbackKwh > 0 && solarKwh > 0
   const currentMonthlyBill = quote.currentMonthlyBill ?? 0
+  const totalMonthlyExtra = Math.round((saldingYearlyExtra + feedInYearlyCost) / 12)
   const monthlyBill2027 = currentMonthlyBill > 0
-    ? Math.round(currentMonthlyBill + saldingMonthlyExtra)
+    ? Math.round(currentMonthlyBill + totalMonthlyExtra)
     : 0
 
   const pageCount = 1
@@ -394,14 +395,18 @@ export default async function PublicQuotePage({ params }: Props) {
                     <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Berekening</p>
                     {[
                       { label: 'Teruglevering per jaar', value: `${feedbackKwh.toLocaleString('nl-NL')} kWh` },
-                      { label: 'Huidig salderingsvoordeel', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.electricityTariff.toFixed(2).replace('.', ',')}` },
-                      { label: 'Uitbetaling na 2027', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedbackTariff.toFixed(2).replace('.', ',')}` },
-                      { label: 'Verschil per jaar', value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}` },
-                      { label: 'Verschil per maand', value: `€${saldingMonthlyExtra}` },
+                      { label: 'Huidig salderingsvoordeel', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.electricityTariff.toFixed(2).replace('.', ',')}`, sub: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr` },
+                      { label: 'Uitbetaling na 2027', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedbackTariff.toFixed(2).replace('.', ',')}`, sub: `€${feedbackIncomeLow.toLocaleString('nl-NL')}/jr` },
+                      { label: 'Terugleverkosten leverancier', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedInCostTariff.toFixed(3).replace('.', ',')}`, sub: `€${feedInYearlyCost.toLocaleString('nl-NL')}/jr` },
+                      { label: 'Totaal extra kosten per jaar', value: `€${(saldingYearlyExtra + feedInYearlyCost).toLocaleString('nl-NL')}`, bold: true },
+                      { label: 'Totaal extra kosten per maand', value: `€${Math.round((saldingYearlyExtra + feedInYearlyCost) / 12)}`, bold: true },
                     ].map((row, i) => (
-                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid #f1f5f9', fontSize: 13, color: '#374151' }}>
-                        <span>{row.label}</span>
-                        <span style={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{row.value}</span>
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid #f1f5f9', fontSize: 13, color: '#374151', background: row.bold ? '#f1f5f9' : 'transparent', marginLeft: row.bold ? -18 : 0, marginRight: row.bold ? -18 : 0, paddingLeft: row.bold ? 18 : 0, paddingRight: row.bold ? 18 : 0 }}>
+                        <span style={{ fontWeight: row.bold ? 700 : 400 }}>{row.label}</span>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontWeight: row.bold ? 700 : 600, fontVariantNumeric: 'tabular-nums', color: row.bold ? '#b91c1c' : '#374151' }}>{row.value}</span>
+                          {'sub' in row && row.sub && <span style={{ display: 'block', fontSize: 11, color: '#9ca3af' }}>{row.sub}</span>}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -424,7 +429,7 @@ export default async function PublicQuotePage({ params }: Props) {
                 ) : (
                   <div style={{ background: '#fef9c3', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 16px' }}>
                     <p style={{ fontSize: 13, color: '#92400e' }}>
-                      Uw maandelijkse termijnstijging bedraagt <strong>€{saldingMonthlyExtra} per maand</strong> na 2027.
+                      Uw maandelijkse kostenstijging bedraagt <strong>€{totalMonthlyExtra} per maand</strong> na 2027 (saldering + terugleverkosten).
                     </p>
                   </div>
                 )}
