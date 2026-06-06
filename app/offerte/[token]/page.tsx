@@ -82,7 +82,7 @@ export default async function PublicQuotePage({ params }: Props) {
 
   // ── Page footer helper ────────────────────────────────────────────────────
   const PageFooter = ({ n, total }: { n: number; total: number }) => (
-    <div style={{ background: green, padding: '16px 52px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+    <div className="pf" style={{ background: green, padding: '16px 52px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
       <div style={{ display: 'flex', gap: 28 }}>
         {[
           { v: '250+', l: 'installaties' },
@@ -126,16 +126,37 @@ export default async function PublicQuotePage({ params }: Props) {
   return (
     <div style={{ fontFamily: font, background: '#d4d4d4', minHeight: '100vh', color: '#111827' }}>
 
-      {/* Print styles */}
+      {/* Print + responsive styles */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           .no-print { display: none !important; }
           .doc-page { box-shadow: none !important; page-break-after: always; margin-bottom: 0 !important; }
           body { background: white !important; }
         }
+        /* Tablet */
         @media (max-width: 900px) {
-          .lh { padding-left: 24px !important; padding-right: 24px !important; }
-          .li { padding: 32px 28px !important; }
+          .lh  { padding: 20px 28px !important; }
+          .li  { padding: 32px 28px !important; }
+          .ph  { padding: 24px 28px !important; }
+          .sec { padding: 32px 28px !important; }
+          .pf  { padding: 12px 28px !important; }
+          .g2  { grid-template-columns: 1fr !important; }
+          .g2r { grid-template-columns: 1fr !important; }
+        }
+        /* Mobile */
+        @media (max-width: 600px) {
+          .doc-page { margin-bottom: 12px !important; }
+          .lh  { padding: 16px 18px !important; flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .lh-right { text-align: left !important; }
+          .li  { padding: 24px 18px !important; }
+          .ph  { padding: 20px 18px !important; }
+          .sec { padding: 24px 18px !important; }
+          .pf  { padding: 10px 18px !important; flex-direction: column !important; gap: 6px !important; }
+          .g2  { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .g2r { grid-template-columns: 1fr !important; }
+          .hide-mobile { display: none !important; }
+          .doc-page h2 { font-size: 20px !important; }
+          .num-big { font-size: 36px !important; }
         }
       ` }} />
 
@@ -195,7 +216,7 @@ export default async function PublicQuotePage({ params }: Props) {
                 </p>
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
+            <div className="lh-right" style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>058-2038054</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>info@bespaarhulpfriesland.nl</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>KVK 71128174</p>
@@ -290,7 +311,7 @@ export default async function PublicQuotePage({ params }: Props) {
         <div className="doc-page" style={PAGE}>
 
           {/* Dark header */}
-          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+          <div className="ph" style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
               Energiebeleid Nederland
             </p>
@@ -303,8 +324,8 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Context tekst */}
-          <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div className="sec" style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
+            <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Achtergrond</p>
                 <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 14 }}>
@@ -335,9 +356,9 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Wat betekent dit voor jou */}
-          <div style={{ padding: '44px 52px', flex: 1 }}>
+          <div className="sec" style={{ padding: '44px 52px', flex: 1 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 28 }}>Wat betekent dit voor u?</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
+            <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
 
               {/* Cirkeldiagram */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -447,7 +468,7 @@ export default async function PublicQuotePage({ params }: Props) {
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
 
           {/* Page header */}
-          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+          <div className="ph" style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
               Situatie-analyse
             </p>
@@ -461,15 +482,15 @@ export default async function PublicQuotePage({ params }: Props) {
 
           {/* S1 — Saldering */}
           {quote.hasSolarPanels && feedbackKwh > 0 && (
-            <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
+            <div className="sec" style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
               <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                   Energiemarktrisico 1: Afschaffing saldering
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
+                <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                   <div>
                     <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Jaarlijkse kostenstijging na 2027</p>
-                    <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                    <p className="num-big" style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
                       +€{saldingYearlyExtra.toLocaleString('nl-NL')}
                     </p>
                     <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>per jaar · +€{saldingMonthlyExtra}/maand</p>
@@ -521,15 +542,15 @@ export default async function PublicQuotePage({ params }: Props) {
 
           {/* S2 — Terugleverkosten */}
           {quote.hasSolarPanels && feedInYearlyCost > 0 && (
-            <div style={{ padding: '44px 52px', background: '#f8f9fa', borderBottom: '1px solid #e5e7eb' }}>
+            <div className="sec" style={{ padding: '44px 52px', background: '#f8f9fa', borderBottom: '1px solid #e5e7eb' }}>
               <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                   Energiemarktrisico 2: Terugleverkosten
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
+                <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                   <div>
                     <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Jaarlijkse kosten, nu al</p>
-                    <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                    <p className="num-big" style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
                       €{feedInYearlyCost.toLocaleString('nl-NL')}
                     </p>
                     <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>per jaar · €{Math.round(feedInYearlyCost / 12)}/maand</p>
@@ -558,15 +579,15 @@ export default async function PublicQuotePage({ params }: Props) {
           )}
 
           {/* S3 — Netcongestie & EMS */}
-          <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
+          <div className="sec" style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
             <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                 Marktachtergrond: Netcongestie en onbalansmarkt
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
+              <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                 <div>
                   <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Netgebieden met congestie</p>
-                  <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>74%</p>
+                  <p className="num-big" style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>74%</p>
                   <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>2025 · Bron: Netbeheer Nederland</p>
                   <div style={{ marginTop: 24 }}>
                     <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 10 }}>% netgebieden met congestie (2020–2027)</p>
@@ -599,15 +620,15 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* S4 — Woningwaarde */}
-          <div style={{ padding: '44px 52px', background: '#f8f9fa' }}>
+          <div className="sec" style={{ padding: '44px 52px', background: '#f8f9fa' }}>
             <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
                 Vastgoedprestatie: Energielabel en woningwaarde
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
+              <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                 <div>
                   <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Waardeverschil label A vs. D</p>
-                  <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>+14%</p>
+                  <p className="num-big" style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>+14%</p>
                   <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Bron: PBL / Calcasa 2023</p>
                   <div style={{ marginTop: 24 }}>
                     <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 10 }}>Relatieve woningwaarde per energielabel</p>
@@ -656,7 +677,7 @@ export default async function PublicQuotePage({ params }: Props) {
         <div className="doc-page" style={PAGE}>
 
           {/* Dark header */}
-          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+          <div className="ph" style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
               Het antwoord
             </p>
@@ -669,7 +690,7 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Table */}
-          <div style={{ padding: '44px 52px' }}>
+          <div className="sec" style={{ padding: '44px 52px' }}>
             <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', marginBottom: 28 }}>
               {((): { title: string; desc: string; value: string | null; note?: boolean }[] => [
                 ...(quote.hasSolarPanels && feedbackKwh > 0 && saldingYearlyExtra > 0 ? [{
@@ -775,7 +796,7 @@ export default async function PublicQuotePage({ params }: Props) {
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
 
           {/* Header */}
-          <div style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
+          <div className="ph" style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
               Uw installatie
             </p>
@@ -785,7 +806,7 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Products */}
-          <div style={{ padding: '36px 52px', flex: 1 }}>
+          <div className="sec" style={{ padding: '36px 52px', flex: 1 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
               {quote.lines.map((line) => {
                 const p2 = line.product
@@ -859,7 +880,7 @@ export default async function PublicQuotePage({ params }: Props) {
         <div className="doc-page" style={PAGE}>
 
           {/* Header */}
-          <div style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
+          <div className="ph" style={{ background: '#111827', padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
               Investering
             </p>
@@ -868,8 +889,8 @@ export default async function PublicQuotePage({ params }: Props) {
             </h2>
           </div>
 
-          <div style={{ padding: '44px 52px', flex: 1 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start', marginBottom: 36 }}>
+          <div className="sec" style={{ padding: '44px 52px', flex: 1 }}>
+            <div className="g2r" style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start', marginBottom: 36 }}>
               <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
                 {quote.lines.map((line, i) => (
                   <div key={line.id} style={{ padding: '14px 20px', borderBottom: i < quote.lines.length - 1 ? '1px solid #e5e7eb' : 'none', display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center' }}>
@@ -921,7 +942,7 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Social proof fill */}
-          <div style={{ background: '#f8f9fa', borderTop: '1px solid #e5e7eb', padding: '36px 52px', flexShrink: 0 }}>
+          <div className="sec" style={{ background: '#f8f9fa', borderTop: '1px solid #e5e7eb', padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>
               250+ tevreden huishoudens gingen u voor
             </p>
@@ -942,7 +963,7 @@ export default async function PublicQuotePage({ params }: Props) {
 
           {/* Acceptatie — 3 knoppen + formulier */}
           {canInteract && (
-            <div style={{ padding: '36px 52px', borderTop: '1px solid #e5e7eb' }}>
+            <div className="sec" style={{ padding: '36px 52px', borderTop: '1px solid #e5e7eb' }}>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Wat wilt u doen?</p>
               <p style={{ fontSize: 13.5, color: '#6b7280', marginBottom: 22 }}>
                 Kies een optie en onderteken digitaal. Na ondertekening nemen wij binnen 24 uur contact op.
@@ -973,7 +994,7 @@ export default async function PublicQuotePage({ params }: Props) {
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
 
           {/* Header */}
-          <div style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
+          <div className="ph" style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
               Algemene voorwaarden
             </p>
@@ -983,13 +1004,13 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Terms */}
-          <div style={{ padding: '36px 52px', borderBottom: '1px solid #e5e7eb' }}>
+          <div className="sec" style={{ padding: '36px 52px', borderBottom: '1px solid #e5e7eb' }}>
             <TermsAndConditions text={quote.termsText} />
           </div>
 
           {/* Handtekening weergave na acceptatie */}
           {quote.status === 'ACCEPTED' && quote.acceptance && (
-            <div style={{ padding: '32px 52px', background: '#f0fdf4' }}>
+            <div className="sec" style={{ padding: '32px 52px', background: '#f0fdf4' }}>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#15803d', marginBottom: 8 }}>
                 Geaccepteerd op {formatDate(quote.acceptedAt)}
               </p>
@@ -1005,7 +1026,7 @@ export default async function PublicQuotePage({ params }: Props) {
           )}
 
           {!quote.termsText && quote.status !== 'ACCEPTED' && (
-            <div style={{ padding: '36px 52px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="sec" style={{ padding: '36px 52px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <p style={{ fontSize: 14, color: '#9ca3af' }}>Geen algemene voorwaarden toegevoegd aan deze offerte.</p>
             </div>
           )}
