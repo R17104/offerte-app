@@ -20,26 +20,24 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             marginBottom: 32,
           }}
         >
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              background: 'var(--accent)',
-              borderRadius: 10,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <svg width="18" height="18" fill="none" viewBox="0 0 16 16">
-              <path d="M8 13.5C8 13.5 2.5 10.5 2.5 6A5.5 5.5 0 0 1 13.5 6C13.5 10.5 8 13.5 8 13.5Z" stroke="white" strokeWidth="1.3" strokeLinejoin="round"/>
-              <path d="M8 13.5V8M8 8L5.5 5.5M8 8L10.5 5.5" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.01em', display: 'block', lineHeight: 1.2 }}>Bespaarhulp</span>
-            <span style={{ fontWeight: 500, fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Friesland</span>
+          <svg width="44" height="42" viewBox="0 0 36 34" fill="none">
+            <rect x="10" y="4" width="3.5" height="6" rx="0.5" fill="#f5c442"/>
+            <path d="M0 15L18 2L36 15H0Z" fill="#f5c442"/>
+            <rect x="2" y="15" width="32" height="19" rx="1.5" fill="#0a5c35"/>
+            <rect x="5" y="18" width="7" height="5.5" rx="0.5" fill="white" fillOpacity="0.22"/>
+            <rect x="5" y="25.5" width="7" height="6" rx="0.5" fill="white" fillOpacity="0.22"/>
+            <rect x="14" y="18" width="7" height="5.5" rx="0.5" fill="white" fillOpacity="0.22"/>
+            <rect x="14" y="25.5" width="7" height="6" rx="0.5" fill="white" fillOpacity="0.22"/>
+            <circle cx="28" cy="22" r="4.5" fill="#f5c442"/>
+            <circle cx="26.5" cy="20.5" r="3" fill="#0a5c35"/>
+          </svg>
+          <div style={{ lineHeight: 1 }}>
+            <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em' }}>
+              <span style={{ color: '#0a5c35' }}>Bespaar</span><span style={{ color: '#f5c442' }}>hulp</span>
+            </div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-tertiary)', letterSpacing: '0.10em', textTransform: 'uppercase', marginTop: 4 }}>
+              Friesland
+            </div>
           </div>
         </div>
         {children}
