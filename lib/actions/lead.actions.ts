@@ -73,6 +73,35 @@ export async function archiveLead(leadId: string) {
   redirect('/leads')
 }
 
+export async function updateLead(leadId: string, data: LeadImportRow) {
+  const { userId } = await verifySession()
+  await prisma.lead.update({
+    where: { id: leadId, createdById: userId },
+    data: {
+      firstName:   data.firstName,
+      lastName:    data.lastName,
+      email:       data.email    || null,
+      phone:       data.phone    || null,
+      street:      data.street   || null,
+      houseNumber: data.houseNumber || null,
+      postalCode:  data.postalCode  || null,
+      city:        data.city        || null,
+    },
+  })
+  revalidatePath('/leads')
+  revalidatePath(`/leads/${leadId}`)
+  redirect(`/leads/${leadId}`)
+}
+
+export async function deleteLead(leadId: string) {
+  const { userId } = await verifySession()
+  await prisma.lead.delete({
+    where: { id: leadId, createdById: userId },
+  })
+  revalidatePath('/leads')
+  redirect('/leads')
+}
+
 export async function createLead(data: LeadImportRow) {
   const { userId } = await verifySession()
   const lead = await prisma.lead.create({

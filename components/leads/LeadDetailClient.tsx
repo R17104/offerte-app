@@ -194,6 +194,17 @@ export default function LeadDetailClient({ lead }: { lead: Lead }) {
           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
             Acties
           </p>
+            <a
+            href={`/leads/${lead.id}/bewerken`}
+            style={{
+              display: 'block', width: '100%', padding: '8px 14px', borderRadius: 8,
+              background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 500,
+              border: 'none', cursor: 'pointer', textAlign: 'center',
+              textDecoration: 'none', marginBottom: 8, boxSizing: 'border-box',
+            }}
+          >
+            Bewerken
+          </a>
           <form action={archiveLead.bind(null, lead.id)}>
             <button
               type="submit"
