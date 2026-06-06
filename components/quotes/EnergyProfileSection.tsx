@@ -11,6 +11,7 @@ export type EnergyState = {
   subsidyAmount: number
   hasBtwReturn: boolean
   hasSolarPanels: boolean
+  solarPanelKwp: string
   solarProductionKwh: string
   electricityUsageKwh: string
   electricityFeedbackKwh: string
@@ -19,6 +20,7 @@ export type EnergyState = {
   feedbackTariff: string
   gasTariff: string
   feedInCostTariff: string
+  hasHeatPump: boolean
   emsAnnualRevenueEur: string
   currentMonthlyBill: string
   numPersons: string
@@ -35,6 +37,7 @@ export const DEFAULT_ENERGY_STATE: EnergyState = {
   subsidyAmount: 0,
   hasBtwReturn: false,
   hasSolarPanels: false,
+  solarPanelKwp: '',
   solarProductionKwh: '',
   electricityUsageKwh: '',
   electricityFeedbackKwh: '',
@@ -43,6 +46,7 @@ export const DEFAULT_ENERGY_STATE: EnergyState = {
   feedbackTariff: '0.07',
   gasTariff: '1.10',
   feedInCostTariff: '0.02',
+  hasHeatPump: false,
   emsAnnualRevenueEur: '0',
   currentMonthlyBill: '0',
   numPersons: '',
@@ -94,6 +98,127 @@ const s = {
     fontFamily: 'var(--font-sans)',
     textAlign: 'left' as const,
   }),
+}
+
+const ALPHA_SIZES = [5.9, 9.3, 11.8, 18.6]
+
+function calcBatteryAdvice(state: EnergyState) {
+  const feedbackKwh = parseFloat(state.electricityFeedbackKwh) || 0
+  const solarKwh    = parseFloat(state.solarProductionKwh) || 0
+  const usageKwh    = parseFloat(state.electricityUsageKwh) || 0
+  const kwp         = parseFloat(state.solarPanelKwp) || 0
+
+  if (!state.hasSolarPanels || feedbackKwh <= 0 || solarKwh <= 0) return null
+
+  // Average daily surplus (full year)
+  const dailySurplusAvg = feedbackKwh / 365
+
+  // Summer accounts for ~65% of annual feedback, spread over 182 days
+  const summerDailySurplus = (feedbackKwh * 0.65) / 182
+
+  // Base recommendation: store a typical summer day's surplus
+  let baseKwh = summerDailySurplus
+
+  // Heat pump: adds evening/morning load that battery can serve → needs more capacity
+  const heatPumpExtra = state.hasHeatPump ? 2.5 : 0
+  baseKwh += heatPumpExtra
+
+  // High kWp → fast charge, more instantaneous power → need larger buffer
+  let kwpExtra = 0
+  if (kwp >= 8) { kwpExtra = kwp * 0.15; baseKwh = Math.max(baseKwh, kwp * 1.2) }
+  else if (kwp >= 5) { kwpExtra = kwp * 0.1; baseKwh = Math.max(baseKwh, kwp * 1.0) }
+
+  // Minimum viable battery
+  baseKwh = Math.max(4, baseKwh)
+
+  const recommended = ALPHA_SIZES.find((s) => s >= baseKwh) ?? 18.6
+
+  // Self-use gain: the amount of feedback we can now use ourselves instead of selling cheap
+  // Assume battery absorbs ~85% of daily feedback (limited by battery size vs surplus)
+  const absorbable = Math.min(recommended * 365 * 0.9, feedbackKwh * 0.85)
+  const tariffDiff = (parseFloat(state.electricityTariff) || 0.28) - (parseFloat(state.feedbackTariff) || 0.07)
+  const annualSavings = Math.round(absorbable * tariffDiff)
+
+  return {
+    feedbackKwh,
+    solarKwh,
+    usageKwh,
+    kwp,
+    dailySurplusAvg: Math.round(dailySurplusAvg * 10) / 10,
+    summerDailySurplus: Math.round(summerDailySurplus * 10) / 10,
+    heatPumpExtra,
+    kwpExtra: Math.round(kwpExtra * 10) / 10,
+    baseKwh: Math.round(baseKwh * 10) / 10,
+    recommended,
+    annualSavings,
+    selfUseKwh: Math.round(absorbable),
+  }
+}
+
+function BatteryAdvice({ state }: { state: EnergyState }) {
+  const adv = calcBatteryAdvice(state)
+  if (!adv) return null
+
+  const row = (label: string, value: string, sub?: string) => (
+    <tr key={label}>
+      <td style={{ paddingBottom: 6, paddingRight: 16, fontSize: 13, color: 'var(--text-secondary)', verticalAlign: 'top' }}>{label}</td>
+      <td style={{ paddingBottom: 6, fontSize: 13, fontWeight: 600, verticalAlign: 'top' }}>
+        {value}
+        {sub && <span style={{ fontSize: 11.5, fontWeight: 400, color: 'var(--text-tertiary)', marginLeft: 6 }}>{sub}</span>}
+      </td>
+    </tr>
+  )
+
+  return (
+    <div style={{
+      background: 'rgba(10,92,53,0.06)',
+      border: '1.5px solid rgba(10,92,53,0.25)',
+      borderRadius: 'var(--radius-lg)',
+      padding: '18px 20px',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--accent)', margin: '0 0 2px' }}>Batterijadvies</p>
+          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0 }}>Op basis van het ingevulde energieprofiel</p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--accent)', lineHeight: 1 }}>{adv.recommended} kWh</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>aanbevolen batterijcapaciteit</div>
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: '#2563eb', marginTop: 4 }}>≈ €{adv.annualSavings}/jaar extra besparing</div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 16, borderTop: '1px solid rgba(10,92,53,0.15)', paddingTop: 14 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Berekening</p>
+        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <tbody>
+            {row('Gemiddeld dagelijks overschot', `${adv.dailySurplusAvg} kWh/dag`, `(${adv.feedbackKwh} kWh/jaar ÷ 365)`)}
+            {row('Zomers dagelijks overschot', `${adv.summerDailySurplus} kWh/dag`, '(65% van jaaropbrengst in ~182 zomerdagen)')}
+            {row('Startpunt berekening', `${adv.summerDailySurplus} kWh`, 'zomerse piekopwek bepaalt minimale capaciteit')}
+            {adv.heatPumpExtra > 0 && row('Warmtepomp toeslag', `+${adv.heatPumpExtra} kWh`, 'verschuiving warmtevraag naar zonne-uren')}
+            {adv.kwp > 0 && adv.kwpExtra > 0 && row(`Hoog vermogen (${adv.kwp} kWp)`, `+${adv.kwpExtra} kWh`, 'snelle laadpiek vraagt grotere buffer')}
+            {row('Minimaal benodigde capaciteit', `${adv.baseKwh} kWh`, '')}
+            {row('Aanbevolen Alpha ESS maat', `${adv.recommended} kWh`, `naaste beschikbare grootte ≥ ${adv.baseKwh} kWh`)}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: 12, background: 'rgba(10,92,53,0.04)', borderRadius: 8, padding: '10px 14px' }}>
+        <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0 }}>
+          <strong>Toelichting:</strong> Met {adv.recommended} kWh batterij kan de klant circa {adv.selfUseKwh} kWh/jaar meer zelf gebruiken
+          in plaats van terug te leveren tegen {parseFloat(state.feedbackTariff) || 0.07}€/kWh.
+          Dit levert een tariffsverschil op van €{Math.round(((parseFloat(state.electricityTariff) || 0.28) - (parseFloat(state.feedbackTariff) || 0.07)) * 100) / 100}/kWh,
+          dus circa €{adv.annualSavings}/jaar{state.hasHeatPump ? ' (inclusief warmtepomp-toeslag)' : ''}.
+          {adv.kwp >= 8 ? ` Door het hoge paneelvermogen (${adv.kwp} kWp) is een grotere batterij nodig om de piekopwek volledig te bufferen.` : ''}
+        </p>
+      </div>
+
+      <p style={{ fontSize: 11.5, color: 'var(--text-tertiary)', margin: '10px 0 0', fontStyle: 'italic' }}>
+        Niet meegenomen: dakoriëntatie, schaduw, EV-laden thuis, of dynamisch verbruikspatroon.
+        Beschouw dit als een eerste indicatie.
+      </p>
+    </div>
+  )
 }
 
 export default function EnergyProfileSection({ state, onChange }: Props) {
@@ -309,16 +434,25 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
               </p>
             </div>
 
-            {/* Zonnepanelen toggle */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, fontWeight: 500 }}>
-              <input type="checkbox"
-                checked={state.hasSolarPanels}
-                onChange={(e) => onChange({ hasSolarPanels: e.target.checked })}
-                style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
-              Klant heeft al zonnepanelen
-            </label>
+            {/* Situatie klant */}
+            <div style={{ display: 'flex', gap: 24 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, fontWeight: 500 }}>
+                <input type="checkbox"
+                  checked={state.hasSolarPanels}
+                  onChange={(e) => onChange({ hasSolarPanels: e.target.checked })}
+                  style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
+                Klant heeft al zonnepanelen
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, fontWeight: 500 }}>
+                <input type="checkbox"
+                  checked={state.hasHeatPump}
+                  onChange={(e) => onChange({ hasHeatPump: e.target.checked })}
+                  style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
+                Klant heeft al een warmtepomp
+              </label>
+            </div>
 
-            <div style={state.hasSolarPanels ? s.row3 : s.row2}>
+            <div style={state.hasSolarPanels ? s.row4 : s.row2}>
               <div>
                 <label style={s.label}>Stroomverbruik (kWh/jaar)</label>
                 <input type="number" min="0" step="any"
@@ -326,6 +460,16 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                   onChange={(e) => onChange({ electricityUsageKwh: e.target.value })}
                   placeholder="3200" style={s.input} />
               </div>
+              {state.hasSolarPanels && (
+                <div>
+                  <label style={s.label}>Vermogen panelen (kWp)</label>
+                  <input type="number" min="0" step="any"
+                    value={state.solarPanelKwp}
+                    onChange={(e) => onChange({ solarPanelKwp: e.target.value })}
+                    placeholder="5.0" style={s.input} />
+                  <p style={s.hint}>Piekvermogen totale installatie</p>
+                </div>
+              )}
               {state.hasSolarPanels && (
                 <div>
                   <label style={s.label}>Zonne-opwek (kWh/jaar)</label>
@@ -356,6 +500,9 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           </div>
         )}
       </div>
+
+      {/* Batterijadvies */}
+      <BatteryAdvice state={state} />
 
       {/* Tarieven */}
       <div style={s.card}>

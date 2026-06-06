@@ -166,10 +166,12 @@ model Quote {
 
   // ── Energieprofiel klant ─────────────────────────────────────────────────
   hasSolarPanels         Boolean @default(false)
+  solarPanelKwp          Float?  // Piekvermogen zonnepanelen (kWp)
   solarProductionKwh     Float?  // Jaarlijkse opwek zonnepanelen (kWh)
   electricityUsageKwh    Float?  // Jaarverbruik stroom (kWh)
   electricityFeedbackKwh Float?  // Jaarlijkse teruglevering (kWh)
   gasUsageM3             Float?  // Jaarverbruik gas (m³)
+  hasHeatPump            Boolean @default(false) // Klant heeft al een warmtepomp
 
   // Tarieven (met defaults, handmatig aanpasbaar)
   electricityTariff Float @default(0.28)  // €/kWh

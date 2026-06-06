@@ -43,6 +43,7 @@ type Props = {
     subsidyAmount: number
     hasBtwReturn: boolean
     hasSolarPanels: boolean
+    solarPanelKwp: number | null
     solarProductionKwh: number | null
     electricityUsageKwh: number | null
     electricityFeedbackKwh: number | null
@@ -53,6 +54,7 @@ type Props = {
     feedInCostTariff: number
     emsAnnualRevenueEur: number
     currentMonthlyBill: number
+    hasHeatPump: boolean
     numPersons: number | null
     houseType: string | null
     buildYear: number | null
@@ -111,6 +113,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
     subsidyAmount: initialData.subsidyAmount,
     hasBtwReturn: initialData.hasBtwReturn,
     hasSolarPanels: initialData.hasSolarPanels,
+    solarPanelKwp: initialData.solarPanelKwp != null ? String(initialData.solarPanelKwp) : '',
     solarProductionKwh: initialData.solarProductionKwh != null ? String(initialData.solarProductionKwh) : '',
     electricityUsageKwh: initialData.electricityUsageKwh != null ? String(initialData.electricityUsageKwh) : '',
     electricityFeedbackKwh: initialData.electricityFeedbackKwh != null ? String(initialData.electricityFeedbackKwh) : '',
@@ -121,6 +124,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
     feedInCostTariff: String(initialData.feedInCostTariff),
     emsAnnualRevenueEur: String(initialData.emsAnnualRevenueEur),
     currentMonthlyBill: String(initialData.currentMonthlyBill),
+    hasHeatPump: initialData.hasHeatPump,
     numPersons: initialData.numPersons != null ? String(initialData.numPersons) : '',
     houseType: initialData.houseType ?? '',
     buildYear: initialData.buildYear != null ? String(initialData.buildYear) : '',
@@ -171,6 +175,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         subsidyAmount: energy.subsidyAmount,
         hasBtwReturn: energy.hasBtwReturn,
         hasSolarPanels: energy.hasSolarPanels,
+        solarPanelKwp: energy.solarPanelKwp ? parseFloat(energy.solarPanelKwp) : null,
         solarProductionKwh: energy.solarProductionKwh ? parseFloat(energy.solarProductionKwh) : null,
         electricityUsageKwh: energy.electricityUsageKwh ? parseFloat(energy.electricityUsageKwh) : null,
         electricityFeedbackKwh: energy.electricityFeedbackKwh ? parseFloat(energy.electricityFeedbackKwh) : null,
@@ -181,6 +186,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0,
         emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
         currentMonthlyBill: parseFloat(energy.currentMonthlyBill) || 0,
+        hasHeatPump: energy.hasHeatPump,
         numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
         houseType: energy.houseType ? energy.houseType as EnergyProfile['houseType'] : null,
         buildYear: energy.buildYear ? parseInt(energy.buildYear) : null,

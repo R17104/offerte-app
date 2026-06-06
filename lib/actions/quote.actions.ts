@@ -37,6 +37,7 @@ export type EnergyProfile = {
   subsidyAmount: number
   hasBtwReturn: boolean
   hasSolarPanels: boolean
+  solarPanelKwp?: number | null
   solarProductionKwh?: number | null
   electricityUsageKwh?: number | null
   electricityFeedbackKwh?: number | null
@@ -47,6 +48,7 @@ export type EnergyProfile = {
   feedInCostTariff: number
   emsAnnualRevenueEur: number
   currentMonthlyBill: number
+  hasHeatPump: boolean
   numPersons?: number | null
   houseType?: HouseType | null
   buildYear?: number | null
