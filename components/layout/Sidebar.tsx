@@ -78,26 +78,30 @@ export default function Sidebar() {
       >
         <div
           style={{
-            width: 26,
-            height: 26,
+            width: 30,
+            height: 30,
             background: 'var(--accent)',
-            borderRadius: 7,
+            borderRadius: 8,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <svg width="13" height="13" fill="none" viewBox="0 0 13 13">
-            <rect x="1" y="1" width="4.5" height="4.5" rx="1" fill="white" />
-            <rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill="white" opacity=".6" />
-            <rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill="white" opacity=".6" />
-            <rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill="white" opacity=".4" />
+          {/* Leaf / energy icon */}
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+            <path d="M8 13.5C8 13.5 2.5 10.5 2.5 6A5.5 5.5 0 0 1 13.5 6C13.5 10.5 8 13.5 8 13.5Z" stroke="white" strokeWidth="1.3" strokeLinejoin="round"/>
+            <path d="M8 13.5V8M8 8L5.5 5.5M8 8L10.5 5.5" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <span style={{ fontWeight: 600, fontSize: 14, letterSpacing: '-0.02em' }}>
-          QuoteApp
-        </span>
+        <div>
+          <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '-0.01em', color: 'var(--text-primary)', display: 'block', lineHeight: 1.2 }}>
+            Bespaarhulp
+          </span>
+          <span style={{ fontWeight: 500, fontSize: 10.5, color: 'var(--text-tertiary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Friesland
+          </span>
+        </div>
       </div>
 
       {/* Nav */}
@@ -134,9 +138,9 @@ export default function Sidebar() {
                     gap: 9,
                     padding: '6px 8px',
                     borderRadius: 'var(--radius-md)',
-                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    background: active ? 'var(--bg-active)' : 'transparent',
-                    fontWeight: active ? 500 : 400,
+                    color: active ? 'var(--accent)' : 'var(--text-secondary)',
+                    background: active ? 'var(--accent-muted)' : 'transparent',
+                    fontWeight: active ? 600 : 400,
                     fontSize: 13.5,
                     transition: 'all 0.1s',
                     marginBottom: 1,
