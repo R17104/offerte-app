@@ -761,9 +761,9 @@ export default async function PublicQuotePage({ params }: Props) {
             <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>
               250+ tevreden huishoudens gingen u voor
             </p>
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 24 }}>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               {[
-                { title: '4,8/5', sub: 'gemiddelde beoordeling' },
+                { title: '1 week', sub: 'binnen 1 week thuis geïnstalleerd' },
                 { title: '250+', sub: 'installaties in Friesland' },
                 { title: 'Warmtefonds', sub: 'lage rente financiering' },
                 { title: 'BTW-teruggave', sub: 'wij regelen het volledig' },
@@ -773,15 +773,6 @@ export default async function PublicQuotePage({ params }: Props) {
                   <p style={{ fontSize: 12, color: '#6b7280' }}>{b.sub}</p>
                 </div>
               ))}
-            </div>
-            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '18px 22px' }}>
-              <div style={{ display: 'flex', gap: 2, marginBottom: 8 }}>
-                {[1,2,3,4,5].map(s => <span key={s} style={{ color: gold, fontSize: 14 }}>★</span>)}
-              </div>
-              <p style={{ fontSize: 13.5, color: '#374151', lineHeight: 1.6, fontStyle: 'italic' }}>
-                "Bespaarhulp Friesland heeft alles van A tot Z geregeld. De thuisbatterij werkt perfect en we merken het direct op onze energierekening."
-              </p>
-              <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>— Familie de Jong, Leeuwarden</p>
             </div>
           </div>
 
