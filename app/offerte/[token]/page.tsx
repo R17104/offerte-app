@@ -86,7 +86,6 @@ export default async function PublicQuotePage({ params }: Props) {
       <div style={{ display: 'flex', gap: 28 }}>
         {[
           { v: '250+', l: 'installaties' },
-          { v: '4,8/5', l: 'beoordeling' },
           { v: 'KVK', l: '71128174' },
         ].map(b => (
           <div key={b.v}>
@@ -197,7 +196,7 @@ export default async function PublicQuotePage({ params }: Props) {
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>06-24992098</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>058-2038054</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>info@bespaarhulpfriesland.nl</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>KVK 71128174</p>
             </div>
@@ -267,7 +266,7 @@ export default async function PublicQuotePage({ params }: Props) {
                   een persoonlijke situatie-analyse en transparante prijsopbouw.
                 </p>
                 <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 16 }}>
-                  Voor vragen staat ons team voor u klaar via 06-24992098 of info@bespaarhulpfriesland.nl.
+                  Voor vragen staat ons team voor u klaar via 058-2038054 of info@bespaarhulpfriesland.nl.
                 </p>
               </div>
             )}
@@ -299,7 +298,7 @@ export default async function PublicQuotePage({ params }: Props) {
               Het einde van de salderingsregeling
             </h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
-              Wat verandert er in 2027 — en wat betekent dat concreet voor uw energierekening?
+              Wat verandert er in 2027 en wat betekent dat concreet voor uw energierekening?
             </p>
           </div>
 
@@ -309,16 +308,16 @@ export default async function PublicQuotePage({ params }: Props) {
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Achtergrond</p>
                 <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85, marginBottom: 14 }}>
-                  Nederland was jarenlang een van de <strong>weinige landen ter wereld</strong> met een volledige salderingsregeling voor zonnepanelen. Iedere kWh die u terugleverde aan het net, mocht u direct verrekenen met uw verbruik — alsof u de stroom zelf had opgeslagen.
+                  Nederland was jarenlang een van de <strong>weinige landen ter wereld</strong> met een volledige salderingsregeling voor zonnepanelen. Iedere kWh die u terugleverde aan het net, mocht u direct verrekenen met uw verbruik, alsof u de stroom zelf had opgeslagen.
                 </p>
                 <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.85 }}>
-                  Dat was uniek. De meeste Europese landen hanteren al jaren een veel lager teruglevertarief. Per <strong>1 januari 2027</strong> volgt Nederland dat voorbeeld. De salderingsregeling stopt, en teruggeleverde stroom wordt voortaan uitbetaald tegen het lage teruglevertarief van circa €{quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh — in plaats van verrekend tegen uw stroomtarief van €{quote.electricityTariff.toFixed(2).replace('.', ',')}/kWh.
+                  Dat was uniek. De meeste Europese landen hanteren al jaren een veel lager teruglevertarief. Per <strong>1 januari 2027</strong> volgt Nederland dat voorbeeld. De salderingsregeling stopt en teruggeleverde stroom wordt voortaan uitbetaald tegen het lage teruglevertarief van circa €{quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh, in plaats van verrekend tegen uw stroomtarief van €{quote.electricityTariff.toFixed(2).replace('.', ',')}/kWh.
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Tijdlijn</p>
                 {[
-                  { year: 'Tot 2023', text: 'Volledige saldering — 100% verrekening', done: true },
+                  { year: 'Tot 2023', text: 'Volledige saldering: 100% verrekening', done: true },
                   { year: '2023–2027', text: 'Afbouw saldering via staffel', done: true },
                   { year: '1 jan 2027', text: 'Saldering vervalt volledig', done: false, highlight: true },
                   { year: 'Na 2027', text: `Teruglevering uitbetaald à €${quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh`, done: false },
@@ -456,7 +455,7 @@ export default async function PublicQuotePage({ params }: Props) {
               De energiemarkt verandert
             </h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
-              Drie ontwikkelingen beïnvloeden uw energiekosten de komende jaren direct — op basis van uw persoonlijke situatie.
+              Drie ontwikkelingen beïnvloeden uw energiekosten de komende jaren direct, op basis van uw persoonlijke situatie.
             </p>
           </div>
 
@@ -465,7 +464,7 @@ export default async function PublicQuotePage({ params }: Props) {
             <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
               <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
-                  Energiemarktrisico 1 — Afschaffing saldering
+                  Energiemarktrisico 1: Afschaffing saldering
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                   <div>
@@ -479,8 +478,8 @@ export default async function PublicQuotePage({ params }: Props) {
                         Waarde teruggeleverde stroom ({feedbackKwh.toLocaleString('nl-NL')} kWh/jr)
                       </p>
                       {[
-                        { label: 'Nu — via saldering', value: saldingYearlyExtra, shade: '#94a3b8' },
-                        { label: 'Na 2027 — teruglevertarief', value: feedbackIncomeLow, shade: '#cbd5e1' },
+                        { label: 'Nu via saldering', value: saldingYearlyExtra, shade: '#94a3b8' },
+                        { label: 'Na 2027 via teruglevertarief', value: feedbackIncomeLow, shade: '#cbd5e1' },
                       ].map((bar, i) => (
                         <div key={i} style={{ marginBottom: 10 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -525,11 +524,11 @@ export default async function PublicQuotePage({ params }: Props) {
             <div style={{ padding: '44px 52px', background: '#f8f9fa', borderBottom: '1px solid #e5e7eb' }}>
               <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
-                  Energiemarktrisico 2 — Terugleverkosten
+                  Energiemarktrisico 2: Terugleverkosten
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                   <div>
-                    <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Jaarlijkse kosten — nu al</p>
+                    <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 6 }}>Jaarlijkse kosten, nu al</p>
                     <p style={{ fontSize: 52, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.02em' }}>
                       €{feedInYearlyCost.toLocaleString('nl-NL')}
                     </p>
@@ -550,7 +549,7 @@ export default async function PublicQuotePage({ params }: Props) {
                   </div>
                   <div style={{ paddingTop: 4 }}>
                     <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.8 }}>
-                      Energieleveranciers rekenen terugleverkosten van €{quote.feedInCostTariff.toFixed(2).replace('.', ',')}/kWh voor elke kWh die u terugstuurt. Dit is een kostenpost die <strong>nu al geldt</strong> — los van de salderingswijziging in 2027.
+                      Energieleveranciers rekenen terugleverkosten van €{quote.feedInCostTariff.toFixed(2).replace('.', ',')}/kWh voor elke kWh die u terugstuurt. Dit is een kostenpost die <strong>nu al geldt</strong>, los van de salderingswijziging in 2027.
                     </p>
                   </div>
                 </div>
@@ -562,7 +561,7 @@ export default async function PublicQuotePage({ params }: Props) {
           <div style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
             <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
-                Marktachtergrond — Netcongestie & onbalansmarkt
+                Marktachtergrond: Netcongestie en onbalansmarkt
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                 <div>
@@ -587,7 +586,7 @@ export default async function PublicQuotePage({ params }: Props) {
                     <strong>74%</strong> van de Nederlandse netgebieden kampt met congestie. Netbeheerders schatten dat er <strong>€180 miljard nodig is</strong> om het stroomnet toekomstbestendig te maken (Netbeheer Nederland, 2024).
                   </p>
                   <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: 10, padding: '14px 16px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>EMS-opbrengst — illustratief voorbeeld</p>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>EMS-opbrengst: illustratief voorbeeld</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
                       <span>Alpha ESS 9,3 kWh batterij</span>
                       <span style={{ fontWeight: 700 }}>€1.314/jaar</span>
@@ -603,7 +602,7 @@ export default async function PublicQuotePage({ params }: Props) {
           <div style={{ padding: '44px 52px', background: '#f8f9fa' }}>
             <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
-                Vastgoedprestatie — Energielabel & woningwaarde
+                Vastgoedprestatie: Energielabel en woningwaarde
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
                 <div>
@@ -675,7 +674,7 @@ export default async function PublicQuotePage({ params }: Props) {
               {((): { title: string; desc: string; value: string | null; note?: boolean }[] => [
                 ...(quote.hasSolarPanels && feedbackKwh > 0 && saldingYearlyExtra > 0 ? [{
                   title: 'Afschaffing saldering (2027)',
-                  desc: 'Batterij slaat overdag overschot op — geen teruglevering, geen tariefverlies na 2027.',
+                  desc: 'Batterij slaat overdag overschot op. Geen teruglevering en geen tariefverlies na 2027.',
                   value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr`,
                 }] : []),
                 ...(feedInYearlyCost > 0 ? [{
@@ -693,7 +692,7 @@ export default async function PublicQuotePage({ params }: Props) {
                 {
                   title: 'Energielabel & woningwaarde',
                   desc: 'Beter energielabel verhoogt de marktwaarde van uw woning structureel.',
-                  value: '+14–28%', note: true,
+                  value: '+14 tot 28%', note: true,
                 },
               ])().map((row, i, arr) => (
                 <div key={row.title} style={{
@@ -928,7 +927,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </p>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               {[
-                { title: '1 week', sub: 'binnen 1 week thuis geïnstalleerd' },
+                { title: '4 weken', sub: 'gemiddelde installatietijd bij u thuis' },
                 { title: '250+', sub: 'installaties in Friesland' },
                 { title: 'Warmtefonds', sub: 'lage rente financiering' },
                 { title: 'BTW-teruggave', sub: 'wij regelen het volledig' },
@@ -1023,7 +1022,7 @@ export default async function PublicQuotePage({ params }: Props) {
           Bespaarhulp <span style={{ color: gold }}>Friesland</span>
         </p>
         <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.45)' }}>
-          Sjouke van der Kooistrjitte 15 · 9088BB Wirdum · 06-24992098 · KVK 71128174
+          Sjouke van der Kooistrjitte 15 · 9088BB Wirdum · 058-2038054 · KVK 71128174
         </p>
       </div>
     </div>
