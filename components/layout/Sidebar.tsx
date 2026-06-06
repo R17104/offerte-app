@@ -20,6 +20,12 @@ const nav = [
       { href: '/getekende-offertes', label: 'Getekende offertes', icon: IconSigned },
     ],
   },
+  {
+    label: 'Leads',
+    items: [
+      { href: '/leads', label: 'Leads', icon: IconLeads },
+    ],
+  },
 ]
 
 export default function Sidebar() {
@@ -211,6 +217,16 @@ function IconDoc({ size = 16, color = 'currentColor' }) {
     <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
       <rect x="2" y="1" width="12" height="14" rx="2" stroke={color} strokeWidth="1.3" />
       <path d="M5 5h6M5 8h6M5 11h4" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconLeads({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <circle cx="8" cy="5" r="2.5" stroke={color} strokeWidth="1.3" />
+      <path d="M2.5 13c0-3.04 2.46-5.5 5.5-5.5s5.5 2.46 5.5 5.5" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M11 9.5l1.5 1.5-1.5 1.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

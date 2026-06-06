@@ -1,0 +1,213 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead } from '@/lib/actions/lead.actions'
+import { LeadStatus } from '@prisma/client'
+
+const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
+  { value: 'NEW',        label: 'Nieuw',               color: '#2563eb' },
+  { value: 'CONTACTED',  label: 'Benaderd',            color: '#d97706' },
+  { value: 'INTERESTED', label: 'Geïnteresseerd',      color: '#7c3aed' },
+  { value: 'QUOTE_SENT', label: 'Offerte verstuurd',   color: '#0891b2' },
+  { value: 'WON',        label: 'Gewonnen',            color: '#16a34a' },
+  { value: 'LOST',       label: 'Verloren',            color: '#9ca3af' },
+]
+
+type Note = { id: string; content: string; createdAt: Date; author: { name: string | null } }
+type Lead = {
+  id: string
+  firstName: string
+  lastName: string
+  email: string | null
+  phone: string | null
+  street: string | null
+  houseNumber: string | null
+  postalCode: string | null
+  city: string | null
+  status: LeadStatus
+  source: string | null
+  createdAt: Date
+  notes: Note[]
+}
+
+const row = (label: string, value: string | null) =>
+  value ? (
+    <div key={label} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 13.5 }}>
+      <span style={{ width: 120, color: 'var(--text-tertiary)', flexShrink: 0 }}>{label}</span>
+      <span style={{ color: 'var(--text-primary)' }}>{value}</span>
+    </div>
+  ) : null
+
+export default function LeadDetailClient({ lead }: { lead: Lead }) {
+  const [status, setStatus] = useState<LeadStatus>(lead.status)
+  const [notes, setNotes] = useState<Note[]>(lead.notes)
+  const [noteText, setNoteText] = useState('')
+  const [isPending, startTransition] = useTransition()
+
+  function handleStatusChange(val: LeadStatus) {
+    setStatus(val)
+    startTransition(() => updateLeadStatus(lead.id, val))
+  }
+
+  function handleAddNote(e: React.FormEvent) {
+    e.preventDefault()
+    if (!noteText.trim()) return
+    const text = noteText.trim()
+    setNoteText('')
+    startTransition(async () => {
+      await addLeadNote(lead.id, text)
+      // Optimistic: server will revalidate; for now just show it optimistically
+      setNotes((prev) => [{
+        id: Date.now().toString(),
+        content: text,
+        createdAt: new Date(),
+        author: { name: 'Jij' },
+      }, ...prev])
+    })
+  }
+
+  function handleDeleteNote(noteId: string) {
+    setNotes((prev) => prev.filter((n) => n.id !== noteId))
+    startTransition(() => deleteLeadNote(noteId, lead.id))
+  }
+
+  const currentStatus = STATUS_OPTIONS.find((s) => s.value === status)!
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
+
+      {/* Links: info + notities */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* Contactgegevens */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>
+            Contactgegevens
+          </p>
+          {row('E-mail', lead.email)}
+          {row('Telefoon', lead.phone)}
+          {row('Adres', lead.street && lead.houseNumber ? `${lead.street} ${lead.houseNumber}` : lead.street)}
+          {row('Postcode', lead.postalCode)}
+          {row('Stad', lead.city)}
+          {row('Bron', lead.source)}
+          {row('Toegevoegd', lead.createdAt.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }))}
+        </div>
+
+        {/* Notities */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>
+            Notities
+          </p>
+
+          <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+            <textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder="Notitie toevoegen…"
+              rows={3}
+              style={{
+                background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)',
+                borderRadius: 8, padding: '9px 12px', fontSize: 13.5,
+                color: 'var(--text-primary)', resize: 'vertical', outline: 'none',
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!noteText.trim() || isPending}
+              style={{
+                alignSelf: 'flex-end', padding: '6px 14px', borderRadius: 8,
+                background: 'var(--accent)', color: '#fff', fontSize: 13, fontWeight: 500,
+                border: 'none', cursor: 'pointer', opacity: !noteText.trim() ? 0.5 : 1,
+              }}
+            >
+              Opslaan
+            </button>
+          </form>
+
+          {notes.length === 0 ? (
+            <p style={{ fontSize: 13, color: 'var(--text-tertiary)', textAlign: 'center', padding: '20px 0' }}>
+              Nog geen notities
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {notes.map((note) => (
+                <div key={note.id} style={{
+                  background: 'var(--bg-elevated)', borderRadius: 8,
+                  padding: '12px 14px', position: 'relative',
+                }}>
+                  <p style={{ fontSize: 13.5, color: 'var(--text-primary)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                    {note.content}
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+                    <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)' }}>
+                      {note.author.name ?? 'Onbekend'} · {new Date(note.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteNote(note.id)}
+                      style={{ fontSize: 11.5, color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px' }}
+                    >
+                      Verwijder
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Rechts: status + acties */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* Status */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
+            Status
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {STATUS_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleStatusChange(opt.value)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '9px 12px', borderRadius: 8, border: '1px solid',
+                  borderColor: status === opt.value ? opt.color : 'var(--border)',
+                  background: status === opt.value ? `${opt.color}12` : 'transparent',
+                  cursor: 'pointer', textAlign: 'left',
+                }}
+              >
+                <span style={{
+                  width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                  background: status === opt.value ? opt.color : 'var(--border-strong)',
+                }} />
+                <span style={{ fontSize: 13.5, fontWeight: status === opt.value ? 600 : 400, color: status === opt.value ? opt.color : 'var(--text-secondary)' }}>
+                  {opt.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Acties */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
+            Acties
+          </p>
+          <form action={archiveLead.bind(null, lead.id)}>
+            <button
+              type="submit"
+              style={{
+                width: '100%', padding: '8px 14px', borderRadius: 8,
+                background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)',
+                color: 'var(--text-secondary)', fontSize: 13.5, cursor: 'pointer',
+              }}
+            >
+              Archiveren
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}

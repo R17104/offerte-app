@@ -54,6 +54,15 @@ enum UserRole {
   SALES
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  QUOTE_SENT
+  WON
+  LOST
+}
+
 // ── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -65,9 +74,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  quotes    Quote[]
-  customers Customer[]
-  products  Product[]
+  quotes     Quote[]
+  customers  Customer[]
+  products   Product[]
+  leads      Lead[]
+  leadNotes  LeadNote[]
 }
 
 model Customer {
@@ -221,6 +232,41 @@ model QuoteLine {
 
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  street      String?
+  houseNumber String?
+  postalCode  String?
+  city        String?
+  status      LeadStatus @default(NEW)
+  source      String?
+  archivedAt  DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  notes LeadNote[]
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
 }
 
 model QuoteAcceptance {
