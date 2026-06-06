@@ -3,7 +3,7 @@
 export const DEFAULT_TERMS_TEXT = `Aanbetaling en eindfactuur
 Wanneer u akkoord gaat met de offerte, wordt na de technische schouw een aanbetaling in rekening gebracht. Het resterende bedrag wordt op de dag van installatie in twee delen gefactureerd. Deze facturen dienen uiterlijk binnen 2 dagen na oplevering te worden voldaan.
 Van een volledig functionerende installatie is sprake wanneer de batterij en omvormer energie opwekken en kunnen terugleveren aan het net.
-De betaling verloopt als volgt: 33% aanbetaling — u ontvangt op de dag van de schouw en op de dag van de installatie een factuur. Deze dient uiterlijk binnen 2 dagen te worden betaald.
+De betaling verloopt als volgt: 50% aanbetaling — u ontvangt op de dag van de schouw en op de dag van de installatie een factuur. Deze dient uiterlijk binnen 2 dagen te worden betaald.
 Indien u uw aanvraag (deels) via het Warmtefonds laat verlopen hoeft u nog niets te betalen totdat de financiering is goedgekeurd. Krijgt u de financiering niet rond en kunt u ons een afwijzing overleggen, dan kunt u kosteloos de koop ontbinden.
 
 Financiering via Nationaal Warmtefonds
