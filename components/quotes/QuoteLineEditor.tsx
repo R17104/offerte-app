@@ -2,8 +2,9 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { createQuote, type QuoteLineInput } from '@/lib/actions/quote.actions'
+import { createQuote, type QuoteLineInput, type EnergyProfile } from '@/lib/actions/quote.actions'
 import { formatCurrency, calculateQuoteTotals } from '@/lib/utils'
+import EnergyProfileSection, { DEFAULT_ENERGY_STATE, type EnergyState } from '@/components/quotes/EnergyProfileSection'
 
 type Product = {
   id: string
@@ -62,6 +63,7 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
   const [validUntil, setValidUntil] = useState('')
   const [discountAmount, setDiscountAmount] = useState(0)
   const [lines, setLines] = useState<Line[]>([emptyLine()])
+  const [energy, setEnergy] = useState<EnergyState>(DEFAULT_ENERGY_STATE)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -102,6 +104,28 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
 
     setSaving(true)
     try {
+      const energyProfile: EnergyProfile = {
+        quoteType: energy.quoteType,
+        financingType: energy.financingType ? energy.financingType as EnergyProfile['financingType'] : null,
+        loanInterestRate: energy.loanInterestRate / 100,
+        loanTermYears: energy.loanTermYears,
+        subsidyAmount: energy.subsidyAmount,
+        hasBtwReturn: energy.hasBtwReturn,
+        hasSolarPanels: energy.hasSolarPanels,
+        solarProductionKwh: energy.solarProductionKwh ? parseFloat(energy.solarProductionKwh) : null,
+        electricityUsageKwh: energy.electricityUsageKwh ? parseFloat(energy.electricityUsageKwh) : null,
+        electricityFeedbackKwh: energy.electricityFeedbackKwh ? parseFloat(energy.electricityFeedbackKwh) : null,
+        gasUsageM3: energy.gasUsageM3 ? parseFloat(energy.gasUsageM3) : null,
+        electricityTariff: parseFloat(energy.electricityTariff) || 0.28,
+        feedbackTariff: parseFloat(energy.feedbackTariff) || 0.07,
+        gasTariff: parseFloat(energy.gasTariff) || 1.10,
+        feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0.02,
+        emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
+        numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
+        houseType: energy.houseType ? energy.houseType as EnergyProfile['houseType'] : null,
+        buildYear: energy.buildYear ? parseInt(energy.buildYear) : null,
+        houseSizeSqm: energy.houseSizeSqm ? parseInt(energy.houseSizeSqm) : null,
+      }
       const input: Parameters<typeof createQuote>[0] = {
         customerId,
         title,
@@ -117,6 +141,7 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
           unitPrice: l.unitPrice,
           vatRate: l.vatRate,
         })),
+        energy: energyProfile,
       }
       const result = await createQuote(input)
       router.push(`/quotes/${result.id}`)
@@ -212,6 +237,12 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
           </div>
         </div>
       </div>
+
+      {/* Energy profile */}
+      <EnergyProfileSection
+        state={energy}
+        onChange={(patch) => setEnergy((prev) => ({ ...prev, ...patch }))}
+      />
 
       {/* Lines */}
       <div style={s.card}>

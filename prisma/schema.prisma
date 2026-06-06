@@ -7,6 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ── Enums ────────────────────────────────────────────────────────────────────
+
+enum AddressType {
+  CORRESPONDENCE
+  DELIVERY
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum ProductCategory {
+  BATTERY
+  SOLAR
+  HEAT_PUMP
+  CHARGER
+  EMERGENCY_POWER
+}
+
+enum QuoteType {
+  EIGEN_INVESTERING
+  GEFINANCIERD
+}
+
+enum FinancingType {
+  WARMTEFONDS
+  SVN
+  BANK
+  OVERIG
+}
+
+enum HouseType {
+  TERRACED
+  CORNER
+  DETACHED
+  APARTMENT
+}
+
+// ── Models ───────────────────────────────────────────────────────────────────
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -39,11 +83,6 @@ model Customer {
   quotes    Quote[]
 }
 
-enum AddressType {
-  CORRESPONDENCE
-  DELIVERY
-}
-
 model Address {
   id          String      @id @default(cuid())
   type        AddressType
@@ -60,17 +99,25 @@ model Address {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   name        String
   description String?
   defaultQty  Float?
   unitPrice   Float
-  vatRate     Float    @default(21)
+  vatRate     Float           @default(21)
   imageUrl    String?
   notes       String?
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  active      Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Categorie & specs
+  category           ProductCategory?
+  capacityKwh        Float?           // Batterij-capaciteit of opwek (kWh)
+  powerKw            Float?           // Vermogen (kW)
+  warrantyYears      Int?             // Garantietermijn
+  savingsKwhYear     Float?           // Verwachte stroombesparing per jaar (kWh)
+  gasReductionM3Year Float?           // Gasbesparing per jaar (m³) — warmtepomp
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
@@ -78,20 +125,12 @@ model Product {
   quoteLines QuoteLine[]
 }
 
-enum QuoteStatus {
-  DRAFT
-  SENT
-  ACCEPTED
-  REJECTED
-  EXPIRED
-}
-
 model Quote {
   id          String      @id @default(cuid())
   quoteNumber String      @unique
   status      QuoteStatus @default(DRAFT)
-  title         String
-  notes         String?
+  title       String
+  notes       String?
   includedItems String?
   validUntil    DateTime?
 
@@ -101,13 +140,44 @@ model Quote {
   total          Float @default(0)
 
   publicToken String @unique @default(uuid())
-
-  termsText  String?
+  termsText   String?
 
   sentAt     DateTime?
   acceptedAt DateTime?
   rejectedAt DateTime?
   archivedAt DateTime?
+
+  // ── Offerteype ──────────────────────────────────────────────────────────
+  quoteType     QuoteType @default(EIGEN_INVESTERING)
+
+  // ── Financiering (alleen bij GEFINANCIERD) ───────────────────────────────
+  financingType    FinancingType?
+  loanInterestRate Float          @default(0.03)   // 3% p.j.
+  loanTermYears    Int            @default(10)
+  subsidyAmount    Float          @default(0)       // BTW-teruggave / subsidie
+  hasBtwReturn     Boolean        @default(false)
+
+  // ── Energieprofiel klant ─────────────────────────────────────────────────
+  hasSolarPanels         Boolean @default(false)
+  solarProductionKwh     Float?  // Jaarlijkse opwek zonnepanelen (kWh)
+  electricityUsageKwh    Float?  // Jaarverbruik stroom (kWh)
+  electricityFeedbackKwh Float?  // Jaarlijkse teruglevering (kWh)
+  gasUsageM3             Float?  // Jaarverbruik gas (m³)
+
+  // Tarieven (met defaults, handmatig aanpasbaar)
+  electricityTariff Float @default(0.28)  // €/kWh
+  feedbackTariff    Float @default(0.07)  // €/kWh na saldering
+  gasTariff         Float @default(1.10)  // €/m³
+  feedInCostTariff  Float @default(0.02)  // €/kWh terugleverkosten leverancier
+
+  // EMS / onbalansmarkt
+  emsAnnualRevenueEur Float @default(0)   // Verwachte jaarlijkse EMS/onbalans opbrengst (€)
+
+  // Schatting-inputs (alternatief voor handmatige invoer)
+  numPersons   Int?
+  houseType    HouseType?
+  buildYear    Int?
+  houseSizeSqm Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

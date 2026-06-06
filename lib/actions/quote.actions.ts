@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { calculateQuoteTotals } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
+import { QuoteType, FinancingType, HouseType } from '@prisma/client'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -28,6 +29,29 @@ export type QuoteLineInput = {
   vatRate: number
 }
 
+export type EnergyProfile = {
+  quoteType: QuoteType
+  financingType?: FinancingType | null
+  loanInterestRate: number
+  loanTermYears: number
+  subsidyAmount: number
+  hasBtwReturn: boolean
+  hasSolarPanels: boolean
+  solarProductionKwh?: number | null
+  electricityUsageKwh?: number | null
+  electricityFeedbackKwh?: number | null
+  gasUsageM3?: number | null
+  electricityTariff: number
+  feedbackTariff: number
+  gasTariff: number
+  feedInCostTariff: number
+  emsAnnualRevenueEur: number
+  numPersons?: number | null
+  houseType?: HouseType | null
+  buildYear?: number | null
+  houseSizeSqm?: number | null
+}
+
 export type CreateQuoteInput = {
   customerId: string
   title: string
@@ -36,6 +60,7 @@ export type CreateQuoteInput = {
   validUntil?: string
   discountAmount: number
   lines: QuoteLineInput[]
+  energy: EnergyProfile
 }
 
 export type AcceptQuoteInput = {
@@ -52,7 +77,7 @@ export type AcceptQuoteInput = {
 
 export async function createQuote(input: CreateQuoteInput): Promise<{ id: string }> {
   const { userId } = await verifySession()
-  const { customerId, title, notes, includedItems, validUntil, discountAmount, lines } = input
+  const { customerId, title, notes, includedItems, validUntil, discountAmount, lines, energy } = input
 
   if (!title || lines.length === 0) {
     throw new Error('Titel en minimaal één productregel zijn verplicht')
@@ -75,6 +100,8 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
       status: 'DRAFT',
       customerId,
       createdById: userId,
+      // Energieprofiel
+      ...energy,
       lines: {
         create: lines.map((l, i) => ({
           sortOrder: i,
@@ -101,11 +128,12 @@ export type UpdateQuoteInput = {
   validUntil?: string
   discountAmount: number
   lines: QuoteLineInput[]
+  energy?: Partial<EnergyProfile>
 }
 
 export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Promise<void> {
   const { userId } = await verifySession()
-  const { title, notes, includedItems, termsText, validUntil, discountAmount, lines } = input
+  const { title, notes, includedItems, termsText, validUntil, discountAmount, lines, energy } = input
 
   if (!title || lines.length === 0) {
     throw new Error('Titel en minimaal één productregel zijn verplicht')
@@ -133,6 +161,7 @@ export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Pro
         subtotal,
         vatTotal,
         total,
+        ...(energy ?? {}),
         lines: {
           create: lines.map((l, i) => ({
             sortOrder: i,

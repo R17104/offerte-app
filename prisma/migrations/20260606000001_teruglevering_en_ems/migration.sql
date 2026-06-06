@@ -1,0 +1,5 @@
+-- Voer dit uit in Supabase Dashboard → SQL Editor
+
+ALTER TABLE "Quote"
+  ADD COLUMN IF NOT EXISTS "feedInCostTariff"    DOUBLE PRECISION NOT NULL DEFAULT 0.02,
+  ADD COLUMN IF NOT EXISTS "emsAnnualRevenueEur" DOUBLE PRECISION NOT NULL DEFAULT 0;

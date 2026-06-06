@@ -2,9 +2,10 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateQuote, type QuoteLineInput, type UpdateQuoteInput } from '@/lib/actions/quote.actions'
+import { updateQuote, type QuoteLineInput, type UpdateQuoteInput, type EnergyProfile } from '@/lib/actions/quote.actions'
 import { formatCurrency, calculateQuoteTotals, formatDateInput } from '@/lib/utils'
 import { DEFAULT_TERMS_TEXT } from '@/components/quotes/TermsAndConditions'
+import EnergyProfileSection, { DEFAULT_ENERGY_STATE, type EnergyState } from '@/components/quotes/EnergyProfileSection'
 
 type Product = {
   id: string
@@ -34,6 +35,26 @@ type Props = {
     validUntil: Date | null
     discountAmount: number
     lines: ExistingLine[]
+    quoteType: string
+    financingType: string | null
+    loanInterestRate: number
+    loanTermYears: number
+    subsidyAmount: number
+    hasBtwReturn: boolean
+    hasSolarPanels: boolean
+    solarProductionKwh: number | null
+    electricityUsageKwh: number | null
+    electricityFeedbackKwh: number | null
+    gasUsageM3: number | null
+    electricityTariff: number
+    feedbackTariff: number
+    gasTariff: number
+    feedInCostTariff: number
+    emsAnnualRevenueEur: number
+    numPersons: number | null
+    houseType: string | null
+    buildYear: number | null
+    houseSizeSqm: number | null
   }
   products: Product[]
 }
@@ -78,6 +99,29 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
   const [lines, setLines] = useState<Line[]>(
     initialData.lines.length > 0 ? initialData.lines.map(fromExisting) : [emptyLine()],
   )
+  const [energy, setEnergy] = useState<EnergyState>({
+    ...DEFAULT_ENERGY_STATE,
+    quoteType: (initialData.quoteType || 'EIGEN_INVESTERING') as EnergyState['quoteType'],
+    financingType: initialData.financingType ?? '',
+    loanInterestRate: initialData.loanInterestRate * 100,
+    loanTermYears: initialData.loanTermYears,
+    subsidyAmount: initialData.subsidyAmount,
+    hasBtwReturn: initialData.hasBtwReturn,
+    hasSolarPanels: initialData.hasSolarPanels,
+    solarProductionKwh: initialData.solarProductionKwh != null ? String(initialData.solarProductionKwh) : '',
+    electricityUsageKwh: initialData.electricityUsageKwh != null ? String(initialData.electricityUsageKwh) : '',
+    electricityFeedbackKwh: initialData.electricityFeedbackKwh != null ? String(initialData.electricityFeedbackKwh) : '',
+    gasUsageM3: initialData.gasUsageM3 != null ? String(initialData.gasUsageM3) : '',
+    electricityTariff: String(initialData.electricityTariff),
+    feedbackTariff: String(initialData.feedbackTariff),
+    gasTariff: String(initialData.gasTariff),
+    feedInCostTariff: String(initialData.feedInCostTariff),
+    emsAnnualRevenueEur: String(initialData.emsAnnualRevenueEur),
+    numPersons: initialData.numPersons != null ? String(initialData.numPersons) : '',
+    houseType: initialData.houseType ?? '',
+    buildYear: initialData.buildYear != null ? String(initialData.buildYear) : '',
+    houseSizeSqm: initialData.houseSizeSqm != null ? String(initialData.houseSizeSqm) : '',
+  })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -115,6 +159,28 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
 
     setSaving(true)
     try {
+      const energyProfile: EnergyProfile = {
+        quoteType: energy.quoteType,
+        financingType: energy.financingType ? energy.financingType as EnergyProfile['financingType'] : null,
+        loanInterestRate: energy.loanInterestRate / 100,
+        loanTermYears: energy.loanTermYears,
+        subsidyAmount: energy.subsidyAmount,
+        hasBtwReturn: energy.hasBtwReturn,
+        hasSolarPanels: energy.hasSolarPanels,
+        solarProductionKwh: energy.solarProductionKwh ? parseFloat(energy.solarProductionKwh) : null,
+        electricityUsageKwh: energy.electricityUsageKwh ? parseFloat(energy.electricityUsageKwh) : null,
+        electricityFeedbackKwh: energy.electricityFeedbackKwh ? parseFloat(energy.electricityFeedbackKwh) : null,
+        gasUsageM3: energy.gasUsageM3 ? parseFloat(energy.gasUsageM3) : null,
+        electricityTariff: parseFloat(energy.electricityTariff) || 0.28,
+        feedbackTariff: parseFloat(energy.feedbackTariff) || 0.07,
+        gasTariff: parseFloat(energy.gasTariff) || 1.10,
+        feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0.02,
+        emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
+        numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
+        houseType: energy.houseType ? energy.houseType as EnergyProfile['houseType'] : null,
+        buildYear: energy.buildYear ? parseInt(energy.buildYear) : null,
+        houseSizeSqm: energy.houseSizeSqm ? parseInt(energy.houseSizeSqm) : null,
+      }
       const input: UpdateQuoteInput = {
         title,
         notes: notes || undefined,
@@ -130,6 +196,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
           unitPrice: l.unitPrice,
           vatRate: l.vatRate,
         })),
+        energy: energyProfile,
       }
       await updateQuote(quoteId, input)
     } catch (err: unknown) {
@@ -227,6 +294,12 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
           </div>
         </div>
       </div>
+
+      {/* Energy profile */}
+      <EnergyProfileSection
+        state={energy}
+        onChange={(patch) => setEnergy((prev) => ({ ...prev, ...patch }))}
+      />
 
       {/* Lines */}
       <div style={s.card}>

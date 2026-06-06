@@ -4,6 +4,27 @@ import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { verifySession } from '@/lib/dal'
+import { ProductCategory } from '@prisma/client'
+
+function parseProductFields(formData: FormData) {
+  const category     = (formData.get('category') as string) || null
+  const imageUrl     = (formData.get('imageUrl') as string) || null
+  const capacityKwh  = formData.get('capacityKwh') ? parseFloat(formData.get('capacityKwh') as string) : null
+  const powerKw      = formData.get('powerKw')     ? parseFloat(formData.get('powerKw') as string)     : null
+  const warrantyYears = formData.get('warrantyYears') ? parseInt(formData.get('warrantyYears') as string) : null
+  const savingsKwhYear     = formData.get('savingsKwhYear')     ? parseFloat(formData.get('savingsKwhYear') as string)     : null
+  const gasReductionM3Year = formData.get('gasReductionM3Year') ? parseFloat(formData.get('gasReductionM3Year') as string) : null
+
+  return {
+    category: (category as ProductCategory) || null,
+    imageUrl,
+    capacityKwh,
+    powerKw,
+    warrantyYears,
+    savingsKwhYear,
+    gasReductionM3Year,
+  }
+}
 
 export async function createProduct(formData: FormData) {
   const { userId } = await verifySession()
@@ -29,6 +50,7 @@ export async function createProduct(formData: FormData) {
       notes: notes || null,
       active: true,
       userId,
+      ...parseProductFields(formData),
     },
   })
 
@@ -61,6 +83,7 @@ export async function updateProduct(id: string, formData: FormData) {
       defaultQty,
       notes: notes || null,
       active,
+      ...parseProductFields(formData),
     },
   })
 
