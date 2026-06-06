@@ -268,6 +268,19 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Huidig termijnbedrag — altijd zichtbaar */}
+            <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
+              <label style={{ ...s.label, fontSize: 13.5, fontWeight: 700 }}>
+                Huidig maandelijks termijnbedrag klant (€)
+              </label>
+              <input type="number" min="0" step="10"
+                value={state.currentMonthlyBill}
+                onChange={(e) => onChange({ currentMonthlyBill: e.target.value })}
+                placeholder="150"
+                style={{ ...s.input, marginTop: 6 }} />
+              <p style={s.hint}>Wat betaalt de klant nu per maand aan de energieleverancier? Gebruikt voor de voor/na vergelijking op de salderingspagina.</p>
+            </div>
+
             {/* Zonnepanelen toggle */}
             <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, fontWeight: 500 }}>
               <input type="checkbox"
@@ -363,14 +376,6 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                 onChange={(e) => onChange({ emsAnnualRevenueEur: e.target.value })}
                 style={s.input} />
               <p style={s.hint}>Alpha ESS EMS handelt automatisch — schat in op basis van batterijgrootte</p>
-            </div>
-            <div>
-              <label style={s.label}>Huidig termijnbedrag klant (€/maand)</label>
-              <input type="number" min="0" step="10"
-                value={state.currentMonthlyBill}
-                onChange={(e) => onChange({ currentMonthlyBill: e.target.value })}
-                style={s.input} />
-              <p style={s.hint}>Huidig maandbedrag bij energieleverancier — gebruikt voor de salderingspagina</p>
             </div>
           </div>
         </div>
