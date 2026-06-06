@@ -382,51 +382,77 @@ export default async function PublicQuotePage({ params }: Props) {
             <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 28 }}>Wat betekent dit voor u?</p>
             <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
 
-              {/* Cirkeldiagram */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 20, alignSelf: 'flex-start' }}>Uw jaarlijkse stroomsituatie</p>
+              {/* Energiestroomoverzicht */}
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 20 }}>Uw jaarlijkse energiestroom</p>
                 {(() => {
-                  const r = 88
-                  const cx = 110
-                  const cy = 110
-                  const circ = 2 * Math.PI * r
-                  const feedPct = solarKwh > 0 ? feedbackKwh / solarKwh : 0
-                  const selfPct = solarKwh > 0 ? (solarKwh - feedbackKwh) / solarKwh : 0
-                  const feedDash = feedPct * circ
-                  const selfDash = selfPct * circ
-                  const selfOffset = -circ * 0.25
-                  const feedOffset = selfOffset - selfDash
+                  const gridPurchase = Math.max(0, usageKwh - directUseKwh)
+                  const directPct    = usageKwh > 0 ? Math.round(directUseKwh / usageKwh * 100) : 0
+                  const gridPct      = 100 - directPct
+                  const selfSolarPct = solarKwh > 0 ? Math.round(directUseKwh / solarKwh * 100) : 0
+                  const feedSolarPct = 100 - selfSolarPct
+                  const total        = Math.max(solarKwh, usageKwh)
+
+                  const Bar = ({ label, kwh, segments }: {
+                    label: string
+                    kwh: number
+                    segments: { pct: number; color: string; legend: string; amount: number }[]
+                  }) => (
+                    <div style={{ marginBottom: 22 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 7 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{label}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>{kwh.toLocaleString('nl-NL')} kWh/jaar</span>
+                      </div>
+                      <div style={{ height: 28, borderRadius: 6, overflow: 'hidden', display: 'flex', background: '#f1f5f9', position: 'relative' }}>
+                        {segments.map((seg, i) => (
+                          <div key={i} style={{
+                            width: `${Math.round(kwh / total * seg.pct)}%`,
+                            background: seg.color,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 11, fontWeight: 700, color: '#fff',
+                            minWidth: seg.pct > 8 ? 32 : 0,
+                            transition: 'width 0.3s',
+                          }}>
+                            {seg.pct > 12 ? `${seg.pct}%` : ''}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: 8 }}>
+                        {segments.map((seg, i) => (
+                          <span key={i} style={{ fontSize: 12, color: '#374151', display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <span style={{ width: 10, height: 10, borderRadius: 2, background: seg.color, display: 'inline-block', flexShrink: 0 }} />
+                            {seg.legend}: <strong style={{ marginLeft: 2 }}>{seg.amount.toLocaleString('nl-NL')} kWh</strong>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )
+
                   return (
-                    <svg width={220} height={220} viewBox="0 0 220 220">
-                      {/* Achtergrond ring */}
-                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={22} />
-                      {/* Zelf gebruik — blauw */}
-                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2563eb" strokeWidth={22}
-                        strokeDasharray={`${selfDash} ${circ - selfDash}`}
-                        strokeDashoffset={selfOffset}
-                        strokeLinecap="butt" />
-                      {/* Teruglevering — grijs */}
-                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#cbd5e1" strokeWidth={22}
-                        strokeDasharray={`${feedDash} ${circ - feedDash}`}
-                        strokeDashoffset={feedOffset}
-                        strokeLinecap="butt" />
-                      {/* Midden tekst */}
-                      <text x={cx} y={cy - 10} textAnchor="middle" fontSize={13} fill="#6b7280">Totale opwek</text>
-                      <text x={cx} y={cy + 10} textAnchor="middle" fontSize={18} fontWeight="bold" fill="#111827">{solarKwh.toLocaleString('nl-NL')}</text>
-                      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={12} fill="#9ca3af">kWh / jaar</text>
-                    </svg>
+                    <div>
+                      <Bar
+                        label="Zonne-opwek"
+                        kwh={solarKwh}
+                        segments={[
+                          { pct: selfSolarPct, color: '#2563eb', legend: 'Direct eigenverbruik', amount: Math.round(directUseKwh) },
+                          { pct: feedSolarPct, color: '#93c5fd', legend: 'Teruglevering aan net', amount: Math.round(feedbackKwh) },
+                        ]}
+                      />
+                      <Bar
+                        label="Totaal verbruik"
+                        kwh={usageKwh}
+                        segments={[
+                          { pct: directPct, color: '#2563eb', legend: 'Gedekt door zon', amount: Math.round(directUseKwh) },
+                          { pct: gridPct,   color: '#e2e8f0', legend: 'Afgenomen van net', amount: Math.round(gridPurchase) },
+                        ]}
+                      />
+                      <div style={{ background: '#f8f9fa', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: '#374151' }}>
+                        <span>Zelfvoorzieningsgraad</span>
+                        <strong style={{ color: '#2563eb' }}>{directPct}%</strong>
+                      </div>
+                    </div>
                   )
                 })()}
-                <div style={{ display: 'flex', gap: 20, marginTop: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <div style={{ width: 12, height: 12, borderRadius: 3, background: '#2563eb' }} />
-                    <span style={{ fontSize: 12, color: '#374151' }}>Eigen gebruik ({Math.round((solarKwh - feedbackKwh) / solarKwh * 100)}%)</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <div style={{ width: 12, height: 12, borderRadius: 3, background: '#cbd5e1' }} />
-                    <span style={{ fontSize: 12, color: '#374151' }}>Teruglevering ({Math.round(feedbackKwh / solarKwh * 100)}%)</span>
-                  </div>
-                </div>
               </div>
 
               {/* Rekensom */}
