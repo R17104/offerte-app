@@ -7,6 +7,7 @@ const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000
 type SessionPayload = {
   userId: string
   email: string
+  role: string
   expiresAt: Date
 }
 
@@ -17,7 +18,7 @@ function getKey() {
 }
 
 export async function encrypt(payload: SessionPayload): Promise<string> {
-  return new SignJWT({ userId: payload.userId, email: payload.email, expiresAt: payload.expiresAt.toISOString() })
+  return new SignJWT({ userId: payload.userId, email: payload.email, role: payload.role, expiresAt: payload.expiresAt.toISOString() })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
@@ -31,6 +32,7 @@ export async function decrypt(session: string | undefined): Promise<SessionPaylo
     return {
       userId: payload.userId as string,
       email: payload.email as string,
+      role: (payload.role as string) ?? 'SALES',
       expiresAt: new Date(payload.expiresAt as string),
     }
   } catch {
@@ -38,9 +40,9 @@ export async function decrypt(session: string | undefined): Promise<SessionPaylo
   }
 }
 
-export async function createSession(userId: string, email: string): Promise<void> {
+export async function createSession(userId: string, email: string, role = 'SALES'): Promise<void> {
   const expiresAt = new Date(Date.now() + SESSION_DURATION)
-  const token = await encrypt({ userId, email, expiresAt })
+  const token = await encrypt({ userId, email, role, expiresAt })
   const cookieStore = await cookies()
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,

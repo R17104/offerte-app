@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { verifySession } from '@/lib/dal'
+import { verifyAdmin } from '@/lib/dal'
 import { ProductCategory } from '@prisma/client'
 
 function parseProductFields(formData: FormData) {
@@ -27,7 +27,7 @@ function parseProductFields(formData: FormData) {
 }
 
 export async function createProduct(formData: FormData) {
-  const { userId } = await verifySession()
+  const { userId } = await verifyAdmin()
 
   const name        = formData.get('name') as string
   const description = formData.get('description') as string | null
@@ -59,7 +59,7 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-  const { userId } = await verifySession()
+  const { userId } = await verifyAdmin()
 
   const name        = formData.get('name') as string
   const description = formData.get('description') as string | null

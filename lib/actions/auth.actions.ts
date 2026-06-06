@@ -25,7 +25,7 @@ export async function login(prevState: AuthState, formData: FormData): Promise<A
     return { error: 'Ongeldig e-mailadres of wachtwoord' }
   }
 
-  await createSession(user.id, user.email)
+  await createSession(user.id, user.email, user.role)
   redirect('/customers')
 }
 
@@ -55,7 +55,7 @@ export async function register(prevState: AuthState, formData: FormData): Promis
     data: { email, password: hashedPassword, name: name || null },
   })
 
-  await createSession(user.id, user.email)
+  await createSession(user.id, user.email, user.role)
   redirect('/customers')
 }
 

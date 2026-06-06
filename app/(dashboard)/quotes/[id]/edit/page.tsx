@@ -45,7 +45,7 @@ export default async function QuoteEditPage({ params }: Props) {
       include: { lines: { orderBy: { sortOrder: 'asc' } } },
     }),
     prisma.product.findMany({
-      where: { userId, active: true },
+      where: { active: true },
       orderBy: { name: 'asc' },
     }),
   ])

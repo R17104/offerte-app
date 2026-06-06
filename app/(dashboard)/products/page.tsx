@@ -9,10 +9,10 @@ import { formatCurrency } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
 
 export default async function ProductsPage() {
-  const { userId } = await verifySession()
+  const { role } = await verifySession()
+  const isAdmin = role === 'ADMIN'
 
   const products = await prisma.product.findMany({
-    where: { userId },
     orderBy: { name: 'asc' },
     include: { _count: { select: { quoteLines: true } } },
   })
@@ -22,7 +22,7 @@ export default async function ProductsPage() {
       <PageHeader
         title="Productcatalogus"
         description={`${products.length} product${products.length !== 1 ? 'en' : ''}`}
-        action={<PrimaryButton href="/products/new">+ Nieuw product</PrimaryButton>}
+        action={isAdmin ? <PrimaryButton href="/products/new">+ Nieuw product</PrimaryButton> : undefined}
       />
 
       <Card padding={0}>
@@ -30,7 +30,7 @@ export default async function ProductsPage() {
           <EmptyState
             title="Nog geen producten"
             description="Voeg producten toe aan de catalogus om ze te gebruiken in offertes."
-            action={<PrimaryButton href="/products/new">Product toevoegen</PrimaryButton>}
+            action={isAdmin ? <PrimaryButton href="/products/new">Product toevoegen</PrimaryButton> : undefined}
           />
         ) : (
           <Table>
@@ -66,9 +66,11 @@ export default async function ProductsPage() {
                     }
                   </Td>
                   <Td>
-                    <SecondaryButton href={`/products/${p.id}/edit`} style={{ padding: '4px 10px', fontSize: 12 }}>
-                      Bewerken
-                    </SecondaryButton>
+                    {isAdmin && (
+                      <SecondaryButton href={`/products/${p.id}/edit`} style={{ padding: '4px 10px', fontSize: 12 }}>
+                        Bewerken
+                      </SecondaryButton>
+                    )}
                   </Td>
                 </Tr>
               ))}

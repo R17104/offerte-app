@@ -4,6 +4,7 @@ import {
   PrimaryButton, SecondaryButton,
 } from '@/components/ui'
 import ImageUpload from '@/components/ui/ImageUpload'
+import { verifyAdmin } from '@/lib/dal'
 
 const CATEGORIES = [
   { value: '',              label: '— Geen categorie —' },
@@ -14,7 +15,9 @@ const CATEGORIES = [
   { value: 'EMERGENCY_POWER', label: '🔌 Noodstroom box' },
 ]
 
-export default function NewProductPage() {
+export default async function NewProductPage() {
+  await verifyAdmin()
+
   return (
     <PageContainer style={{ maxWidth: 780 }}>
       <PageHeader

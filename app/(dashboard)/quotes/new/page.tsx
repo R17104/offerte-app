@@ -20,7 +20,7 @@ export default async function NewQuotePage({ searchParams }: Props) {
       select: { id: true, firstName: true, lastName: true },
     }),
     prisma.product.findMany({
-      where: { userId, active: true },
+      where: { active: true },
       orderBy: { name: 'asc' },
       select: {
         id: true, name: true, description: true,

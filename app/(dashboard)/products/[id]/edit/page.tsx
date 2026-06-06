@@ -8,7 +8,7 @@ import {
   PrimaryButton, SecondaryButton,
 } from '@/components/ui'
 import ImageUpload from '@/components/ui/ImageUpload'
-import { verifySession } from '@/lib/dal'
+import { verifyAdmin } from '@/lib/dal'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -22,7 +22,7 @@ const CATEGORIES = [
 ]
 
 export default async function EditProductPage({ params }: Props) {
-  const { userId } = await verifySession()
+  const { userId } = await verifyAdmin()
   const { id } = await params
 
   const product = await prisma.product.findUnique({ where: { id, userId } })
