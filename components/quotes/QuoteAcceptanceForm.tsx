@@ -176,14 +176,17 @@ export default function QuoteAcceptanceForm({ token, customerName }: Props) {
               style={pubInput}
             />
           </Field>
-          <Field label="IBAN (optioneel)">
-            <input
-              value={form.iban}
-              onChange={(e) => setForm({ ...form, iban: e.target.value })}
-              placeholder="NL00 BANK 0000 0000 00"
-              style={pubInput}
-            />
-          </Field>
+          {selectedType === 'reserve_deposit' && (
+            <Field label="IBAN" required>
+              <input
+                value={form.iban}
+                onChange={(e) => setForm({ ...form, iban: e.target.value })}
+                placeholder="NL00 BANK 0000 0000 00"
+                required
+                style={pubInput}
+              />
+            </Field>
+          )}
         </div>
 
         <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '14px 16px' }}>
