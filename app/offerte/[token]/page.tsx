@@ -62,10 +62,14 @@ export default async function PublicQuotePage({ params }: Props) {
   const solarKwh      = quote.solarProductionKwh ?? 0
   const directUseKwh  = Math.max(0, solarKwh - feedbackKwh)
 
-  const saldingYearlyExtra  = Math.round(feedbackKwh * quote.electricityTariff)
-  const saldingMonthlyExtra = Math.round(saldingYearlyExtra / 12)
-  const feedbackIncomeLow   = Math.round(feedbackKwh * quote.feedbackTariff)
-  const feedInYearlyCost    = Math.round(feedbackKwh * quote.feedInCostTariff)
+  // Saldering is begrensd op netto afname van het net (= usageKwh in dit model)
+  const saldeerbaar           = Math.min(feedbackKwh, usageKwh)
+  const currentSalderingValue = Math.round(saldeerbaar * quote.electricityTariff)
+  // Verlies door afschaffing = alleen het tariffsverschil over het gesaldeerde deel
+  const saldingYearlyExtra    = Math.round(saldeerbaar * (quote.electricityTariff - quote.feedbackTariff))
+  const saldingMonthlyExtra   = Math.round(saldingYearlyExtra / 12)
+  const feedbackIncomeLow     = Math.round(feedbackKwh * quote.feedbackTariff)
+  const feedInYearlyCost      = Math.round(feedbackKwh * quote.feedInCostTariff)
 
   const totalBatteryKwh = quote.lines
     .filter(l => l.product?.category === 'BATTERY')
@@ -415,8 +419,9 @@ export default async function PublicQuotePage({ params }: Props) {
                     <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Berekening</p>
                     {[
                       { label: 'Teruglevering per jaar', value: `${feedbackKwh.toLocaleString('nl-NL')} kWh` },
-                      { label: 'Huidig salderingsvoordeel', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.electricityTariff.toFixed(2).replace('.', ',')}`, sub: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr` },
-                      { label: 'Uitbetaling na 2027', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedbackTariff.toFixed(2).replace('.', ',')}`, sub: `€${feedbackIncomeLow.toLocaleString('nl-NL')}/jr` },
+                      { label: 'Gesaldeerd deel (max. eigen verbruik)', value: `${saldeerbaar.toLocaleString('nl-NL')} × €${quote.electricityTariff.toFixed(2).replace('.', ',')}`, sub: `€${currentSalderingValue.toLocaleString('nl-NL')}/jr (huidig voordeel)` },
+                      { label: 'Datzelfde deel na 2027', value: `${saldeerbaar.toLocaleString('nl-NL')} × €${quote.feedbackTariff.toFixed(2).replace('.', ',')}`, sub: `€${Math.round(saldeerbaar * quote.feedbackTariff).toLocaleString('nl-NL')}/jr` },
+                      { label: 'Verlies door afschaffing saldering', value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr`, sub: `(€${currentSalderingValue.toLocaleString('nl-NL')} - €${Math.round(saldeerbaar * quote.feedbackTariff).toLocaleString('nl-NL')})` },
                       { label: 'Terugleverkosten leverancier', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedInCostTariff.toFixed(3).replace('.', ',')}`, sub: `€${feedInYearlyCost.toLocaleString('nl-NL')}/jr` },
                       { label: 'Totaal extra kosten per jaar', value: `€${(saldingYearlyExtra + feedInYearlyCost).toLocaleString('nl-NL')}`, bold: true },
                       { label: 'Totaal extra kosten per maand', value: `€${Math.round((saldingYearlyExtra + feedInYearlyCost) / 12)}`, bold: true },
@@ -498,35 +503,39 @@ export default async function PublicQuotePage({ params }: Props) {
                       <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', marginBottom: 12 }}>
                         Waarde teruggeleverde stroom ({feedbackKwh.toLocaleString('nl-NL')} kWh/jr)
                       </p>
-                      {[
-                        { label: 'Nu via saldering', value: saldingYearlyExtra, shade: '#94a3b8' },
-                        { label: 'Na 2027 via teruglevertarief', value: feedbackIncomeLow, shade: '#cbd5e1' },
-                      ].map((bar, i) => (
-                        <div key={i} style={{ marginBottom: 10 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                            <span style={{ fontSize: 12, color: '#374151' }}>{bar.label}</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>€{bar.value.toLocaleString('nl-NL')}</span>
+                      {(() => {
+                        const futureVal = Math.round(saldeerbaar * quote.feedbackTariff)
+                        const bars = [
+                          { label: 'Nu via saldering', value: currentSalderingValue, shade: '#94a3b8' },
+                          { label: 'Na 2027 via teruglevertarief', value: futureVal, shade: '#cbd5e1' },
+                        ]
+                        return bars.map((bar, i) => (
+                          <div key={i} style={{ marginBottom: 10 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                              <span style={{ fontSize: 12, color: '#374151' }}>{bar.label}</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>€{bar.value.toLocaleString('nl-NL')}</span>
+                            </div>
+                            <div style={{ height: 8, background: '#f1f5f9', borderRadius: 3 }}>
+                              <div style={{ height: '100%', width: `${Math.round(bar.value / Math.max(currentSalderingValue, 1) * 100)}%`, background: bar.shade, borderRadius: 3 }} />
+                            </div>
                           </div>
-                          <div style={{ height: 8, background: '#f1f5f9', borderRadius: 3 }}>
-                            <div style={{ height: '100%', width: `${Math.round(bar.value / Math.max(saldingYearlyExtra, 1) * 100)}%`, background: bar.shade, borderRadius: 3 }} />
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      })()}
                     </div>
                   </div>
                   <div style={{ paddingTop: 4 }}>
                     <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.8, marginBottom: 16 }}>
-                      De salderingsregeling vervalt per <strong>1 januari 2027</strong>. Uw {feedbackKwh.toLocaleString('nl-NL')} kWh teruglevering wordt dan niet meer verrekend à €{quote.electricityTariff.toFixed(2).replace('.', ',')}/kWh, maar uitbetaald à €{quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh.
+                      De salderingsregeling vervalt per <strong>1 januari 2027</strong>. Van uw {feedbackKwh.toLocaleString('nl-NL')} kWh teruglevering kan {saldeerbaar.toLocaleString('nl-NL')} kWh worden gesaldeerd (maximaal uw eigen netto verbruik). Dat deel wordt straks niet meer verrekend à €{quote.electricityTariff.toFixed(2).replace('.', ',')}/kWh, maar uitbetaald à €{quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh.
                     </p>
                     <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: 10, padding: '14px 16px' }}>
                       <div style={{ fontSize: 13, color: '#374151', fontVariantNumeric: 'tabular-nums' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 6 }}>
-                          <span>{feedbackKwh.toLocaleString('nl-NL')} kWh × €{quote.electricityTariff.toFixed(2).replace('.', ',')} <span style={{ color: '#9ca3af' }}>(nu)</span></span>
-                          <span style={{ fontWeight: 600 }}>€{saldingYearlyExtra.toLocaleString('nl-NL')}</span>
+                          <span>{saldeerbaar.toLocaleString('nl-NL')} kWh × €{quote.electricityTariff.toFixed(2).replace('.', ',')} <span style={{ color: '#9ca3af' }}>(nu, via saldering)</span></span>
+                          <span style={{ fontWeight: 600 }}>€{currentSalderingValue.toLocaleString('nl-NL')}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 8 }}>
-                          <span>{feedbackKwh.toLocaleString('nl-NL')} kWh × €{quote.feedbackTariff.toFixed(2).replace('.', ',')} <span style={{ color: '#9ca3af' }}>(na 2027)</span></span>
-                          <span style={{ fontWeight: 600 }}>€{feedbackIncomeLow.toLocaleString('nl-NL')}</span>
+                          <span>{saldeerbaar.toLocaleString('nl-NL')} kWh × €{quote.feedbackTariff.toFixed(2).replace('.', ',')} <span style={{ color: '#9ca3af' }}>(na 2027)</span></span>
+                          <span style={{ fontWeight: 600 }}>€{Math.round(saldeerbaar * quote.feedbackTariff).toLocaleString('nl-NL')}</span>
                         </div>
                       </div>
                       <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
