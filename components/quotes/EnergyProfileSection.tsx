@@ -109,7 +109,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
     const gasTariff = parseFloat(state.gasTariff) || 1.10
     if (usage === 0 && gas === 0) return
     const feedback    = parseFloat(state.electricityFeedbackKwh) || 0
-    const feedInCost  = parseFloat(state.feedInCostTariff) || 0.02
+    const feedInCost  = parseFloat(state.feedInCostTariff) || 0
     const netElec = Math.max(0, usage - (state.hasSolarPanels ? solar : 0))
     const monthly = Math.round(netElec * tariff / 12 + gas * gasTariff / 12 + feedback * feedInCost / 12)
     onChange({ currentMonthlyBill: String(monthly) })
@@ -297,7 +297,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                   </button>
                 )}
               </div>
-              <input type="number" min="0" step="10"
+              <input type="number" min="0" step="any"
                 value={state.currentMonthlyBill}
                 onChange={(e) => { setBillManuallyEdited(true); onChange({ currentMonthlyBill: e.target.value }) }}
                 placeholder="150"
@@ -321,7 +321,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
             <div style={state.hasSolarPanels ? s.row3 : s.row2}>
               <div>
                 <label style={s.label}>Stroomverbruik (kWh/jaar)</label>
-                <input type="number" min="0" step="100"
+                <input type="number" min="0" step="any"
                   value={state.electricityUsageKwh}
                   onChange={(e) => onChange({ electricityUsageKwh: e.target.value })}
                   placeholder="3200" style={s.input} />
@@ -329,7 +329,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
               {state.hasSolarPanels && (
                 <div>
                   <label style={s.label}>Zonne-opwek (kWh/jaar)</label>
-                  <input type="number" min="0" step="100"
+                  <input type="number" min="0" step="any"
                     value={state.solarProductionKwh}
                     onChange={(e) => onChange({ solarProductionKwh: e.target.value })}
                     placeholder="4200" style={s.input} />
@@ -338,7 +338,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
               {state.hasSolarPanels && (
                 <div>
                   <label style={s.label}>Teruglevering (kWh/jaar)</label>
-                  <input type="number" min="0" step="100"
+                  <input type="number" min="0" step="any"
                     value={state.electricityFeedbackKwh}
                     onChange={(e) => onChange({ electricityFeedbackKwh: e.target.value })}
                     placeholder="2100" style={s.input} />
@@ -348,7 +348,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
             </div>
             <div>
               <label style={s.label}>Gasverbruik (m³/jaar)</label>
-              <input type="number" min="0" step="100"
+              <input type="number" min="0" step="any"
                 value={state.gasUsageM3}
                 onChange={(e) => onChange({ gasUsageM3: e.target.value })}
                 placeholder="1400" style={{ ...s.input, maxWidth: 200 }} />
@@ -367,14 +367,14 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           <div style={s.row3}>
             <div>
               <label style={s.label}>Stroomprijs (€/kWh)</label>
-              <input type="number" min="0" step="0.01"
+              <input type="number" min="0" step="any"
                 value={state.electricityTariff}
                 onChange={(e) => onChange({ electricityTariff: e.target.value })}
                 style={s.input} />
             </div>
             <div>
               <label style={s.label}>Teruglevertarief na 2027 (€/kWh)</label>
-              <input type="number" min="0" step="0.01"
+              <input type="number" min="0" step="any"
                 value={state.feedbackTariff}
                 onChange={(e) => onChange({ feedbackTariff: e.target.value })}
                 style={s.input} />
@@ -382,7 +382,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
             </div>
             <div>
               <label style={s.label}>Gasprijs (€/m³)</label>
-              <input type="number" min="0" step="0.01"
+              <input type="number" min="0" step="any"
                 value={state.gasTariff}
                 onChange={(e) => onChange({ gasTariff: e.target.value })}
                 style={s.input} />
@@ -391,7 +391,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           <div style={s.row2}>
             <div>
               <label style={s.label}>Terugleverkosten leverancier (€/kWh)</label>
-              <input type="number" min="0" step="0.005"
+              <input type="number" min="0" step="any"
                 value={state.feedInCostTariff}
                 onChange={(e) => onChange({ feedInCostTariff: e.target.value })}
                 style={s.input} />
@@ -399,7 +399,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
             </div>
             <div>
               <label style={s.label}>EMS / onbalansmarkt opbrengst (€/jaar)</label>
-              <input type="number" min="0" step="50"
+              <input type="number" min="0" step="any"
                 value={state.emsAnnualRevenueEur}
                 onChange={(e) => onChange({ emsAnnualRevenueEur: e.target.value })}
                 style={s.input} />

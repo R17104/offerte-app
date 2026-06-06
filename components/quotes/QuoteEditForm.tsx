@@ -178,7 +178,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         electricityTariff: parseFloat(energy.electricityTariff) || 0.28,
         feedbackTariff: parseFloat(energy.feedbackTariff) || 0.07,
         gasTariff: parseFloat(energy.gasTariff) || 1.10,
-        feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0.02,
+        feedInCostTariff: parseFloat(energy.feedInCostTariff) || 0,
         emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
         currentMonthlyBill: parseFloat(energy.currentMonthlyBill) || 0,
         numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
