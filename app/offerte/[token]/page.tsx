@@ -700,7 +700,7 @@ export default async function PublicQuotePage({ params }: Props) {
               Investering
             </p>
             <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
-              Transparante prijsopbouw
+              Prijsopbouw
             </h2>
           </div>
 
@@ -785,12 +785,34 @@ export default async function PublicQuotePage({ params }: Props) {
             </div>
           </div>
 
+          {/* Acceptatie — 3 knoppen + formulier */}
+          {canInteract && (
+            <div style={{ padding: '36px 52px', borderTop: '1px solid #e5e7eb' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Wat wilt u doen?</p>
+              <p style={{ fontSize: 13.5, color: '#6b7280', marginBottom: 22 }}>
+                Kies een optie en onderteken digitaal. Na ondertekening nemen wij binnen 24 uur contact op.
+              </p>
+              <QuoteAcceptanceForm token={token} customerName={customerName} />
+            </div>
+          )}
+
+          {quote.status === 'ACCEPTED' && quote.acceptance && (
+            <div style={{ padding: '24px 52px', background: '#f0fdf4', borderTop: '1px solid #bbf7d0' }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#15803d', marginBottom: 4 }}>
+                Geaccepteerd op {formatDate(quote.acceptedAt)}
+              </p>
+              <p style={{ fontSize: 13, color: '#166534' }}>
+                Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}
+              </p>
+            </div>
+          )}
+
           <PageFooter n={p} total={pageCount} />
         </div>
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 6 — ONDERTEKENING
+            PAGINA 6 — VOORWAARDEN & HANDTEKENING
         ══════════════════════════════════════════════════════════════════ */}
         {(() => { const p = nextPage(); return (
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
@@ -798,23 +820,23 @@ export default async function PublicQuotePage({ params }: Props) {
           {/* Header */}
           <div style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
-              Voorwaarden & akkoord
+              Algemene voorwaarden
             </p>
             <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
-              {canInteract ? 'Offerte accepteren' : quote.status === 'ACCEPTED' ? 'Geaccepteerd' : 'Voorwaarden'}
+              {quote.status === 'ACCEPTED' ? 'Getekend document' : 'Voorwaarden'}
             </h2>
           </div>
 
           {/* Terms */}
           {quote.termsText && (
-            <div style={{ padding: '36px 52px', borderBottom: canInteract ? '1px solid #e5e7eb' : 'none' }}>
+            <div style={{ padding: '36px 52px', borderBottom: '1px solid #e5e7eb' }}>
               <TermsAndConditions text={quote.termsText} />
             </div>
           )}
 
-          {/* Signed status */}
+          {/* Handtekening weergave na acceptatie */}
           {quote.status === 'ACCEPTED' && quote.acceptance && (
-            <div style={{ padding: '32px 52px', background: '#f0fdf4', borderBottom: '1px solid #bbf7d0' }}>
+            <div style={{ padding: '32px 52px', background: '#f0fdf4' }}>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#15803d', marginBottom: 8 }}>
                 Geaccepteerd op {formatDate(quote.acceptedAt)}
               </p>
@@ -829,13 +851,9 @@ export default async function PublicQuotePage({ params }: Props) {
             </div>
           )}
 
-          {/* Acceptance form */}
-          {canInteract && (
-            <div style={{ padding: '36px 52px', flex: 1 }}>
-              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24 }}>
-                Na acceptatie nemen wij binnen 24 uur contact op voor de planning van de installatie.
-              </p>
-              <QuoteAcceptanceForm token={token} customerName={customerName} />
+          {!quote.termsText && quote.status !== 'ACCEPTED' && (
+            <div style={{ padding: '36px 52px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <p style={{ fontSize: 14, color: '#9ca3af' }}>Geen algemene voorwaarden toegevoegd aan deze offerte.</p>
             </div>
           )}
 

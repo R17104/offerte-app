@@ -71,6 +71,7 @@ export type AcceptQuoteInput = {
   agreedToTerms: boolean
   signatureData: string
   ipAddress?: string
+  acceptanceType?: string
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────────
@@ -233,14 +234,15 @@ export async function acceptQuoteByToken(token: string, input: AcceptQuoteInput)
     }),
     prisma.quoteAcceptance.create({
       data: {
-        quoteId:       quote.id,
-        firstName:     input.firstName,
-        lastName:      input.lastName,
-        dateOfBirth:   new Date(input.dateOfBirth),
-        iban:          input.iban || null,
-        agreedToTerms: input.agreedToTerms,
-        signatureData: input.signatureData,
-        ipAddress:     input.ipAddress || null,
+        quoteId:        quote.id,
+        firstName:      input.firstName,
+        lastName:       input.lastName,
+        dateOfBirth:    new Date(input.dateOfBirth),
+        iban:           input.iban || null,
+        agreedToTerms:  input.agreedToTerms,
+        signatureData:  input.signatureData,
+        ipAddress:      input.ipAddress || null,
+        acceptanceType: input.acceptanceType || null,
       },
     }),
   ])

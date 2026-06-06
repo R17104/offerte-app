@@ -218,15 +218,16 @@ model QuoteLine {
 }
 
 model QuoteAcceptance {
-  id            String   @id @default(cuid())
-  firstName     String
-  lastName      String
-  dateOfBirth   DateTime
-  iban          String?
-  agreedToTerms Boolean  @default(false)
-  signatureData String
-  acceptedAt    DateTime @default(now())
-  ipAddress     String?
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  iban           String?
+  agreedToTerms  Boolean  @default(false)
+  signatureData  String
+  acceptedAt     DateTime @default(now())
+  ipAddress      String?
+  acceptanceType String?
 
   quoteId String @unique
   quote   Quote  @relation(fields: [quoteId], references: [id])
