@@ -118,8 +118,7 @@ function calcBatteryAdvice(state: EnergyState) {
   // Summer accounts for ~65% of annual feedback, spread over 182 days
   const summerDailySurplus = (feedbackKwh * 0.65) / 182
 
-  // Base recommendation: store a typical summer day's surplus
-  let baseKwh = summerDailySurplus
+  let baseKwh = 0
 
   // Heat pump: adds evening/morning load that battery can serve → needs more capacity
   const heatPumpExtra = state.hasHeatPump ? 2.5 : 0
