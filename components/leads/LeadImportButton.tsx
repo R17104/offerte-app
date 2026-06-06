@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { importLeads, type LeadImportRow } from '@/lib/actions/lead.actions'
 
 const FIELD_MAP: Record<string, keyof LeadImportRow> = {
-  voornaam: 'firstName', firstname: 'firstName', first_name: 'firstName', naam: 'firstName',
+  voornaam: 'firstName', firstname: 'firstName', first_name: 'firstName',
   achternaam: 'lastName', lastname: 'lastName', last_name: 'lastName', familienaam: 'lastName',
   email: 'email', 'e-mail': 'email', emailadres: 'email',
   telefoon: 'phone', phone: 'phone', tel: 'phone', mobiel: 'phone', telefoonnummer: 'phone',
@@ -14,37 +14,63 @@ const FIELD_MAP: Record<string, keyof LeadImportRow> = {
   stad: 'city', city: 'city', plaats: 'city', woonplaats: 'city',
 }
 
+function splitLine(line: string, sep: string): string[] {
+  const cols: string[] = []
+  let cur = '', inQ = false
+  for (const ch of line + sep) {
+    if (ch === '"') { inQ = !inQ }
+    else if (ch === sep && !inQ) { cols.push(cur.trim()); cur = '' }
+    else { cur += ch }
+  }
+  return cols
+}
+
+function splitFullName(full: string): { firstName: string; lastName: string } {
+  const parts = full.trim().split(/\s+/)
+  return { firstName: parts[0] ?? '', lastName: parts.slice(1).join(' ') }
+}
+
 function parseCSV(text: string): LeadImportRow[] {
-  const lines = text.trim().split(/\r?\n/)
-  if (lines.length < 2) return []
+  const lines = text.trim().split(/\r?\n/).filter((l) => l.trim())
+  if (lines.length === 0) return []
 
-  // Detect separator: semicolon or comma
   const sep = lines[0].includes(';') ? ';' : ','
-
-  const headers = lines[0].split(sep).map((h) =>
-    h.trim().toLowerCase().replace(/['"]/g, '').replace(/\s+/g, '_')
+  const firstCols = splitLine(lines[0], sep).map((c) =>
+    c.toLowerCase().replace(/['"]/g, '').replace(/\s+/g, '_')
   )
 
-  const mapped = headers.map((h) => FIELD_MAP[h] ?? null)
+  // Detect header row: if any column matches a known field name
+  const hasHeader = firstCols.some((c) => c in FIELD_MAP)
 
-  return lines.slice(1).flatMap((line) => {
-    if (!line.trim()) return []
-    // Handle quoted fields
-    const cols: string[] = []
-    let cur = '', inQ = false
-    for (const ch of line + sep) {
-      if (ch === '"') { inQ = !inQ }
-      else if (ch === sep && !inQ) { cols.push(cur.trim()); cur = '' }
-      else { cur += ch }
-    }
-
-    const row: Partial<LeadImportRow> = {}
-    mapped.forEach((field, i) => {
-      if (field && cols[i]) row[field] = cols[i]
+  if (hasHeader) {
+    const mapped = firstCols.map((h) => FIELD_MAP[h] ?? null)
+    return lines.slice(1).flatMap((line) => {
+      const cols = splitLine(line, sep)
+      const row: Partial<LeadImportRow> = {}
+      mapped.forEach((field, i) => { if (field && cols[i]) row[field] = cols[i] })
+      if (!row.firstName && !row.lastName) return []
+      return [{ firstName: row.firstName ?? '', lastName: row.lastName ?? '', ...row }]
     })
+  }
 
-    if (!row.firstName && !row.lastName) return []
-    return [{ firstName: row.firstName ?? '', lastName: row.lastName ?? '', ...row }]
+  // Positional format (no header):
+  // col0=product/bron, col1=volledige naam, col2=email, col3=telefoon,
+  // col4=postcode, col5=huisnummer, col6=stad, col7=provincie (ignored), col8=datum (ignored)
+  return lines.flatMap((line) => {
+    const cols = splitLine(line, sep)
+    if (cols.length < 2) return []
+    const { firstName, lastName } = splitFullName(cols[1] ?? '')
+    if (!firstName) return []
+    return [{
+      source:      cols[0] || undefined,
+      firstName,
+      lastName,
+      email:       cols[2] || undefined,
+      phone:       cols[3] || undefined,
+      postalCode:  cols[4] || undefined,
+      houseNumber: cols[5] || undefined,
+      city:        cols[6] || undefined,
+    }]
   })
 }
 
@@ -62,7 +88,7 @@ export default function LeadImportButton() {
       const text = await file.text()
       const rows = parseCSV(text)
       if (rows.length === 0) {
-        setResult({ ok: false, error: 'Geen geldige rijen gevonden. Controleer de kolomnamen (voornaam, achternaam, email, telefoon, postcode, stad…).' })
+        setResult({ ok: false, error: 'Geen geldige rijen gevonden in het CSV bestand.' })
         return
       }
       await importLeads(rows, file.name)

@@ -15,6 +15,7 @@ export type LeadImportRow = {
   houseNumber?: string
   postalCode?: string
   city?: string
+  source?: string
 }
 
 export async function importLeads(rows: LeadImportRow[], source: string) {
@@ -29,7 +30,7 @@ export async function importLeads(rows: LeadImportRow[], source: string) {
       houseNumber: r.houseNumber || null,
       postalCode:  r.postalCode  || null,
       city:        r.city        || null,
-      source,
+      source:      r.source || source,
       createdById: userId,
     })),
     skipDuplicates: false,
