@@ -100,7 +100,7 @@ const s = {
   }),
 }
 
-const ALPHA_SIZES = [5.9, 9.3, 11.8, 18.6]
+const ALPHA_SIZES = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
 
 function calcBatteryAdvice(state: EnergyState) {
   const feedbackKwh = parseFloat(state.electricityFeedbackKwh) || 0
