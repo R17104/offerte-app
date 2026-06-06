@@ -819,11 +819,9 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           {/* Terms */}
-          {quote.termsText && (
-            <div style={{ padding: '36px 52px', borderBottom: '1px solid #e5e7eb' }}>
-              <TermsAndConditions text={quote.termsText} />
-            </div>
-          )}
+          <div style={{ padding: '36px 52px', borderBottom: '1px solid #e5e7eb' }}>
+            <TermsAndConditions text={quote.termsText} />
+          </div>
 
           {/* Handtekening weergave na acceptatie */}
           {quote.status === 'ACCEPTED' && quote.acceptance && (
