@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createQuote, type QuoteLineInput, type EnergyProfile } from '@/lib/actions/quote.actions'
+import { createCustomerInline } from '@/lib/actions/customer.actions'
 import { formatCurrency, calculateQuoteTotals } from '@/lib/utils'
 import EnergyProfileSection, { DEFAULT_ENERGY_STATE, type EnergyState } from '@/components/quotes/EnergyProfileSection'
 
@@ -15,9 +16,11 @@ type Product = {
   defaultQty: number | null
 }
 
+type CustomerOption = { id: string; firstName: string; lastName: string }
+
 type Props = {
   customerId: string
-  customers: { id: string; firstName: string; lastName: string }[]
+  customers: CustomerOption[]
   products: Product[]
   preselectedCustomerId?: string
 }
@@ -54,9 +57,19 @@ function emptyLine(): Line {
   }
 }
 
-export default function QuoteLineEditor({ customerId: defaultCustomerId, customers, products, preselectedCustomerId }: Props) {
+const EMPTY_NEW_CUSTOMER = {
+  firstName: '', lastName: '', dateOfBirth: '',
+  email: '', phone: '', street: '', houseNumber: '', postalCode: '', city: '',
+}
+
+export default function QuoteLineEditor({ customerId: defaultCustomerId, customers: initialCustomers, products, preselectedCustomerId }: Props) {
   const router = useRouter()
   const [customerId, setCustomerId] = useState(preselectedCustomerId || defaultCustomerId || '')
+  const [customers, setCustomers] = useState<CustomerOption[]>(initialCustomers)
+  const [showNewCustomer, setShowNewCustomer] = useState(false)
+  const [newCustomer, setNewCustomer] = useState(EMPTY_NEW_CUSTOMER)
+  const [savingCustomer, setSavingCustomer] = useState(false)
+  const [customerError, setCustomerError] = useState('')
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [includedItems, setIncludedItems] = useState(DEFAULT_INCLUDED_ITEMS)
@@ -66,6 +79,26 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
   const [energy, setEnergy] = useState<EnergyState>(DEFAULT_ENERGY_STATE)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  async function handleCreateCustomer() {
+    setCustomerError('')
+    if (!newCustomer.firstName || !newCustomer.lastName || !newCustomer.dateOfBirth) {
+      setCustomerError('Voornaam, achternaam en geboortedatum zijn verplicht')
+      return
+    }
+    setSavingCustomer(true)
+    try {
+      const created = await createCustomerInline(newCustomer)
+      setCustomers((prev) => [...prev, created])
+      setCustomerId(created.id)
+      setShowNewCustomer(false)
+      setNewCustomer(EMPTY_NEW_CUSTOMER)
+    } catch (err: unknown) {
+      setCustomerError(err instanceof Error ? err.message : 'Fout bij aanmaken klant')
+    } finally {
+      setSavingCustomer(false)
+    }
+  }
 
   const updateLine = useCallback((key: string, patch: Partial<Line>) => {
     setLines((prev) =>
@@ -168,21 +201,103 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
       <div style={s.card}>
         <p style={s.cardTitle}>Offertegegevens</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <div style={s.field}>
+          <div style={{ ...s.field, gridColumn: '1 / -1' }}>
             <label style={s.label}>Klant <span style={{ color: 'var(--danger)' }}>*</span></label>
-            <select
-              value={customerId}
-              onChange={(e) => setCustomerId(e.target.value)}
-              required
-              style={s.input}
-            >
-              <option value="">— Selecteer klant —</option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.firstName} {c.lastName}
-                </option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <select
+                value={customerId}
+                onChange={(e) => { setCustomerId(e.target.value); setShowNewCustomer(false) }}
+                style={{ ...s.input, flex: 1 }}
+              >
+                <option value="">— Selecteer bestaande klant —</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.firstName} {c.lastName}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => { setShowNewCustomer((v) => !v); setCustomerId(''); setCustomerError('') }}
+                style={{
+                  padding: '8px 14px', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
+                  background: showNewCustomer ? 'var(--accent)' : 'var(--bg-elevated)',
+                  color: showNewCustomer ? '#fff' : 'var(--accent)',
+                  border: '1px solid var(--accent)', borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer', fontFamily: 'var(--font-sans)',
+                }}>
+                {showNewCustomer ? '✕ Annuleren' : '+ Nieuwe klant'}
+              </button>
+            </div>
+
+            {showNewCustomer && (
+              <div style={{
+                marginTop: 12, background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)',
+                padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12,
+              }}>
+                <p style={{ fontWeight: 600, fontSize: 13.5, margin: 0 }}>Nieuwe klant aanmaken</p>
+                {customerError && (
+                  <div style={{ background: 'var(--danger-muted)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 6, padding: '8px 12px', color: 'var(--danger)', fontSize: 12.5 }}>
+                    {customerError}
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={s.label}>Voornaam <span style={{ color: 'var(--danger)' }}>*</span></label>
+                    <input value={newCustomer.firstName} onChange={(e) => setNewCustomer((p) => ({ ...p, firstName: e.target.value }))} placeholder="Jan" style={s.input} />
+                  </div>
+                  <div>
+                    <label style={s.label}>Achternaam <span style={{ color: 'var(--danger)' }}>*</span></label>
+                    <input value={newCustomer.lastName} onChange={(e) => setNewCustomer((p) => ({ ...p, lastName: e.target.value }))} placeholder="de Vries" style={s.input} />
+                  </div>
+                  <div>
+                    <label style={s.label}>Geboortedatum <span style={{ color: 'var(--danger)' }}>*</span></label>
+                    <input type="date" value={newCustomer.dateOfBirth} onChange={(e) => setNewCustomer((p) => ({ ...p, dateOfBirth: e.target.value }))} style={s.input} />
+                  </div>
+                  <div>
+                    <label style={s.label}>E-mailadres</label>
+                    <input type="email" value={newCustomer.email} onChange={(e) => setNewCustomer((p) => ({ ...p, email: e.target.value }))} placeholder="jan@example.nl" style={s.input} />
+                  </div>
+                  <div>
+                    <label style={s.label}>Telefoonnummer</label>
+                    <input value={newCustomer.phone} onChange={(e) => setNewCustomer((p) => ({ ...p, phone: e.target.value }))} placeholder="06-12345678" style={s.input} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8 }}>
+                    <div>
+                      <label style={s.label}>Straat</label>
+                      <input value={newCustomer.street} onChange={(e) => setNewCustomer((p) => ({ ...p, street: e.target.value }))} placeholder="Hoofdstraat" style={s.input} />
+                    </div>
+                    <div>
+                      <label style={s.label}>Huisnr.</label>
+                      <input value={newCustomer.houseNumber} onChange={(e) => setNewCustomer((p) => ({ ...p, houseNumber: e.target.value }))} placeholder="12a" style={s.input} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={s.label}>Postcode</label>
+                    <input value={newCustomer.postalCode} onChange={(e) => setNewCustomer((p) => ({ ...p, postalCode: e.target.value }))} placeholder="8911 AB" style={s.input} />
+                  </div>
+                  <div>
+                    <label style={s.label}>Stad</label>
+                    <input value={newCustomer.city} onChange={(e) => setNewCustomer((p) => ({ ...p, city: e.target.value }))} placeholder="Leeuwarden" style={s.input} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={handleCreateCustomer}
+                    disabled={savingCustomer}
+                    style={{
+                      padding: '9px 20px', background: 'var(--accent)', color: '#fff',
+                      border: 'none', borderRadius: 'var(--radius-md)', fontSize: 13.5,
+                      fontWeight: 600, cursor: savingCustomer ? 'not-allowed' : 'pointer',
+                      opacity: savingCustomer ? 0.7 : 1, fontFamily: 'var(--font-sans)',
+                    }}>
+                    {savingCustomer ? 'Aanmaken...' : 'Klant aanmaken en selecteren'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           <div style={s.field}>
             <label style={s.label}>Titel <span style={{ color: 'var(--danger)' }}>*</span></label>

@@ -54,6 +54,55 @@ export async function createCustomer(formData: FormData) {
   redirect(`/customers/${customer.id}`)
 }
 
+// ── Create inline (geen redirect, voor gebruik binnen andere formulieren) ─────
+
+export async function createCustomerInline(data: {
+  firstName: string
+  lastName: string
+  dateOfBirth: string
+  email?: string
+  phone?: string
+  street?: string
+  houseNumber?: string
+  postalCode?: string
+  city?: string
+}): Promise<{ id: string; firstName: string; lastName: string }> {
+  const { userId } = await verifySession()
+
+  if (!data.firstName || !data.lastName || !data.dateOfBirth) {
+    throw new Error('Verplichte velden ontbreken')
+  }
+
+  const customer = await prisma.customer.create({
+    data: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: new Date(data.dateOfBirth),
+      email: data.email || null,
+      phone: data.phone || null,
+      userId,
+      addresses:
+        data.street && data.city
+          ? {
+              create: [
+                {
+                  type: 'CORRESPONDENCE',
+                  street: data.street,
+                  houseNumber: data.houseNumber || '',
+                  postalCode: data.postalCode || '',
+                  city: data.city,
+                },
+              ],
+            }
+          : undefined,
+    },
+    select: { id: true, firstName: true, lastName: true },
+  })
+
+  revalidatePath('/customers')
+  return customer
+}
+
 // ── Update ────────────────────────────────────────────────────────────────────
 
 export async function updateCustomer(id: string, formData: FormData) {
