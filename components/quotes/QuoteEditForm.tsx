@@ -55,6 +55,7 @@ type Props = {
     emsAnnualRevenueEur: number
     currentMonthlyBill: number
     hasHeatPump: boolean
+    includeBatteryAdvice: boolean
     numPersons: number | null
     houseType: string | null
     buildYear: number | null
@@ -125,6 +126,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
     emsAnnualRevenueEur: String(initialData.emsAnnualRevenueEur),
     currentMonthlyBill: String(initialData.currentMonthlyBill),
     hasHeatPump: initialData.hasHeatPump,
+    includeBatteryAdvice: initialData.includeBatteryAdvice,
     numPersons: initialData.numPersons != null ? String(initialData.numPersons) : '',
     houseType: initialData.houseType ?? '',
     buildYear: initialData.buildYear != null ? String(initialData.buildYear) : '',
@@ -187,6 +189,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         emsAnnualRevenueEur: parseFloat(energy.emsAnnualRevenueEur) || 0,
         currentMonthlyBill: parseFloat(energy.currentMonthlyBill) || 0,
         hasHeatPump: energy.hasHeatPump,
+        includeBatteryAdvice: energy.includeBatteryAdvice,
         numPersons: energy.numPersons ? parseInt(energy.numPersons) : null,
         houseType: energy.houseType ? energy.houseType as EnergyProfile['houseType'] : null,
         buildYear: energy.buildYear ? parseInt(energy.buildYear) : null,

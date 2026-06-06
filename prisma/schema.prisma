@@ -172,6 +172,7 @@ model Quote {
   electricityFeedbackKwh Float?  // Jaarlijkse teruglevering (kWh)
   gasUsageM3             Float?  // Jaarverbruik gas (m³)
   hasHeatPump            Boolean @default(false) // Klant heeft al een warmtepomp
+  includeBatteryAdvice   Boolean @default(false) // Batterijadvies meesturen in offerte
 
   // Tarieven (met defaults, handmatig aanpasbaar)
   electricityTariff Float @default(0.28)  // €/kWh

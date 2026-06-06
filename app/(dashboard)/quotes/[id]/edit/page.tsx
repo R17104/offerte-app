@@ -112,6 +112,7 @@ export default async function QuoteEditPage({ params }: Props) {
           emsAnnualRevenueEur: quote.emsAnnualRevenueEur,
           currentMonthlyBill: quote.currentMonthlyBill,
           hasHeatPump: quote.hasHeatPump,
+          includeBatteryAdvice: quote.includeBatteryAdvice,
           numPersons: quote.numPersons,
           houseType: quote.houseType,
           buildYear: quote.buildYear,

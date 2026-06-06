@@ -49,6 +49,7 @@ export type EnergyProfile = {
   emsAnnualRevenueEur: number
   currentMonthlyBill: number
   hasHeatPump: boolean
+  includeBatteryAdvice: boolean
   numPersons?: number | null
   houseType?: HouseType | null
   buildYear?: number | null

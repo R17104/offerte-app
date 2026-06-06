@@ -1,0 +1,1 @@
+ALTER TABLE "Quote" ADD COLUMN IF NOT EXISTS "includeBatteryAdvice" BOOLEAN NOT NULL DEFAULT false;

@@ -21,6 +21,7 @@ export type EnergyState = {
   gasTariff: string
   feedInCostTariff: string
   hasHeatPump: boolean
+  includeBatteryAdvice: boolean
   emsAnnualRevenueEur: string
   currentMonthlyBill: string
   numPersons: string
@@ -47,6 +48,7 @@ export const DEFAULT_ENERGY_STATE: EnergyState = {
   gasTariff: '1.10',
   feedInCostTariff: '0.02',
   hasHeatPump: false,
+  includeBatteryAdvice: false,
   emsAnnualRevenueEur: '0',
   currentMonthlyBill: '0',
   numPersons: '',
@@ -155,7 +157,7 @@ function calcBatteryAdvice(state: EnergyState) {
   }
 }
 
-function BatteryAdvice({ state }: { state: EnergyState }) {
+function BatteryAdvice({ state, onChange }: { state: EnergyState; onChange: (patch: Partial<EnergyState>) => void }) {
   const adv = calcBatteryAdvice(state)
   if (!adv) return null
 
@@ -217,6 +219,25 @@ function BatteryAdvice({ state }: { state: EnergyState }) {
         Niet meegenomen: dakoriëntatie, schaduw, EV-laden thuis, of dynamisch verbruikspatroon.
         Beschouw dit als een eerste indicatie.
       </p>
+
+      <div style={{ marginTop: 14, borderTop: '1px solid rgba(10,92,53,0.15)', paddingTop: 14 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={state.includeBatteryAdvice}
+            onChange={(e) => onChange({ includeBatteryAdvice: e.target.checked })}
+            style={{ width: 17, height: 17, accentColor: 'var(--accent)' }}
+          />
+          <div>
+            <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--accent)' }}>
+              Batterijadvies meesturen in offerte
+            </span>
+            <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '2px 0 0' }}>
+              Voegt een pagina toe met het persoonlijk batterijadvies vóór de situatie-analyse.
+            </p>
+          </div>
+        </label>
+      </div>
     </div>
   )
 }
@@ -502,7 +523,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
       </div>
 
       {/* Batterijadvies */}
-      <BatteryAdvice state={state} />
+      <BatteryAdvice state={state} onChange={onChange} />
 
       {/* Tarieven */}
       <div style={s.card}>

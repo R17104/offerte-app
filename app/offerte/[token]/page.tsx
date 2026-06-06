@@ -117,8 +117,26 @@ export default async function PublicQuotePage({ params }: Props) {
     ? Math.round(currentMonthlyBill + totalMonthlyExtra)
     : 0
 
+  // ── Batterijadvies berekening (herbruikbaar op offertepagina) ─────────────
+  const kwp             = quote.solarPanelKwp ?? 0
+  const summerSurplus   = feedbackKwh > 0 ? (feedbackKwh * 0.65) / 182 : 0
+  const heatPumpExtra   = quote.hasHeatPump ? 2.5 : 0
+  let advBaseKwh        = summerSurplus + heatPumpExtra
+  let kwpExtra          = 0
+  if (kwp >= 8)       { kwpExtra = kwp * 0.15; advBaseKwh = Math.max(advBaseKwh, kwp * 1.2) }
+  else if (kwp >= 5)  { kwpExtra = kwp * 0.1;  advBaseKwh = Math.max(advBaseKwh, kwp * 1.0) }
+  advBaseKwh = Math.max(4, advBaseKwh)
+  const ALPHA_SIZES     = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
+  const advRecommended  = ALPHA_SIZES.find(s => s >= advBaseKwh) ?? 55.8
+  const tariffDiff      = quote.electricityTariff - quote.feedbackTariff
+  const advAbsorbable   = Math.min(advRecommended * 365 * 0.9, feedbackKwh * 0.85)
+  const advAnnualSavings = Math.round(advAbsorbable * tariffDiff)
+  const advSelfUseKwh   = Math.round(advAbsorbable)
+  const showBatteryAdvicePage = quote.includeBatteryAdvice && quote.hasSolarPanels && feedbackKwh > 0 && solarKwh > 0
+
   const pageCount = 1
     + (showSalderingPage ? 1 : 0)
+    + (showBatteryAdvicePage ? 1 : 0)
     + (showBespaarplan ? 2 : 0)
     + 1 // installatie
     + 1 // investering
@@ -460,6 +478,194 @@ export default async function PublicQuotePage({ params }: Props) {
                 )}
               </div>
             </div>
+          </div>
+
+          <PageFooter n={p} total={pageCount} />
+        </div>
+        )})()}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PAGINA 2B — PERSOONLIJK BATTERIJADVIES
+        ══════════════════════════════════════════════════════════════════ */}
+        {showBatteryAdvicePage && (() => { const p = nextPage(); return (
+        <div className="doc-page" style={PAGE}>
+
+          {/* Page header */}
+          <div className="ph" style={{ background: green, padding: '36px 52px', flexShrink: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
+              Persoonlijk batterijadvies
+            </p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', marginBottom: 6 }}>
+              De juiste batterij voor uw situatie
+            </h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', maxWidth: 520 }}>
+              Op basis van uw energieprofiel hebben wij berekend welke batterijcapaciteit het beste bij u past.
+            </p>
+          </div>
+
+          {/* Hero: aanbeveling */}
+          <div className="sec" style={{ padding: '36px 52px', background: '#f8faf9', borderBottom: '1px solid #e5e7eb', flexShrink: 0 }}>
+            <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+                  Aanbevolen batterijcapaciteit
+                </p>
+                <div style={{ fontSize: 72, fontWeight: 900, color: green, lineHeight: 1, letterSpacing: '-0.03em' }}>
+                  {advRecommended.toString().replace('.', ',')}
+                  <span style={{ fontSize: 28, fontWeight: 600, color: '#6b7280', marginLeft: 6 }}>kWh</span>
+                </div>
+                <p style={{ fontSize: 14, color: '#374151', marginTop: 10 }}>
+                  Alpha ESS thuisbatterij — specifiek gekozen op basis van uw dagelijks overschot en verbruikspatroon.
+                </p>
+                <div style={{ marginTop: 16, display: 'flex', gap: 16 }}>
+                  <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 16px', textAlign: 'center', flex: 1 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: '#2563eb' }}>€{advAnnualSavings.toLocaleString('nl-NL')}</div>
+                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>verwachte besparing/jaar</div>
+                  </div>
+                  <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 16px', textAlign: 'center', flex: 1 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: green }}>{advSelfUseKwh.toLocaleString('nl-NL')}</div>
+                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>kWh extra zelfgebruik/jaar</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visueel: overschot vóór vs na batterij */}
+              <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '20px 22px' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Uw zonne-energie: nu vs. met batterij
+                </p>
+                {(() => {
+                  const selfNow = solarKwh > 0 ? Math.round((solarKwh - feedbackKwh) / solarKwh * 100) : 0
+                  const feedNow = 100 - selfNow
+                  const extraSelf = solarKwh > 0 ? Math.round(advSelfUseKwh / solarKwh * 100) : 0
+                  const selfAfter = Math.min(100, selfNow + extraSelf)
+                  const feedAfter = 100 - selfAfter
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                      {[
+                        { label: 'Nu (zonder batterij)', selfPct: selfNow, feedPct: feedNow },
+                        { label: 'Met batterij', selfPct: selfAfter, feedPct: feedAfter },
+                      ].map((row, i) => (
+                        <div key={i}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                            <span style={{ fontSize: 12, color: '#374151', fontWeight: i === 1 ? 700 : 400 }}>{row.label}</span>
+                            <span style={{ fontSize: 12, color: green, fontWeight: 700 }}>{row.selfPct}% eigen gebruik</span>
+                          </div>
+                          <div style={{ height: 18, borderRadius: 6, overflow: 'hidden', background: '#f1f5f9', display: 'flex' }}>
+                            <div style={{ width: `${row.selfPct}%`, background: green, transition: 'width 0.3s' }} />
+                            <div style={{ width: `${row.feedPct}%`, background: '#d1d5db' }} />
+                          </div>
+                          <div style={{ display: 'flex', gap: 14, marginTop: 5 }}>
+                            <span style={{ fontSize: 11, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ width: 8, height: 8, background: green, borderRadius: 2, display: 'inline-block' }} /> Eigen gebruik
+                            </span>
+                            <span style={{ fontSize: 11, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ width: 8, height: 8, background: '#d1d5db', borderRadius: 2, display: 'inline-block' }} /> Teruglevering
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+              </div>
+            </div>
+          </div>
+
+          {/* Berekeningsonderbouwing */}
+          <div className="sec" style={{ padding: '32px 52px', borderBottom: '1px solid #e5e7eb' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 18 }}>
+              Hoe komt dit advies tot stand?
+            </p>
+            <div className="g2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+              <div style={{ background: '#f8f9fa', borderRadius: 10, padding: '18px 20px' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 14 }}>Stap-voor-stap berekening</p>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {([
+                      ['Teruglevering per jaar', `${feedbackKwh.toLocaleString('nl-NL')} kWh`],
+                      ['Gemiddeld dagelijks overschot', `${(Math.round(feedbackKwh / 365 * 10) / 10).toString().replace('.', ',')} kWh/dag`],
+                      ['Zomers dagelijks overschot', `${(Math.round(feedbackKwh * 0.65 / 182 * 10) / 10).toString().replace('.', ',')} kWh/dag`],
+                      ...(quote.hasHeatPump ? [['Warmtepomp toeslag', '+2,5 kWh']] : []),
+                      ...(kwp >= 5 ? [[`Hoog vermogen (${kwp.toString().replace('.', ',')} kWp)`, `+${(Math.round(kwpExtra * 10) / 10).toString().replace('.', ',')} kWh`]] : []),
+                      ['Minimaal benodigde capaciteit', `${(Math.round(advBaseKwh * 10) / 10).toString().replace('.', ',')} kWh`],
+                      ['Aanbevolen Alpha ESS maat', `${advRecommended.toString().replace('.', ',')} kWh`],
+                    ] as [string, string][]).map(([label, val], i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #e9ecef' }}>
+                        <td style={{ padding: '7px 0', fontSize: 12.5, color: '#4b5563' }}>{label}</td>
+                        <td style={{ padding: '7px 0', fontSize: 12.5, fontWeight: 700, textAlign: 'right', color: '#111827' }}>{val}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ background: '#fff', border: `2px solid ${green}`, borderRadius: 10, padding: '16px 18px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: green, marginBottom: 8 }}>Waarom dit formaat?</p>
+                  <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6 }}>
+                    De zomer levert circa 65% van uw jaarlijkse teruglevering in slechts 182 dagen. Op een goede zomerdag
+                    stroomt er {(Math.round(feedbackKwh * 0.65 / 182 * 10) / 10).toString().replace('.', ',')} kWh terug naar het net.
+                    Een batterij van {advRecommended.toString().replace('.', ',')} kWh vangt dit dagelijks overschot volledig op.
+                  </p>
+                </div>
+                {quote.hasHeatPump && (
+                  <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '14px 16px' }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#1d4ed8', marginBottom: 6 }}>Warmtepomp meegerekend</p>
+                    <p style={{ fontSize: 12.5, color: '#374151', lineHeight: 1.5 }}>
+                      Uw warmtepomp heeft extra opslagcapaciteit nodig voor piekverplaatsing.
+                      Wij hebben 2,5 kWh extra capaciteit meegenomen in het advies.
+                    </p>
+                  </div>
+                )}
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '14px 16px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginBottom: 6 }}>Zelfvoorzieningsgraad stijgt</p>
+                  <p style={{ fontSize: 12.5, color: '#374151', lineHeight: 1.5 }}>
+                    Door {advSelfUseKwh.toLocaleString('nl-NL')} kWh/jaar zelf te gebruiken in plaats van terug te leveren,
+                    ontvangt u €{tariffDiff.toFixed(2).replace('.', ',')} meer per kWh.
+                    Dat levert u circa <strong>€{advAnnualSavings.toLocaleString('nl-NL')}/jaar</strong> op.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Wat lost de batterij op */}
+          <div className="sec" style={{ padding: '28px 52px', flexGrow: 1 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+              Wat lost de batterij voor u op?
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+              {[
+                {
+                  icon: '⚡',
+                  title: 'Salderingsverlies',
+                  body: `Na 2027 vervalt de salderingsregeling. De batterij slaat uw overschot op zodat u het zelf gebruikt — voor €${quote.electricityTariff.toFixed(2).replace('.', ',')} i.p.v. het terug te leveren voor €${quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh.`,
+                  color: '#dc2626', bg: '#fef2f2', border: '#fca5a5',
+                },
+                {
+                  icon: '💸',
+                  title: 'Terugleverkosten',
+                  body: `Uw energieleverancier rekent terugleverkosten per kWh. Met een batterij levert u minder terug en betaalt u minder terugleverkosten.`,
+                  color: '#d97706', bg: '#fffbeb', border: '#fcd34d',
+                },
+                {
+                  icon: '📈',
+                  title: 'EMS onbalansmarkt',
+                  body: `De Alpha ESS EMS handelt automatisch op de onbalansmarkt. Gemiddeld levert dit €1.314/jaar extra op (3-jaarsgemiddelde, 9,3 kWh systeem).`,
+                  color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe',
+                },
+              ].map((card, i) => (
+                <div key={i} style={{ background: card.bg, border: `1px solid ${card.border}`, borderRadius: 10, padding: '16px' }}>
+                  <div style={{ fontSize: 20, marginBottom: 8 }}>{card.icon}</div>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: card.color, marginBottom: 6 }}>{card.title}</p>
+                  <p style={{ fontSize: 12, color: '#374151', lineHeight: 1.6 }}>{card.body}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 16, fontStyle: 'italic' }}>
+              * Niet meegenomen in dit advies: dakoriëntatie, schaduw, EV-laden thuis. Dit is een indicatie op basis van uw opgegeven verbruiksgegevens.
+            </p>
           </div>
 
           <PageFooter n={p} total={pageCount} />
