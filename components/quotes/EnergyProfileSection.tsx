@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { estimateEnergyUsage } from '@/lib/savings'
 
 export type EnergyState = {
@@ -98,6 +98,20 @@ const s = {
 
 export default function EnergyProfileSection({ state, onChange }: Props) {
   const [inputMode, setInputMode] = useState<'estimate' | 'manual'>('manual')
+  const [billManuallyEdited, setBillManuallyEdited] = useState(false)
+
+  useEffect(() => {
+    if (billManuallyEdited) return
+    const usage    = parseFloat(state.electricityUsageKwh) || 0
+    const solar    = parseFloat(state.solarProductionKwh) || 0
+    const tariff   = parseFloat(state.electricityTariff) || 0.28
+    const gas      = parseFloat(state.gasUsageM3) || 0
+    const gasTariff = parseFloat(state.gasTariff) || 1.10
+    if (usage === 0 && gas === 0) return
+    const netElec = Math.max(0, usage - (state.hasSolarPanels ? solar : 0))
+    const monthly = Math.round(netElec * tariff / 12 + gas * gasTariff / 12)
+    onChange({ currentMonthlyBill: String(monthly) })
+  }, [state.electricityUsageKwh, state.solarProductionKwh, state.electricityTariff, state.gasUsageM3, state.gasTariff, state.hasSolarPanels, billManuallyEdited])
 
   function runEstimate() {
     if (!state.numPersons || !state.houseType || !state.buildYear) return
@@ -268,17 +282,29 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {/* Huidig termijnbedrag — altijd zichtbaar */}
+            {/* Huidig termijnbedrag — altijd zichtbaar, auto-berekend */}
             <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
-              <label style={{ ...s.label, fontSize: 13.5, fontWeight: 700 }}>
-                Huidig maandelijks termijnbedrag klant (€)
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <label style={{ ...s.label, fontSize: 13.5, fontWeight: 700, margin: 0 }}>
+                  Huidig maandelijks termijnbedrag klant (€)
+                </label>
+                {billManuallyEdited && (
+                  <button type="button" onClick={() => setBillManuallyEdited(false)}
+                    style={{ fontSize: 11, color: 'var(--text-tertiary)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', padding: 0 }}>
+                    ↺ auto
+                  </button>
+                )}
+              </div>
               <input type="number" min="0" step="10"
                 value={state.currentMonthlyBill}
-                onChange={(e) => onChange({ currentMonthlyBill: e.target.value })}
+                onChange={(e) => { setBillManuallyEdited(true); onChange({ currentMonthlyBill: e.target.value }) }}
                 placeholder="150"
-                style={{ ...s.input, marginTop: 6 }} />
-              <p style={s.hint}>Wat betaalt de klant nu per maand aan de energieleverancier? Gebruikt voor de voor/na vergelijking op de salderingspagina.</p>
+                style={{ ...s.input }} />
+              <p style={s.hint}>
+                {billManuallyEdited
+                  ? 'Handmatig ingevuld — klik "↺ auto" om terug te gaan naar automatische berekening.'
+                  : 'Automatisch berekend op basis van verbruik en tarieven. Klik het veld om handmatig aan te passen.'}
+              </p>
             </div>
 
             {/* Zonnepanelen toggle */}
