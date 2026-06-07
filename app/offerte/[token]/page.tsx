@@ -1196,7 +1196,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </p>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               {[
-                { title: '4 weken', sub: 'gemiddelde installatietijd bij u thuis' },
+                { title: '2 weken', sub: 'gemiddelde installatietijd bij u thuis' },
                 { title: '250+', sub: 'installaties in Friesland' },
                 { title: 'Warmtefonds', sub: 'lage rente financiering' },
                 { title: 'BTW-teruggave', sub: 'wij regelen het volledig' },
