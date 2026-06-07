@@ -122,11 +122,13 @@ export default async function PublicQuotePage({ params }: Props) {
   const kwp             = quote.solarPanelKwp ?? 0
   const summerSurplus   = feedbackKwh > 0 ? (feedbackKwh * 0.65) / 182 : 0
   const heatPumpExtra   = quote.hasHeatPump ? 2.5 : 0
-  let advBaseKwh        = heatPumpExtra
+  let advBaseKwh        = feedbackKwh > 0 ? feedbackKwh / 365 : 0
+  advBaseKwh           += heatPumpExtra
   let kwpExtra          = 0
-  if (kwp >= 8)       { kwpExtra = kwp * 0.15; advBaseKwh = Math.max(advBaseKwh, kwp * 1.2) }
-  else if (kwp >= 5)  { kwpExtra = kwp * 0.1;  advBaseKwh = Math.max(advBaseKwh, kwp * 1.0) }
-  advBaseKwh = Math.max(4, advBaseKwh)
+  if (kwp >= 8)       kwpExtra = kwp * 0.15
+  else if (kwp >= 5)  kwpExtra = kwp * 0.1
+  advBaseKwh           += kwpExtra
+  advBaseKwh            = Math.max(4, advBaseKwh)
   const ALPHA_SIZES     = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
   const advRecommended  = ALPHA_SIZES.find(s => s >= advBaseKwh) ?? 55.8
   const tariffDiff      = quote.electricityTariff - quote.feedbackTariff

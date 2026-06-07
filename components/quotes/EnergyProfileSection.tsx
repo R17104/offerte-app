@@ -118,7 +118,8 @@ function calcBatteryAdvice(state: EnergyState) {
   // Summer accounts for ~65% of annual feedback, spread over 182 days
   const summerDailySurplus = (feedbackKwh * 0.65) / 182
 
-  let baseKwh = 0
+  // Base: average daily surplus is what the battery needs to store
+  let baseKwh = dailySurplusAvg
 
   // Heat pump: adds evening/morning load that battery can serve → needs more capacity
   const heatPumpExtra = state.hasHeatPump ? 2.5 : 0
@@ -126,8 +127,9 @@ function calcBatteryAdvice(state: EnergyState) {
 
   // High kWp → fast charge, more instantaneous power → need larger buffer
   let kwpExtra = 0
-  if (kwp >= 8) { kwpExtra = kwp * 0.15; baseKwh = Math.max(baseKwh, kwp * 1.2) }
-  else if (kwp >= 5) { kwpExtra = kwp * 0.1; baseKwh = Math.max(baseKwh, kwp * 1.0) }
+  if (kwp >= 8) kwpExtra = kwp * 0.15
+  else if (kwp >= 5) kwpExtra = kwp * 0.1
+  baseKwh += kwpExtra
 
   // Minimum viable battery
   baseKwh = Math.max(4, baseKwh)
@@ -195,7 +197,7 @@ function BatteryAdvice({ state, onChange }: { state: EnergyState; onChange: (pat
           <tbody>
             {row('Gemiddeld dagelijks overschot', `${adv.dailySurplusAvg} kWh/dag`, `(${adv.feedbackKwh} kWh/jaar ÷ 365)`)}
             {row('Zomers dagelijks overschot', `${adv.summerDailySurplus} kWh/dag`, '(65% van jaaropbrengst in ~182 zomerdagen)')}
-            {row('Startpunt berekening', `${adv.summerDailySurplus} kWh`, 'zomerse piekopwek bepaalt minimale capaciteit')}
+            {row('Startpunt berekening', `${adv.dailySurplusAvg} kWh`, 'gemiddeld dagelijks overschot als basis')}
             {adv.heatPumpExtra > 0 && row('Warmtepomp toeslag', `+${adv.heatPumpExtra} kWh`, 'verschuiving warmtevraag naar zonne-uren')}
             {adv.kwp > 0 && adv.kwpExtra > 0 && row(`Hoog vermogen (${adv.kwp} kWp)`, `+${adv.kwpExtra} kWh`, 'snelle laadpiek vraagt grotere buffer')}
             {row('Minimaal benodigde capaciteit', `${adv.baseKwh} kWh`, '')}
