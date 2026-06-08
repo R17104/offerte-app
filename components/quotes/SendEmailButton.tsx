@@ -16,11 +16,11 @@ export default function SendEmailButton({ quoteId, customerEmail }: { quoteId: s
   function handleSend() {
     setMsg(null)
     startTransition(async () => {
-      try {
-        await sendQuoteByEmail(quoteId)
+      const result = await sendQuoteByEmail(quoteId)
+      if (result.ok) {
         setMsg({ ok: true, text: `Verstuurd naar ${customerEmail}` })
-      } catch (err) {
-        setMsg({ ok: false, text: err instanceof Error ? err.message : 'Versturen mislukt' })
+      } else {
+        setMsg({ ok: false, text: result.error ?? 'Versturen mislukt' })
       }
     })
   }
