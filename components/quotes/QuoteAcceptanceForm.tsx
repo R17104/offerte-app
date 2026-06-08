@@ -26,8 +26,8 @@ const OPTIONS: AcceptanceOption[] = [
   },
   {
     type: 'reserve_deposit',
-    label: 'Reserveer aanbod voor €250',
-    description: 'Ik reserveer dit aanbod met een aanbetaling van €250.',
+    label: 'Plan schouw in online of fysiek voor €250',
+    description: 'Ik plan een schouw in (online of fysiek) en betaal €250 aan om het aanbod te reserveren.',
     style: 'outline',
   },
 ]
