@@ -321,7 +321,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
               </div>
               <div>
                 <label style={s.label}>Rente (% per jaar)</label>
-                <input type="number" min="0" max="20" step="0.1"
+                <input type="number" min="0" max="20" step="0.01"
                   value={state.loanInterestRate}
                   onChange={(e) => onChange({ loanInterestRate: parseFloat(e.target.value) || 0 })}
                   style={s.input} />
