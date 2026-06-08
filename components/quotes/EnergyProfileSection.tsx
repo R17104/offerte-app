@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { estimateEnergyUsage } from '@/lib/savings'
+import EnergyLabelLookup from '@/components/quotes/EnergyLabelLookup'
 
 export type EnergyState = {
   quoteType: 'EIGEN_INVESTERING' | 'GEFINANCIERD'
@@ -356,6 +357,9 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           </div>
         </div>
       )}
+
+      {/* Energielabel opzoeken */}
+      <EnergyLabelLookup />
 
       {/* Energieprofiel */}
       <div style={s.card}>
