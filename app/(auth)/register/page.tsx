@@ -92,6 +92,25 @@ export default function RegisterPage() {
             />
           </div>
 
+          <div>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6 }}>
+              Registratiecode <span style={{ color: 'var(--danger)' }}>*</span>
+            </label>
+            <input
+              name="registrationCode"
+              type="text"
+              required
+              maxLength={4}
+              pattern="\d{4}"
+              inputMode="numeric"
+              placeholder="4-cijferige code"
+              style={{ ...inputStyle, letterSpacing: '0.25em', textAlign: 'center', fontSize: 18 }}
+            />
+            <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 5 }}>
+              Vraag deze code op bij de beheerder
+            </p>
+          </div>
+
           {state?.error && (
             <div
               style={{

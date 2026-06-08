@@ -41,6 +41,18 @@ export async function adminDeleteUser(userId: string) {
   revalidatePath('/instellingen')
 }
 
+export async function updateRegistrationCode(code: string) {
+  const { role } = await verifySession()
+  if (role !== 'ADMIN') throw new Error('Geen toegang')
+  if (!/^\d{4}$/.test(code)) throw new Error('Code moet precies 4 cijfers zijn')
+  await prisma.setting.upsert({
+    where: { key: 'registration_code' },
+    update: { value: code },
+    create: { key: 'registration_code', value: code },
+  })
+  revalidatePath('/instellingen')
+}
+
 export async function adminUpdateRole(userId: string, newRole: 'ADMIN' | 'SALES') {
   const { role, userId: callerId } = await verifySession()
   if (role !== 'ADMIN') throw new Error('Geen toegang')

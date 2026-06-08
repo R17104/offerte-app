@@ -265,6 +265,12 @@ model Lead {
   notes LeadNote[]
 }
 
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 model LeadNote {
   id        String   @id @default(cuid())
   content   String

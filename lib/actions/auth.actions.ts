@@ -34,6 +34,7 @@ export async function register(prevState: AuthState, formData: FormData): Promis
   const email = (formData.get('email') as string)?.toLowerCase().trim()
   const password = formData.get('password') as string
   const passwordConfirm = formData.get('passwordConfirm') as string
+  const registrationCode = (formData.get('registrationCode') as string)?.trim()
 
   if (!email || !password) {
     return { error: 'E-mail en wachtwoord zijn verplicht' }
@@ -43,6 +44,12 @@ export async function register(prevState: AuthState, formData: FormData): Promis
   }
   if (password !== passwordConfirm) {
     return { error: 'Wachtwoorden komen niet overeen' }
+  }
+
+  const setting = await prisma.setting.findUnique({ where: { key: 'registration_code' } })
+  const validCode = setting?.value ?? '1234'
+  if (!registrationCode || registrationCode !== validCode) {
+    return { error: 'Ongeldige registratiecode' }
   }
 
   const existing = await prisma.user.findUnique({ where: { email } })

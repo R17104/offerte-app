@@ -8,15 +8,18 @@ import InstellingenClient from '@/components/account/InstellingenClient'
 export default async function InstellingenPage() {
   await verifyAdmin()
 
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'asc' },
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
-  })
+  const [users, codeSetting] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
+    }),
+    prisma.setting.findUnique({ where: { key: 'registration_code' } }),
+  ])
 
   return (
     <PageContainer>
       <PageHeader title="Instellingen" description="Platformbeheer en gebruikersbeheer" />
-      <InstellingenClient users={users} />
+      <InstellingenClient users={users} registrationCode={codeSetting?.value ?? '1234'} />
     </PageContainer>
   )
 }

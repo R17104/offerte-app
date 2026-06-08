@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { adminCreateUser, adminDeleteUser, adminUpdateRole } from '@/lib/actions/user.actions'
+import { adminCreateUser, adminDeleteUser, adminUpdateRole, updateRegistrationCode } from '@/lib/actions/user.actions'
 
 type User = { id: string; name: string | null; email: string; role: string; createdAt: Date }
 
@@ -11,10 +11,12 @@ const ROLE_COLOR: Record<string, { bg: string; text: string }> = {
   SALES: { bg: '#dbeafe', text: '#1e40af' },
 }
 
-export default function InstellingenClient({ users: initial }: { users: User[] }) {
+export default function InstellingenClient({ users: initial, registrationCode: initialCode }: { users: User[]; registrationCode: string }) {
   const [users, setUsers] = useState(initial)
   const [isPending, startTransition] = useTransition()
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [code, setCode] = useState(initialCode)
+  const [codeMsg, setCodeMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'SALES' as 'ADMIN' | 'SALES' })
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -66,8 +68,65 @@ export default function InstellingenClient({ users: initial }: { users: User[] }
     fontFamily: 'var(--font-sans)', boxSizing: 'border-box',
   }
 
+  function handleCodeSave(e: React.FormEvent) {
+    e.preventDefault()
+    setCodeMsg(null)
+    startTransition(async () => {
+      try {
+        await updateRegistrationCode(code)
+        setCodeMsg({ ok: true, text: 'Code opgeslagen' })
+      } catch (err) {
+        setCodeMsg({ ok: false, text: err instanceof Error ? err.message : 'Mislukt' })
+      }
+    })
+  }
+
   return (
     <div style={{ maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* Registratiecode */}
+      <form onSubmit={handleCodeSave}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '24px 28px' }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Registratiecode</p>
+          <p style={{ fontSize: 12.5, color: 'var(--text-tertiary)', marginBottom: 20 }}>
+            Nieuwe accounts kunnen alleen worden aangemaakt met deze 4-cijferige code.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              maxLength={4}
+              pattern="\d{4}"
+              inputMode="numeric"
+              required
+              style={{
+                width: 100, padding: '10px 14px', borderRadius: 8, textAlign: 'center',
+                border: '1px solid var(--border-strong)', background: 'var(--bg-elevated)',
+                color: 'var(--text-primary)', fontSize: 22, fontWeight: 700,
+                letterSpacing: '0.3em', outline: 'none', fontFamily: 'var(--font-sans)',
+              }}
+            />
+            <button
+              type="submit"
+              disabled={isPending || code.length !== 4}
+              style={{
+                padding: '10px 20px', borderRadius: 8, border: 'none',
+                background: 'var(--accent)', color: '#fff', fontSize: 13.5,
+                fontWeight: 600, cursor: 'pointer', opacity: code.length !== 4 ? 0.5 : 1,
+                fontFamily: 'var(--font-sans)',
+              }}
+            >
+              Opslaan
+            </button>
+            {codeMsg && (
+              <span style={{ fontSize: 13, color: codeMsg.ok ? '#16a34a' : 'var(--danger)' }}>
+                {codeMsg.ok ? '✓ ' : '✕ '}{codeMsg.text}
+              </span>
+            )}
+          </div>
+        </div>
+      </form>
 
       {/* Gebruikersbeheer */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
