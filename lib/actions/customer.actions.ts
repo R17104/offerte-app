@@ -217,3 +217,13 @@ export async function deleteCustomer(id: string) {
   revalidatePath('/customers')
   redirect('/customers')
 }
+
+export async function assignCustomer(customerId: string, userId: string | null) {
+  await verifySession()
+  await prisma.customer.update({
+    where: { id: customerId },
+    data: { userId },
+  })
+  revalidatePath(`/customers/${customerId}`)
+  revalidatePath('/customers')
+}

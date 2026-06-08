@@ -9,20 +9,25 @@ import LeadDetailClient from '@/components/leads/LeadDetailClient'
 type Props = { params: Promise<{ id: string }> }
 
 export default async function LeadDetailPage({ params }: Props) {
-  const { userId } = await verifySession()
+  const { userId, role } = await verifySession()
   const { id } = await params
 
   const lead = await prisma.lead.findUnique({
-    where: { id, createdById: userId },
+    where: role === 'ADMIN' ? { id } : { id, createdById: userId },
     include: {
       notes: {
         include: { author: { select: { name: true } } },
         orderBy: { createdAt: 'desc' },
       },
+      assignedTo: { select: { id: true, name: true, email: true } },
     },
   })
 
   if (!lead) notFound()
+
+  const users = role === 'ADMIN'
+    ? await prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } })
+    : []
 
   return (
     <PageContainer>
@@ -30,7 +35,7 @@ export default async function LeadDetailPage({ params }: Props) {
         title={`${lead.firstName} ${lead.lastName}`}
         back={{ href: '/leads', label: 'Leads' }}
       />
-      <LeadDetailClient lead={lead} />
+      <LeadDetailClient lead={lead} users={users} isAdmin={role === 'ADMIN'} />
     </PageContainer>
   )
 }

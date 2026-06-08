@@ -3,12 +3,13 @@ export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { updateQuoteStatus, archiveQuote, unarchiveQuote, deleteQuote } from '@/lib/actions/quote.actions'
+import { updateQuoteStatus, archiveQuote, unarchiveQuote, deleteQuote, assignQuote } from '@/lib/actions/quote.actions'
 import {
   PageContainer, PageHeader, Card, CardHeader, SecondaryButton,
   Badge, Table, Thead, Tbody, Tr, Th, Td, Divider,
 } from '@/components/ui'
 import ConfirmButton from '@/components/ui/ConfirmButton'
+import AssignSalesperson from '@/components/ui/AssignSalesperson'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
 
@@ -23,19 +24,24 @@ const TRANSITIONS: Record<string, { status: string; label: string; danger?: bool
 }
 
 export default async function QuoteDetailPage({ params }: Props) {
-  const { userId } = await verifySession()
+  const { userId, role } = await verifySession()
   const { id } = await params
 
   const quote = await prisma.quote.findUnique({
-    where: { id, createdById: userId },
+    where: role === 'ADMIN' ? { id } : { id, createdById: userId },
     include: {
       customer: { include: { addresses: { where: { type: 'CORRESPONDENCE' }, take: 1 } } },
       lines: { orderBy: { sortOrder: 'asc' } },
       acceptance: true,
+      assignedTo: { select: { id: true, name: true, email: true } },
     },
   })
 
   if (!quote) notFound()
+
+  const users = role === 'ADMIN'
+    ? await prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } })
+    : []
 
   const meta = STATUS_META[quote.status] ?? STATUS_META.DRAFT
   const actions = TRANSITIONS[quote.status] ?? []
@@ -252,6 +258,20 @@ export default async function QuoteDetailPage({ params }: Props) {
                   )
                 })}
               </div>
+            )}
+
+            {users.length > 0 && (
+              <>
+                <Divider />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Verkoper</p>
+                  <AssignSalesperson
+                    currentId={quote.assignedTo?.id ?? null}
+                    users={users}
+                    onAssign={(uid) => assignQuote(quote.id, uid)}
+                  />
+                </div>
+              </>
             )}
 
             <Divider />

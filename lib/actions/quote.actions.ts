@@ -314,3 +314,13 @@ export async function rejectQuoteByToken(token: string) {
 
   redirect(`/offerte/${token}/bevestiging?type=rejected`)
 }
+
+export async function assignQuote(quoteId: string, assignedToId: string | null) {
+  await verifySession()
+  await prisma.quote.update({
+    where: { id: quoteId },
+    data: { assignedToId },
+  })
+  revalidatePath(`/quotes/${quoteId}`)
+  revalidatePath('/quotes')
+}

@@ -79,6 +79,9 @@ model User {
   products   Product[]
   leads      Lead[]
   leadNotes  LeadNote[]
+
+  assignedQuotes Quote[] @relation("QuoteAssignee")
+  assignedLeads  Lead[]  @relation("LeadAssignee")
 }
 
 model Customer {
@@ -209,8 +212,11 @@ model Quote {
   customerId  String
   customer    Customer @relation(fields: [customerId], references: [id])
 
-  createdById String
-  createdBy   User @relation(fields: [createdById], references: [id])
+  createdById  String
+  createdBy    User    @relation(fields: [createdById], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("QuoteAssignee", fields: [assignedToId], references: [id])
 
   lines      QuoteLine[]
   acceptance QuoteAcceptance?
@@ -252,6 +258,9 @@ model Lead {
 
   createdById String
   createdBy   User   @relation(fields: [createdById], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("LeadAssignee", fields: [assignedToId], references: [id])
 
   notes LeadNote[]
 }

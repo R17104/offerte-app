@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead } from '@/lib/actions/lead.actions'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, assignLead } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
+import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
 const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
   { value: 'NEW',        label: 'Nieuw',               color: '#2563eb' },
@@ -14,6 +15,7 @@ const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
 ]
 
 type Note = { id: string; content: string; createdAt: Date; author: { name: string | null } }
+type SalesUser = { id: string; name: string | null; email: string }
 type Lead = {
   id: string
   firstName: string
@@ -28,6 +30,7 @@ type Lead = {
   source: string | null
   createdAt: Date
   notes: Note[]
+  assignedTo: SalesUser | null
 }
 
 const row = (label: string, value: string | null) =>
@@ -38,7 +41,7 @@ const row = (label: string, value: string | null) =>
     </div>
   ) : null
 
-export default function LeadDetailClient({ lead }: { lead: Lead }) {
+export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead; users: SalesUser[]; isAdmin: boolean }) {
   const [status, setStatus] = useState<LeadStatus>(lead.status)
   const [notes, setNotes] = useState<Note[]>(lead.notes)
   const [noteText, setNoteText] = useState('')
@@ -188,6 +191,20 @@ export default function LeadDetailClient({ lead }: { lead: Lead }) {
             ))}
           </div>
         </div>
+
+        {/* Verkoper */}
+        {isAdmin && (
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
+              Verkoper
+            </p>
+            <AssignSalesperson
+              currentId={lead.assignedTo?.id ?? null}
+              users={users}
+              onAssign={(uid) => assignLead(lead.id, uid)}
+            />
+          </div>
+        )}
 
         {/* Acties */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>

@@ -8,29 +8,35 @@ import {
 } from '@/components/ui'
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import {
-  archiveCustomer, unarchiveCustomer, deleteCustomer,
+  archiveCustomer, unarchiveCustomer, deleteCustomer, assignCustomer,
 } from '@/lib/actions/customer.actions'
+import AssignSalesperson from '@/components/ui/AssignSalesperson'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
 
 type Props = { params: Promise<{ id: string }> }
 
 export default async function CustomerDetailPage({ params }: Props) {
-  const { userId } = await verifySession()
+  const { userId, role } = await verifySession()
   const { id } = await params
 
   const customer = await prisma.customer.findUnique({
-    where: { id, userId },
+    where: role === 'ADMIN' ? { id } : { id, userId },
     include: {
       addresses: true,
       quotes: {
         orderBy: { createdAt: 'desc' },
         include: { _count: { select: { lines: true } } },
       },
+      user: { select: { id: true, name: true, email: true } },
     },
   })
 
   if (!customer) notFound()
+
+  const users = role === 'ADMIN'
+    ? await prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } })
+    : []
 
   const corrAddr = customer.addresses.find((a) => a.type === 'CORRESPONDENCE')
   const delAddr  = customer.addresses.find((a) => a.type === 'DELIVERY')
@@ -93,6 +99,17 @@ export default async function CustomerDetailPage({ params }: Props) {
           </div>
         }
       />
+
+      {users.length > 0 && (
+        <Card style={{ marginBottom: 16 }}>
+          <CardHeader title="Verkoper" />
+          <AssignSalesperson
+            currentId={customer.user?.id ?? null}
+            users={users}
+            onAssign={(uid) => assignCustomer(id, uid)}
+          />
+        </Card>
+      )}
 
       <div className="r-grid-2" style={{ display: 'grid', gap: 16, marginBottom: 16 }}>
         {/* Contact */}
