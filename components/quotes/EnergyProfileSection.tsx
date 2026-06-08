@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { estimateEnergyUsage } from '@/lib/savings'
-import EnergyLabelLookup from '@/components/quotes/EnergyLabelLookup'
-
 export type EnergyState = {
   quoteType: 'EIGEN_INVESTERING' | 'GEFINANCIERD'
   financingType: string
@@ -12,6 +10,7 @@ export type EnergyState = {
   subsidyAmount: number
   hasBtwReturn: boolean
   hasSolarPanels: boolean
+  energyLabel: string
   solarPanelKwp: string
   solarProductionKwh: string
   electricityUsageKwh: string
@@ -39,6 +38,7 @@ export const DEFAULT_ENERGY_STATE: EnergyState = {
   subsidyAmount: 0,
   hasBtwReturn: false,
   hasSolarPanels: false,
+  energyLabel: '',
   solarPanelKwp: '',
   solarProductionKwh: '',
   electricityUsageKwh: '',
@@ -358,8 +358,38 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
         </div>
       )}
 
-      {/* Energielabel opzoeken */}
-      <EnergyLabelLookup />
+      {/* Energielabel */}
+      <div style={s.card}>
+        <p style={s.cardTitle}>Energielabel woning</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <select
+            value={state.energyLabel}
+            onChange={(e) => onChange({ energyLabel: e.target.value })}
+            style={{ ...s.input, width: 140, appearance: 'none' }}
+          >
+            <option value="">— Onbekend —</option>
+            {['A++++','A+++','A++','A+','A','B','C','D','E','F','G'].map((l) => (
+              <option key={l} value={l}>{l}</option>
+            ))}
+          </select>
+          {state.energyLabel && (
+            <div style={{
+              width: 44, height: 44, borderRadius: 8, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 16, fontWeight: 800, color: '#fff',
+              background: ({ 'A++++':'#005a00','A+++':'#007a00','A++':'#009900','A+':'#33b200',
+                A:'#4cc300',B:'#8bc400',C:'#c8d400',D:'#f5d800',E:'#f5a800',F:'#f57000',G:'#e83000' } as Record<string,string>)[state.energyLabel] ?? '#6b7280',
+            }}>
+              {state.energyLabel}
+            </div>
+          )}
+          <p style={{ fontSize: 12, color: 'var(--text-tertiary)', margin: 0 }}>
+            Opzoeken via{' '}
+            <a href="https://www.ep-online.nl/EpOnline/zoek-energielabel" target="_blank" rel="noreferrer"
+              style={{ color: 'var(--text-link)' }}>ep-online.nl</a>
+          </p>
+        </div>
+      </div>
 
       {/* Energieprofiel */}
       <div style={s.card}>
