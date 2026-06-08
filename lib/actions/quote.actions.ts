@@ -324,3 +324,30 @@ export async function assignQuote(quoteId: string, assignedToId: string | null) 
   revalidatePath(`/quotes/${quoteId}`)
   revalidatePath('/quotes')
 }
+
+export async function sendQuoteByEmail(quoteId: string) {
+  const { userId } = await verifySession()
+  const sender = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } })
+
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    include: { customer: true },
+  })
+  if (!quote) throw new Error('Offerte niet gevonden')
+  if (!quote.customer.email) throw new Error('Klant heeft geen e-mailadres')
+
+  const { sendQuoteEmail } = await import('@/lib/email')
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://offerte-app.vercel.app'
+
+  await sendQuoteEmail({
+    to: quote.customer.email,
+    customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
+    senderName: sender?.name ?? sender?.email ?? 'Bespaarhulp Friesland',
+    quoteTitle: quote.title,
+    quoteNumber: quote.quoteNumber,
+    quoteUrl: `${baseUrl}/offerte/${quote.publicToken}`,
+  })
+
+  await prisma.quote.update({ where: { id: quoteId }, data: { sentAt: new Date() } })
+  revalidatePath(`/quotes/${quoteId}`)
+}

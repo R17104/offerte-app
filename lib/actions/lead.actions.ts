@@ -103,6 +103,16 @@ export async function deleteLead(leadId: string) {
   redirect('/leads')
 }
 
+export async function updateFollowUp(leadId: string, date: string | null) {
+  await verifySession()
+  await prisma.lead.update({
+    where: { id: leadId },
+    data: { followUpAt: date ? new Date(date) : null },
+  })
+  revalidatePath(`/leads/${leadId}`)
+  revalidatePath('/')
+}
+
 export async function assignLead(leadId: string, assignedToId: string | null) {
   await verifySession()
   await prisma.lead.update({

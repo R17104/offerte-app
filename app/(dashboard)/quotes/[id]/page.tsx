@@ -10,6 +10,7 @@ import {
 } from '@/components/ui'
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
+import SendEmailButton from '@/components/quotes/SendEmailButton'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
 
@@ -229,6 +230,13 @@ export default async function QuoteDetailPage({ params }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
               <Badge label={meta.label} color={meta.color} bg={meta.bg} />
             </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Versturen</p>
+              <SendEmailButton quoteId={quote.id} customerEmail={quote.customer.email ?? null} />
+            </div>
+
+            <Divider />
 
             {actions.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

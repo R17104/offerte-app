@@ -23,6 +23,7 @@ export default async function LeadDetailPage({ params }: Props) {
     },
   })
 
+
   if (!lead) notFound()
 
   const users = role === 'ADMIN'
