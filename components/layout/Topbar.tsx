@@ -1,9 +1,16 @@
+import Link from 'next/link'
 import { getSession } from '@/lib/session'
+import { prisma } from '@/lib/db'
 import { logout } from '@/lib/actions/auth.actions'
 
 export default async function Topbar() {
   const session = await getSession()
-  const initials = session?.email?.[0]?.toUpperCase() ?? 'A'
+  const user = session?.userId
+    ? await prisma.user.findUnique({ where: { id: session.userId }, select: { name: true, email: true } })
+    : null
+
+  const displayName = user?.name || session?.email?.split('@')[0] || 'Account'
+  const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
     <header
@@ -20,22 +27,10 @@ export default async function Topbar() {
         alignItems: 'center',
         zIndex: 40,
         gap: 12,
+        padding: '0 20px',
       }}
     >
       <div style={{ flex: 1 }} />
-
-      <span
-        style={{
-          fontSize: 12.5,
-          color: 'var(--text-tertiary)',
-          maxWidth: 200,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {session?.email}
-      </span>
 
       <form action={logout}>
         <button
@@ -55,24 +50,30 @@ export default async function Topbar() {
         </button>
       </form>
 
-      <div
+      <Link
+        href="/account"
         style={{
-          width: 30,
-          height: 30,
-          borderRadius: '50%',
-          background: 'var(--accent-muted)',
-          border: '1px solid var(--border-strong)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 11,
-          fontWeight: 700,
-          color: 'var(--accent)',
-          flexShrink: 0,
+          display: 'flex', alignItems: 'center', gap: 9,
+          textDecoration: 'none', padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          transition: 'background 0.1s',
         }}
       >
-        {initials}
-      </div>
+        <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
+          {displayName}
+        </span>
+        <div
+          style={{
+            width: 30, height: 30, borderRadius: '50%',
+            background: 'var(--accent-muted)',
+            border: '1px solid var(--border-strong)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, fontWeight: 700, color: 'var(--accent)', flexShrink: 0,
+          }}
+        >
+          {initials}
+        </div>
+      </Link>
     </header>
   )
 }

@@ -165,16 +165,32 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div
-        style={{
-          padding: '12px 18px',
-          borderTop: '1px solid var(--border)',
-          fontSize: 11.5,
-          color: 'var(--text-tertiary)',
-          flexShrink: 0,
-        }}
-      >
-        v0.1.0 — beta
+      {/* Account / instellingen */}
+      <div style={{ padding: '8px 8px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
+        {[
+          { href: '/account',      label: 'Mijn account',  icon: IconPerson },
+          { href: '/instellingen', label: 'Instellingen',  icon: IconSettings },
+        ].map((item) => {
+          const active = path.startsWith(item.href)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 9,
+                padding: '6px 8px', borderRadius: 'var(--radius-md)',
+                color: active ? 'var(--accent)' : 'var(--text-secondary)',
+                background: active ? 'var(--accent-muted)' : 'transparent',
+                fontWeight: active ? 600 : 400, fontSize: 13.5,
+                transition: 'all 0.1s', marginBottom: 1,
+              }}
+            >
+              <item.icon size={15} color={active ? 'var(--accent)' : 'var(--text-tertiary)'} />
+              {item.label}
+            </Link>
+          )
+        })}
+        <p style={{ fontSize: 10, color: 'var(--text-tertiary)', padding: '6px 8px 2px' }}>v0.1.0 — beta</p>
       </div>
     </aside>
     </>
@@ -227,6 +243,24 @@ function IconLeads({ size = 16, color = 'currentColor' }) {
       <circle cx="8" cy="5" r="2.5" stroke={color} strokeWidth="1.3" />
       <path d="M2.5 13c0-3.04 2.46-5.5 5.5-5.5s5.5 2.46 5.5 5.5" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
       <path d="M11 9.5l1.5 1.5-1.5 1.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function IconPerson({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <circle cx="8" cy="5.5" r="2.5" stroke={color} strokeWidth="1.3" />
+      <path d="M2.5 13.5c0-3.04 2.46-5.5 5.5-5.5s5.5 2.46 5.5 5.5" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconSettings({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="2" stroke={color} strokeWidth="1.3" />
+      <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
     </svg>
   )
 }
