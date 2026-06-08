@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, assignLead } from '@/lib/actions/lead.actions'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
@@ -199,9 +199,10 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
               Verkoper
             </p>
             <AssignSalesperson
+              entityType="lead"
+              entityId={lead.id}
               currentId={lead.assignedTo?.id ?? null}
               users={users}
-              onAssign={(uid) => assignLead(lead.id, uid)}
             />
           </div>
         )}

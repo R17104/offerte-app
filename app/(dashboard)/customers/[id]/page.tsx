@@ -8,7 +8,7 @@ import {
 } from '@/components/ui'
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import {
-  archiveCustomer, unarchiveCustomer, deleteCustomer, assignCustomer,
+  archiveCustomer, unarchiveCustomer, deleteCustomer,
 } from '@/lib/actions/customer.actions'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
@@ -104,9 +104,10 @@ export default async function CustomerDetailPage({ params }: Props) {
         <Card style={{ marginBottom: 16 }}>
           <CardHeader title="Verkoper" />
           <AssignSalesperson
+            entityType="customer"
+            entityId={id}
             currentId={customer.user?.id ?? null}
             users={users}
-            onAssign={(uid) => assignCustomer(id, uid)}
           />
         </Card>
       )}

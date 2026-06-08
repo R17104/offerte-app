@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { updateQuoteStatus, archiveQuote, unarchiveQuote, deleteQuote, assignQuote } from '@/lib/actions/quote.actions'
+import { updateQuoteStatus, archiveQuote, unarchiveQuote, deleteQuote } from '@/lib/actions/quote.actions'
 import {
   PageContainer, PageHeader, Card, CardHeader, SecondaryButton,
   Badge, Table, Thead, Tbody, Tr, Th, Td, Divider,
@@ -266,9 +266,10 @@ export default async function QuoteDetailPage({ params }: Props) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Verkoper</p>
                   <AssignSalesperson
+                    entityType="quote"
+                    entityId={quote.id}
                     currentId={quote.assignedTo?.id ?? null}
                     users={users}
-                    onAssign={(uid) => assignQuote(quote.id, uid)}
                   />
                 </div>
               </>

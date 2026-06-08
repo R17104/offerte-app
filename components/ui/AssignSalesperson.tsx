@@ -1,21 +1,29 @@
 'use client'
 
 import { useTransition } from 'react'
+import { assignLead } from '@/lib/actions/lead.actions'
+import { assignQuote } from '@/lib/actions/quote.actions'
+import { assignCustomer } from '@/lib/actions/customer.actions'
 
 type User = { id: string; name: string | null; email: string }
 
 type Props = {
+  entityType: 'lead' | 'quote' | 'customer'
+  entityId: string
   currentId: string | null
   users: User[]
-  onAssign: (userId: string | null) => Promise<void>
 }
 
-export default function AssignSalesperson({ currentId, users, onAssign }: Props) {
+export default function AssignSalesperson({ entityType, entityId, currentId, users }: Props) {
   const [isPending, startTransition] = useTransition()
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const val = e.target.value || null
-    startTransition(() => onAssign(val))
+    startTransition(() => {
+      if (entityType === 'lead')     assignLead(entityId, val)
+      if (entityType === 'quote')    assignQuote(entityId, val)
+      if (entityType === 'customer') assignCustomer(entityId, val)
+    })
   }
 
   return (
