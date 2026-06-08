@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function sendQuoteEmail({
   to,
   customerName,
@@ -17,6 +15,8 @@ export async function sendQuoteEmail({
   quoteUrl: string
   quoteNumber: string
 }) {
+  if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY is niet ingesteld in Vercel omgevingsvariabelen')
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const from = process.env.RESEND_FROM ?? 'Bespaarhulp Friesland <onboarding@resend.dev>'
 
   const html = `
