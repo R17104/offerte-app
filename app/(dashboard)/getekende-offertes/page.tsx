@@ -21,7 +21,6 @@ export default async function GetekendeOffertesPage() {
 
   const quotes = await prisma.quote.findMany({
     where: {
-      createdById: userId,
       status: 'ACCEPTED',
       acceptance: { isNot: null },
     },
