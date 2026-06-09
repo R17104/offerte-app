@@ -156,6 +156,7 @@ model Product {
   warrantyYears      Int?             // Garantietermijn
   savingsKwhYear     Float?           // Verwachte stroombesparing per jaar (kWh)
   gasReductionM3Year Float?           // Gasbesparing per jaar (m³) — warmtepomp
+  isMaatwerk         Boolean          @default(false) // Prijs bepaald na schouw
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id])

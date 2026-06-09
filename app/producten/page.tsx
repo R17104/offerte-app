@@ -22,7 +22,7 @@ export default async function ProductenPage() {
     select: {
       id: true, name: true, description: true, unitPrice: true, vatRate: true,
       imageUrl: true, category: true, capacityKwh: true, powerKw: true,
-      warrantyYears: true, active: true,
+      warrantyYears: true, active: true, isMaatwerk: true,
     },
   })
 

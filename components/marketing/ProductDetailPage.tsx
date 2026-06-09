@@ -20,6 +20,7 @@ type Product = {
   savingsKwhYear: number | null
   gasReductionM3Year: number | null
   notes: string | null
+  isMaatwerk?: boolean
 }
 
 // Galerij per product — key = hoofdafbeelding URL
@@ -470,8 +471,17 @@ export default function ProductDetailPage({ product }: { product: Product }) {
 
             {/* Price */}
             <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: 20, marginBottom: 20 }}>
-              <div style={{ fontSize: 32, fontWeight: 900, color: '#111827', lineHeight: 1 }}>{fmt(inclPrice)}</div>
-              <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{fmt(product.unitPrice)} excl. {product.vatRate}% btw</div>
+              {product.isMaatwerk ? (
+                <>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: '#0a5c35', lineHeight: 1 }}>Maatwerk</div>
+                  <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Prijs wordt bepaald na de schouw — geen verrassingen achteraf</div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: '#111827', lineHeight: 1 }}>{fmt(inclPrice)}</div>
+                  <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{fmt(product.unitPrice)} excl. {product.vatRate}% btw</div>
+                </>
+              )}
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <Link
                   href={`/offerte-aanvragen?product=${product.id}`}

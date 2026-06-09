@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const product = await prisma.product.findUnique({
     where: { id, active: true, shopVisible: true },
-    select: { name: true, description: true, unitPrice: true, vatRate: true, imageUrl: true, category: true, capacityKwh: true, powerKw: true },
+    select: { name: true, description: true, unitPrice: true, vatRate: true, imageUrl: true, category: true, capacityKwh: true, powerKw: true, isMaatwerk: true },
   })
 
   if (!product) return { title: 'Product niet gevonden' }
@@ -56,7 +56,7 @@ export default async function ProductDetailRoute({ params }: Props) {
       id: true, name: true, description: true, unitPrice: true, vatRate: true,
       imageUrl: true, category: true, capacityKwh: true, powerKw: true,
       warrantyYears: true, savingsKwhYear: true, gasReductionM3Year: true,
-      notes: true, active: true, shopVisible: true,
+      notes: true, active: true, shopVisible: true, isMaatwerk: true,
     },
   })
 

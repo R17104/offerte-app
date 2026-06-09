@@ -18,6 +18,7 @@ type Product = {
   powerKw: number | null
   warrantyYears: number | null
   active: boolean
+  isMaatwerk: boolean
 }
 
 const CAT: Record<string, { label: string; icon: string; gradient: string }> = {
@@ -309,14 +310,19 @@ export default function ShopPage({ products }: { products: Product[] }) {
                         )}
 
                         <div style={{ marginTop: 'auto' }}>
-                          {/* Price — vekto.nl stijl */}
+                          {/* Price */}
                           <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: 12, marginBottom: 12 }}>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
-                              {fmt(inclPrice)}
-                            </div>
-                            <div style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 2 }}>
-                              {fmt(p.unitPrice)} excl. {p.vatRate}% btw
-                            </div>
+                            {p.isMaatwerk ? (
+                              <>
+                                <div style={{ fontSize: 20, fontWeight: 900, color: '#0a5c35', lineHeight: 1 }}>Maatwerk</div>
+                                <div style={{ fontSize: 11.5, color: '#6b7280', marginTop: 2 }}>Prijs bepaald na schouw</div>
+                              </>
+                            ) : (
+                              <>
+                                <div style={{ fontSize: 20, fontWeight: 900, color: '#111827', lineHeight: 1 }}>{fmt(inclPrice)}</div>
+                                <div style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 2 }}>{fmt(p.unitPrice)} excl. {p.vatRate}% btw</div>
+                              </>
+                            )}
                           </div>
 
                           {/* CTA */}
