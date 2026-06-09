@@ -141,3 +141,37 @@ export async function createLead(data: LeadImportRow) {
   revalidatePath('/leads')
   redirect(`/leads/${lead.id}`)
 }
+
+export async function createLeadFromLanding({
+  naam, email, telefoon, postcode, bericht,
+}: {
+  naam: string
+  email: string
+  telefoon?: string
+  postcode?: string
+  bericht?: string
+}) {
+  const parts = naam.trim().split(' ')
+  const firstName = parts[0] ?? naam
+  const lastName  = parts.slice(1).join(' ') || '-'
+
+  // Find first admin/system user to assign as creator
+  const systemUser = await prisma.user.findFirst({ where: { role: 'ADMIN' }, orderBy: { createdAt: 'asc' } })
+    ?? await prisma.user.findFirst({ orderBy: { createdAt: 'asc' } })
+  if (!systemUser) return
+
+  await prisma.lead.create({
+    data: {
+      firstName,
+      lastName,
+      email:    email || null,
+      phone:    telefoon || null,
+      postalCode: postcode || null,
+      source:   'Website',
+      status:   'NEW',
+      createdById: systemUser.id,
+    },
+  })
+  revalidatePath('/leads')
+  revalidatePath('/dashboard')
+}

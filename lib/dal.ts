@@ -13,7 +13,7 @@ export const verifySession = cache(async (): Promise<{ userId: string; email: st
 export const verifyAdmin = cache(async (): Promise<{ userId: string; email: string; role: string }> => {
   const session = await verifySession()
   if (session.role !== 'ADMIN') {
-    redirect('/customers')
+    redirect('/dashboard')
   }
   return session
 })

@@ -26,7 +26,7 @@ export async function login(prevState: AuthState, formData: FormData): Promise<A
   }
 
   await createSession(user.id, user.email, user.role)
-  redirect('/customers')
+  redirect('/dashboard')
 }
 
 export async function register(prevState: AuthState, formData: FormData): Promise<AuthState> {
@@ -63,7 +63,7 @@ export async function register(prevState: AuthState, formData: FormData): Promis
   })
 
   await createSession(user.id, user.email, user.role)
-  redirect('/customers')
+  redirect('/dashboard')
 }
 
 export async function logout(): Promise<void> {

@@ -1,18 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { decrypt } from '@/lib/session'
 
-const PUBLIC_PATHS = ['/login', '/register', '/offerte']
+const PUBLIC_PATHS = ['/', '/login', '/register', '/offerte']
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
+  const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
 
   if (isPublic) {
     const cookie = req.cookies.get('session')?.value
     const session = await decrypt(cookie)
+    // Logged-in users visiting login/register → stuur naar dashboard
     if (session?.userId && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
-      return NextResponse.redirect(new URL('/customers', req.url))
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+    // Logged-in users visiting landing page → stuur naar dashboard
+    if (session?.userId && pathname === '/') {
+      return NextResponse.redirect(new URL('/dashboard', req.url))
     }
     return NextResponse.next()
   }

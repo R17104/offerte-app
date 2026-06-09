@@ -8,7 +8,7 @@ const nav = [
   {
     label: 'Algemeen',
     items: [
-      { href: '/', label: 'Dashboard', icon: IconGrid },
+      { href: '/dashboard', label: 'Dashboard', icon: IconGrid },
     ],
   },
   {
@@ -131,8 +131,8 @@ export default function Sidebar() {
 
             {group.items.map((item) => {
               const active =
-                item.href === '/'
-                  ? path === '/'
+                item.href === '/dashboard'
+                  ? path === '/dashboard'
                   : path.startsWith(item.href)
 
               return (
