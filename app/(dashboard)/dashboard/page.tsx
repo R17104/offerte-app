@@ -5,6 +5,7 @@ import { PageContainer, PageHeader, Card, CardHeader, Badge, Divider } from '@/c
 import { formatCurrency, formatDate, STATUS_META } from '@/lib/utils'
 import Link from 'next/link'
 import { verifySession } from '@/lib/dal'
+import SalesTodoPanel from '@/components/dashboard/SalesTodoPanel'
 
 function StatCard({ label, value, sub, color, href }: { label: string; value: string | number; sub?: string; color?: string; href?: string }) {
   const inner = (
@@ -25,15 +26,17 @@ export default async function DashboardPage() {
   const { userId, role } = await verifySession()
 
   const now = new Date()
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const todayEnd   = new Date(todayStart.getTime() + 86400000)
-  const weekAgo    = new Date(now.getTime() - 7 * 86400000)
+  const todayStart  = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayEnd    = new Date(todayStart.getTime() + 86400000)
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000)
 
   const [
     quoteStats, recentQuotes,
     leadStats, followUpToday,
-    leadsThisWeek, pipelineAgg,
-    perVerkoper,
+    newLeads30, pipelineAgg,
+    closedDealsAgg,
+    quotes30, perVerkoper,
+    todos, users,
   ] = await Promise.all([
     prisma.quote.groupBy({ by: ['status'], _count: true, _sum: { total: true }, where: { archivedAt: null } }),
     prisma.quote.findMany({
@@ -46,8 +49,14 @@ export default async function DashboardPage() {
       orderBy: { followUpAt: 'asc' },
       select: { id: true, firstName: true, lastName: true, followUpAt: true, status: true, assignedTo: { select: { name: true } } },
     }),
-    prisma.lead.count({ where: { archivedAt: null, createdAt: { gte: weekAgo } } }),
+    prisma.lead.count({ where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo } } }),
     prisma.quote.aggregate({ _sum: { total: true }, where: { archivedAt: null, status: { in: ['DRAFT', 'SENT'] } } }),
+    prisma.quote.aggregate({ _sum: { total: true }, where: { archivedAt: null, status: 'ACCEPTED' } }),
+    // last 30 days: accepted + sent + rejected (for conversion rate)
+    prisma.quote.groupBy({
+      by: ['status'], _count: true,
+      where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo }, status: { in: ['SENT', 'ACCEPTED', 'REJECTED'] } },
+    }),
     prisma.user.findMany({
       select: {
         id: true, name: true, email: true,
@@ -55,15 +64,23 @@ export default async function DashboardPage() {
         assignedLeads: { where: { archivedAt: null }, select: { status: true } },
       },
     }),
+    prisma.salesTodo.findMany({
+      orderBy: [{ done: 'asc' }, { createdAt: 'desc' }],
+      include: { assignedTo: { select: { id: true, name: true, email: true } } },
+    }),
+    prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } }),
   ])
 
-  const totalQuotes    = quoteStats.reduce((s, r) => s + r._count, 0)
-  const acceptedCount  = quoteStats.find((r) => r.status === 'ACCEPTED')?._count ?? 0
-  const sentCount      = (quoteStats.find((r) => r.status === 'SENT')?._count ?? 0) + acceptedCount
-  const conversionRate = sentCount > 0 ? Math.round((acceptedCount / sentCount) * 100) : 0
-  const pipelineValue  = pipelineAgg._sum.total ?? 0
   const totalLeads     = leadStats.reduce((s, r) => s + r._count, 0)
-  const newLeads       = leadStats.find((r) => r.status === 'NEW')?._count ?? 0
+  const pipelineValue  = pipelineAgg._sum.total ?? 0
+  const closedValue    = closedDealsAgg._sum.total ?? 0
+
+  // 30-day conversion
+  const accepted30 = quotes30.find((r) => r.status === 'ACCEPTED')?._count ?? 0
+  const sent30     = quotes30.find((r) => r.status === 'SENT')?._count ?? 0
+  const rejected30 = quotes30.find((r) => r.status === 'REJECTED')?._count ?? 0
+  const total30    = accepted30 + sent30 + rejected30
+  const conv30     = total30 > 0 ? Math.round((accepted30 / total30) * 100) : 0
 
   const STATUS_LEAD_COLOR: Record<string, string> = {
     NEW: '#2563eb', CONTACTED: '#d97706', INTERESTED: '#7c3aed',
@@ -80,11 +97,38 @@ export default async function DashboardPage() {
 
       {/* KPI row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 28 }}>
-        <StatCard label="Pipeline waarde" value={formatCurrency(pipelineValue)} sub="openstaande offertes" color="#0a5c35" />
-        <StatCard label="Conversieratio" value={`${conversionRate}%`} sub={`${acceptedCount} van ${sentCount} verstuurd`} color="#2563eb" />
-        <StatCard label="Leads totaal" value={totalLeads} sub={`${newLeads} nieuw`} color="#7c3aed" href="/leads" />
-        <StatCard label="Leads deze week" value={leadsThisWeek} sub="nieuwe leads" color="#d97706" href="/leads" />
-        <StatCard label="Offertes" value={totalQuotes} sub={`${acceptedCount} geaccepteerd`} href="/quotes" />
+        <StatCard
+          label="Geclosede deals"
+          value={formatCurrency(closedValue)}
+          sub="totale waarde geaccepteerd"
+          color="#16a34a"
+          href="/quotes"
+        />
+        <StatCard
+          label="Conversie (30 dagen)"
+          value={`${conv30}%`}
+          sub={`${accepted30} gesloten van ${total30} verstuurd`}
+          color="#2563eb"
+        />
+        <StatCard
+          label="Nieuwe leads (30 dgn)"
+          value={newLeads30}
+          sub="binnengekomen leads"
+          color="#7c3aed"
+          href="/leads"
+        />
+        <StatCard
+          label="Pipeline waarde"
+          value={formatCurrency(pipelineValue)}
+          sub="openstaande offertes"
+          color="#0a5c35"
+        />
+        <StatCard
+          label="Leads totaal"
+          value={totalLeads}
+          sub="actieve leads"
+          href="/leads"
+        />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start' }} className="r-grid-detail">
@@ -158,18 +202,24 @@ export default async function DashboardPage() {
         {/* Rechterkolom */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
+          {/* Sales todos */}
+          <Card>
+            <CardHeader title="Taken & notities" />
+            <SalesTodoPanel todos={todos} users={users} />
+          </Card>
+
           {/* Per verkoper */}
           <Card>
             <CardHeader title="Per verkoper" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {perVerkoper.map((u) => {
-                const qTotal = u.quotes.length
+                const qTotal    = u.quotes.length
                 const qAccepted = u.quotes.filter((q) => q.status === 'ACCEPTED').length
-                const qValue = u.quotes.reduce((s, q) => s + q.total, 0)
-                const lTotal = u.assignedLeads.length
-                const conv = qTotal > 0 ? Math.round((qAccepted / qTotal) * 100) : 0
+                const qValue    = u.quotes.reduce((s, q) => s + q.total, 0)
+                const lTotal    = u.assignedLeads.length
+                const conv      = qTotal > 0 ? Math.round((qAccepted / qTotal) * 100) : 0
                 const displayName = u.name ?? u.email.split('@')[0]
-                const initials = displayName.slice(0, 2).toUpperCase()
+                const initials    = displayName.slice(0, 2).toUpperCase()
                 return (
                   <div key={u.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                     <div style={{
