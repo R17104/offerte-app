@@ -79,6 +79,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
   const [hasHeatPump,      setHasHeatPump]      = useState(false)
   const [elTariff,         setElTariff]         = useState('0.28')
   const [fbTariff,         setFbTariff]         = useState('0.07')
+  const [includeInstallation, setIncludeInstallation] = useState(false)
   const [opmerkingen,      setOpmerkingen]      = useState('')
 
   function applyHouseDefaults(type: string) {
@@ -115,6 +116,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
         electricityTariff: parseFloat(elTariff) || 0.28,
         feedbackTariff:    parseFloat(fbTariff)  || 0.07,
         productId: product.id,
+        includeInstallation,
         opmerkingen: opmerkingen || undefined,
       })
       if (result.success) {
@@ -382,6 +384,46 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
                         <span style={{ color: '#111827', fontWeight: 500 }}>{v}</span>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Installatie optie */}
+                  <div style={{ marginBottom: 20 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 10 }}>Installatie</p>
+                    <button
+                      type="button"
+                      onClick={() => setIncludeInstallation(v => !v)}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
+                        borderRadius: 10, border: `2px solid ${includeInstallation ? '#0a5c35' : '#e5e7eb'}`,
+                        background: includeInstallation ? '#f0fdf4' : '#fff', cursor: 'pointer', textAlign: 'left',
+                        fontFamily: 'inherit', transition: 'all 0.15s',
+                      }}
+                    >
+                      <div style={{
+                        width: 20, height: 20, borderRadius: 5, border: `2px solid ${includeInstallation ? '#0a5c35' : '#d1d5db'}`,
+                        background: includeInstallation ? '#0a5c35' : '#fff', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {includeInstallation && <span style={{ color: '#fff', fontSize: 12, fontWeight: 800 }}>✓</span>}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: includeInstallation ? '#0a5c35' : '#111827', marginBottom: 2 }}>
+                          Vakkundige installatie meenemen
+                        </p>
+                        <p style={{ fontSize: 12.5, color: '#6b7280', lineHeight: 1.5 }}>
+                          Professionele montage en inbedrijfstelling door gecertificeerd installateur
+                        </p>
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <p style={{ fontSize: 16, fontWeight: 900, color: includeInstallation ? '#0a5c35' : '#374151' }}>+ €1.250</p>
+                        <p style={{ fontSize: 11, color: '#9ca3af' }}>excl. BTW</p>
+                      </div>
+                    </button>
+                    {!includeInstallation && (
+                      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 6, paddingLeft: 4 }}>
+                        Prijzen zijn exclusief installatie. U kunt installatie later alsnog toevoegen.
+                      </p>
+                    )}
                   </div>
 
                   <div style={{ marginBottom: 20 }}>

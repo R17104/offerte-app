@@ -208,6 +208,7 @@ export type IntakeFormData = {
   feedbackTariff?: number
   // Product
   productId: string
+  includeInstallation: boolean
   opmerkingen?: string
 }
 
@@ -224,7 +225,10 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
   const count = await prisma.quote.count({ where: { quoteNumber: { startsWith: `OFT-${year}-` } } })
   const quoteNumber = `OFT-${year}-${String(count + 1).padStart(4, '0')}`
 
-  const lines = [{ productId: product.id, name: product.name, description: product.description ?? undefined, quantity: 1, unitPrice: product.unitPrice, vatRate: product.vatRate }]
+  const lines: { productId?: string; name: string; description?: string; quantity: number; unitPrice: number; vatRate: number }[] = [
+    { productId: product.id, name: product.name, description: product.description ?? undefined, quantity: 1, unitPrice: product.unitPrice, vatRate: product.vatRate },
+    ...(data.includeInstallation ? [{ name: 'Vakkundige installatie', description: 'Professionele montage en inbedrijfstelling door gecertificeerd installateur', quantity: 1, unitPrice: 1250, vatRate: 21 }] : []),
+  ]
   const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, 0)
 
   const validUntil = new Date()
@@ -314,6 +318,7 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
     `📋 Offerte aanvraag via website`,
     ``,
     `Product: ${product.name} (€${product.unitPrice.toLocaleString('nl-NL')} excl. BTW)`,
+    data.includeInstallation ? `Installatie: ja (+€1.250 excl. BTW)` : `Installatie: nee (alleen product)`,
     `Offertenummer: ${quoteNumber}`,
     ``,
     `Huidig maandtermijn: €${data.currentMonthlyBill}/mnd`,
