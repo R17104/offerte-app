@@ -23,6 +23,7 @@ export default async function GetekendeOffertesPage() {
     where: {
       status: 'ACCEPTED',
       acceptance: { isNot: null },
+      ...(role !== 'ADMIN' && { createdById: userId }),
     },
     include: {
       customer: true,
