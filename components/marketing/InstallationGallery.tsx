@@ -4,46 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 const SLIDES = [
-  // ── AlphaESS installaties (6) ────────────────────────────────────────────────
+  // ── AlphaESS (6) ─────────────────────────────────────────────────────────────
   {
-    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png',
     name: 'Familie Hoekstra',
     city: 'Leeuwarden',
     stars: 5,
-    quote: 'Al na 4 maanden merk ik het enorm in mijn stroomrekening. De installatie was binnen een dag klaar, super netjes gedaan!',
+    quote: 'Al na 4 maanden merk ik het enorm op mijn stroomrekening. De installatie was binnen een dag klaar, super netjes gedaan!',
     product: 'AlphaESS 9,3 kWh thuisbatterij',
-  },
-  {
-    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png',
-    name: 'Dhr. de Vries',
-    city: 'Drachten',
-    stars: 5,
-    quote: 'Eindelijk onafhankelijk van de energiemaatschappij. Zelfs bij stroomuitval draait alles gewoon door. Zou het iedereen aanraden.',
-    product: 'AlphaESS 9,3 kWh + noodstroom',
-  },
-  {
-    image: 'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_006.png',
-    name: 'Mevr. Bakker',
-    city: 'Sneek',
-    stars: 5,
-    quote: 'Ze rekenden eerlijk uit wat het zou opleveren en dat klopte ook. Ik bespaar nu meer dan €90 per maand.',
-    product: 'AlphaESS 3,8 kWh thuisbatterij',
-  },
-  {
-    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png',
-    name: 'Familie Visser',
-    city: 'Heerenveen',
-    stars: 5,
-    quote: 'We combineerden de batterij met onze bestaande zonnepanelen. Nu gebruiken we overdag én \'s avonds onze eigen stroom. Geweldig!',
-    product: 'AlphaESS + zonnepanelen',
-  },
-  {
-    image: 'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_002.png',
-    name: 'Dhr. Dijkstra',
-    city: 'Franeker',
-    stars: 5,
-    quote: 'Binnen één dag geïnstalleerd en alles uitgelegd. Nu bespaar ik zo\'n €80 per maand. De terugverdientijd is slechts 6 jaar.',
-    product: 'AlphaESS SMILE-G3 systeem',
   },
   {
     image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-008.png',
@@ -53,7 +21,39 @@ const SLIDES = [
     quote: 'Na de stroomstoring vorig jaar wilde ik een noodstroomoplossing. Nu staat er een complete AlphaESS backup in de garage. Nooit meer zorgen.',
     product: 'AlphaESS BackupBox noodstroom',
   },
-  // ── Sigenergy installaties (2) ───────────────────────────────────────────────
+  {
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
+    name: 'Dhr. Dijkstra',
+    city: 'Franeker',
+    stars: 5,
+    quote: 'Binnen één dag geïnstalleerd en alles uitgelegd. Nu bespaar ik zo\'n €80 per maand. Terugverdientijd van slechts 6 jaar.',
+    product: 'AlphaESS SMILE-G3 systeem',
+  },
+  {
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png',
+    name: 'Familie Visser',
+    city: 'Heerenveen',
+    stars: 5,
+    quote: 'We combineerden de batterij met onze bestaande zonnepanelen. Nu gebruiken we overdag én \'s avonds onze eigen stroom. Geweldig!',
+    product: 'AlphaESS + zonnepanelen combo',
+  },
+  {
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-004_1_2.png',
+    name: 'Mevr. Bakker',
+    city: 'Sneek',
+    stars: 5,
+    quote: 'Ze rekenden eerlijk uit wat het zou opleveren en dat klopte ook. Ik bespaar nu meer dan €90 per maand.',
+    product: 'AlphaESS 3,8 kWh thuisbatterij',
+  },
+  {
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-006_1.png',
+    name: 'Dhr. de Vries',
+    city: 'Drachten',
+    stars: 5,
+    quote: 'Eindelijk onafhankelijk van de energiemaatschappij. Zelfs bij stroomuitval draait alles gewoon door. Zou het iedereen aanraden.',
+    product: 'AlphaESS 9,3 kWh + laadpaal',
+  },
+  // ── Sigenergy (2) ────────────────────────────────────────────────────────────
   {
     image: 'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
     name: 'Familie Meijer',
@@ -63,7 +63,7 @@ const SLIDES = [
     product: 'Sigenergy SigenStor 6 kWh',
   },
   {
-    image: 'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg',
+    image: 'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg',
     name: 'Dhr. van der Berg',
     city: 'Harlingen',
     stars: 5,
