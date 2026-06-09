@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
+import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 type Product = {
   id: string
@@ -64,6 +65,8 @@ function ProductImage({ product }: { product: Product }) {
 }
 
 export default function ShopPage({ products }: { products: Product[] }) {
+  const w = useWindowWidth()
+  const isMobile = w < 768
   const [tab, setTab] = useState('all')
   const [search, setSearch] = useState('')
 
@@ -84,28 +87,30 @@ export default function ShopPage({ products }: { products: Product[] }) {
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 clamp(16px,4vw,48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={216} height={54} priority style={{ display: 'block' }} />
+            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 150 : 200} height={isMobile ? 38 : 50} priority style={{ display: 'block' }} />
           </Link>
 
-          {/* Search */}
-          <div style={{ position: 'relative', flex: 1, maxWidth: 480 }}>
-            <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} width="15" height="15" fill="none" viewBox="0 0 16 16">
-              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.4"/>
-              <path d="M10 10l3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-            </svg>
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Zoek op naam of type..."
-              style={{ width: '100%', padding: '8px 12px 8px 36px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 13.5, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111827' }}
-            />
-          </div>
+          {/* Search — verborgen op mobiel (staat hieronder) */}
+          {!isMobile && (
+            <div style={{ position: 'relative', flex: 1, maxWidth: 480 }}>
+              <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} width="15" height="15" fill="none" viewBox="0 0 16 16">
+                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.4"/>
+                <path d="M10 10l3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Zoek op naam of type..."
+                style={{ width: '100%', padding: '8px 12px 8px 36px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 13.5, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111827' }}
+              />
+            </div>
+          )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <Link href="/#contact" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: '#0a5c35', padding: '7px 16px', borderRadius: 8, textDecoration: 'none' }}>
+            <Link href="/#contact" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: '#0a5c35', padding: '7px 14px', borderRadius: 8, textDecoration: 'none', whiteSpace: 'nowrap' }}>
               Gratis advies
             </Link>
-            <Link href="/login" style={{ fontSize: 12.5, color: '#9ca3af', textDecoration: 'none', padding: '7px 10px' }}>Login</Link>
+            {!isMobile && <Link href="/login" style={{ fontSize: 12.5, color: '#9ca3af', textDecoration: 'none', padding: '7px 10px' }}>Login</Link>}
           </div>
         </div>
       </header>
@@ -143,10 +148,53 @@ export default function ShopPage({ products }: { products: Product[] }) {
           </p>
         </div>
 
+        {/* Zoekbalk op mobiel */}
+        {isMobile && (
+          <div style={{ position: 'relative', marginBottom: 16 }}>
+            <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} width="15" height="15" fill="none" viewBox="0 0 16 16">
+              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.4"/>
+              <path d="M10 10l3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Zoek op naam of type..."
+              style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111827' }}
+            />
+          </div>
+        )}
+
+        {/* Categorie filter: horizontaal scrollbaar op mobiel, sidebar op desktop */}
+        {isMobile ? (
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 16, scrollbarWidth: 'none' }}>
+            {TABS.map(t => {
+              const count = t.key === 'all' ? products.filter(p => p.active).length : products.filter(p => p.active && p.category === t.key).length
+              if (t.key !== 'all' && count === 0) return null
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  style={{
+                    flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                    background: tab === t.key ? '#0a5c35' : '#f3f4f6',
+                    color: tab === t.key ? '#fff' : '#374151',
+                    fontWeight: tab === t.key ? 700 : 500, fontSize: 13, fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t.key !== 'all' && <span>{CAT[t.key]?.icon}</span>}
+                  {t.label}
+                  <span style={{ fontSize: 11, opacity: 0.7 }}>{count}</span>
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
+
         <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
 
-          {/* Sidebar filters */}
-          <aside style={{ width: 220, flexShrink: 0 }}>
+          {/* Sidebar filters — alleen op desktop */}
+          <aside style={{ width: isMobile ? 0 : 220, flexShrink: 0, display: isMobile ? 'none' : 'block' }}>
             <p style={{ fontSize: 11.5, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>Categorie</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {TABS.map(t => {

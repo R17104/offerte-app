@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
+import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 type Product = {
   id: string
@@ -281,7 +282,7 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
           <span>200 kWh</span><span>20.000 kWh</span>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
         {[
           { label: 'Besparing/jaar', value: `€ ${annualSavings}`, highlight: true },
           { label: 'Terugverdientijd', value: `${payback} jaar`, highlight: false },
@@ -394,6 +395,8 @@ function ProductGallery({ product }: { product: Product }) {
 }
 
 export default function ProductDetailPage({ product }: { product: Product }) {
+  const w = useWindowWidth()
+  const isMobile = w < 768
   const cat = CAT[product.category ?? '']
   const inclPrice = product.unitPrice * (1 + product.vatRate / 100)
   const articleNr = product.notes?.match(/Art\. nr\. (\S+)/)?.[1]
@@ -405,12 +408,12 @@ export default function ProductDetailPage({ product }: { product: Product }) {
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 clamp(16px,4vw,48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={216} height={54} priority style={{ display: 'block' }} />
+            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 150 : 200} height={isMobile ? 38 : 50} priority style={{ display: 'block' }} />
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <Link href="/producten" style={{ fontSize: 13.5, fontWeight: 600, color: '#374151', textDecoration: 'none', padding: '7px 14px' }}>Alle producten</Link>
-            <Link href="/#contact" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: '#0a5c35', padding: '7px 16px', borderRadius: 8, textDecoration: 'none' }}>
+            {!isMobile && <Link href="/producten" style={{ fontSize: 13.5, fontWeight: 600, color: '#374151', textDecoration: 'none', padding: '7px 14px' }}>Alle producten</Link>}
+            <Link href="/#contact" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: '#0a5c35', padding: '7px 14px', borderRadius: 8, textDecoration: 'none', whiteSpace: 'nowrap' }}>
               Gratis advies
             </Link>
           </div>
@@ -441,7 +444,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
         </div>
 
         {/* Main content */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,480px)', gap: 48, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0,1fr) minmax(0,480px)', gap: isMobile ? 24 : 48, alignItems: 'start' }}>
 
           {/* Image panel */}
           <div>

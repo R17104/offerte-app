@@ -6,6 +6,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
+import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 const InstallationGallery = dynamic(() => import('@/components/marketing/InstallationGallery'))
 const BatterijCheck = dynamic(() => import('@/components/marketing/BatterijCheck'))
@@ -44,27 +45,36 @@ const card: React.CSSProperties = {
 // ── Header ────────────────────────────────────────────────────────────────────
 
 function Header() {
+  const w = useWindowWidth()
+  const isMobile = w < 768
+  const isTablet = w >= 768 && w < 1024
+
   return (
     <header style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
       background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(12px)',
       borderBottom: '1px solid rgba(0,0,0,0.06)',
     }}>
-      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={216} height={54} priority style={{ display: 'block' }} />
+          <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 160 : 200} height={isMobile ? 40 : 50} priority style={{ display: 'block' }} />
         </a>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {[['Producten', '/producten'], ['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze'], ['Ervaringen', '#ervaringen']].map(([l, h]) => (
+          {!isMobile && !isTablet && [['Producten', '/producten'], ['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze']].map(([l, h]) => (
             <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, fontWeight: 500 }}>{l}</a>
           ))}
-          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: '8px 18px', fontSize: 13.5, marginLeft: 6, boxShadow: 'none' }}>
-            Gratis advies
+          {isTablet && [['Producten', '/producten'], ['Welk product?', '/welk-product']].map(([l, h]) => (
+            <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 10px', borderRadius: 8, fontWeight: 500 }}>{l}</a>
+          ))}
+          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: isMobile ? '8px 14px' : '8px 18px', fontSize: 13.5, marginLeft: 4, boxShadow: 'none', whiteSpace: 'nowrap' }}>
+            {isMobile ? 'Gratis advies' : 'Gratis advies'}
           </a>
-          <Link href="/login" style={{ fontSize: 12.5, color: '#9ca3af', textDecoration: 'none', padding: '8px 12px' }}>
-            Login
-          </Link>
+          {!isMobile && (
+            <Link href="/login" style={{ fontSize: 12.5, color: '#9ca3af', textDecoration: 'none', padding: '8px 10px' }}>
+              Login
+            </Link>
+          )}
         </nav>
       </div>
     </header>
