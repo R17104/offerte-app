@@ -6,23 +6,22 @@ import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 
 // ── Calculator logic ─────────────────────────────────────────────────────────
 
-function calcSavings(gas: number, kwh: number, hasHeatPump: boolean) {
+function calcSavings(gas: number, kwh: number, hasHeatPump: boolean, hasSolar: boolean) {
   const gasTariff = 1.10
   const elecTariff = 0.28
 
-  // Zonnepanelen: ~85% van stroomverbruik opwekken
-  const solarCover = Math.min(kwh * 0.85, kwh)
-  const solarSavings = Math.round(solarCover * elecTariff * 0.7) // netto na terugleverkosten
+  // Zonnepanelen: alleen tonen als ze er nog niet zijn
+  const solarSavings = hasSolar ? 0 : Math.round(kwh * 0.85 * elecTariff * 0.7)
 
   // Warmtepomp: 60-70% gasreductie
-  const heatPumpGasReduction = hasHeatPump ? 0 : Math.round(gas * 0.65)
-  const heatPumpSavings = Math.round(heatPumpGasReduction * gasTariff)
+  const heatPumpSavings = hasHeatPump ? 0 : Math.round(gas * 0.65 * gasTariff)
 
-  // Batterij: extra 15% van stroomverbruik zelf gebruiken
-  const batterySavings = Math.round(kwh * 0.15 * elecTariff)
+  // Batterij: bij bestaande zonnepanelen hogere besparing (meer surplus om op te slaan)
+  const batteryBase = hasSolar ? kwh * 0.30 : kwh * 0.15
+  const batterySavings = Math.round(batteryBase * elecTariff)
 
   const total = solarSavings + heatPumpSavings + batterySavings
-  return { solarSavings, heatPumpSavings, batterySavings, total }
+  return { solarSavings, heatPumpSavings, batterySavings, total, hasSolar }
 }
 
 const HOUSE_DEFAULTS: Record<string, { gas: number; kwh: number }> = {
@@ -161,13 +160,14 @@ function Calculator() {
   const [kwh, setKwh] = useState('')
   const [houseType, setHouseType] = useState('')
   const [hasHeatPump, setHasHeatPump] = useState(false)
+  const [hasSolar, setHasSolar] = useState(false)
   const [result, setResult] = useState<ReturnType<typeof calcSavings> | null>(null)
 
   function handleEstimate() {
     const defaults = HOUSE_DEFAULTS[houseType] ?? { gas: 1500, kwh: 3200 }
     const g = parseFloat(gas) || defaults.gas
     const k = parseFloat(kwh) || defaults.kwh
-    setResult(calcSavings(g, k, hasHeatPump))
+    setResult(calcSavings(g, k, hasHeatPump, hasSolar))
   }
 
   function useDefaults() {
@@ -230,11 +230,18 @@ function Calculator() {
                 </div>
               </div>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, color: '#374151' }}>
-                <input type="checkbox" checked={hasHeatPump} onChange={(e) => setHasHeatPump(e.target.checked)}
-                  style={{ width: 16, height: 16, accentColor: '#0a5c35' }} />
-                Ik heb al een warmtepomp
-              </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, color: '#374151' }}>
+                  <input type="checkbox" checked={hasSolar} onChange={(e) => setHasSolar(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: '#0a5c35' }} />
+                  Ik heb al zonnepanelen
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13.5, color: '#374151' }}>
+                  <input type="checkbox" checked={hasHeatPump} onChange={(e) => setHasHeatPump(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: '#0a5c35' }} />
+                  Ik heb al een warmtepomp
+                </label>
+              </div>
 
               <button onClick={handleEstimate} style={{
                 width: '100%', padding: '12px', borderRadius: 10,
@@ -272,6 +279,12 @@ function Calculator() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.1)', borderRadius: 8 }}>
                       <span style={{ fontSize: 13.5, color: '#fff' }}>☀️ Zonnepanelen</span>
                       <span style={{ fontSize: 13.5, fontWeight: 700, color: '#f5c442' }}>€{result.solarSavings.toLocaleString('nl-NL')}/jaar</span>
+                    </div>
+                  )}
+                  {result.hasSolar && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 8 }}>
+                      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>☀️ Zonnepanelen</span>
+                      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>al aanwezig</span>
                     </div>
                   )}
                   {result.heatPumpSavings > 0 && (
