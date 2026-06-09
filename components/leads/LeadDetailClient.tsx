@@ -30,6 +30,8 @@ type Lead = {
   source: string | null
   createdAt: Date
   followUpAt: Date | null
+  quoteId: string | null
+  quote: { id: string; quoteNumber: string; title: string; total: number; status: string } | null
   notes: Note[]
   assignedTo: SalesUser | null
 }
@@ -82,6 +84,25 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
 
       {/* Links: info + notities */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* Pre-gemaakte offerte banner */}
+        {lead.quote && (
+          <div style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '1.5px solid #86efac', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: '#0a5c35', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📄</div>
+              <div>
+                <p style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 2 }}>Automatisch gegenereerde offerte</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{lead.quote.quoteNumber}</p>
+                <p style={{ fontSize: 12.5, color: '#374151' }}>{lead.quote.title}</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <a href={`/quotes/${lead.quote.id}`} style={{ padding: '8px 18px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>
+                Offerte bekijken →
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Contactgegevens */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>

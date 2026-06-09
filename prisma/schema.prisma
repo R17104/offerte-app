@@ -88,7 +88,7 @@ model Customer {
   id          String    @id @default(cuid())
   firstName   String
   lastName    String
-  dateOfBirth DateTime
+  dateOfBirth DateTime?
   iban        String?
   email       String?
   phone       String?
@@ -213,6 +213,8 @@ model Quote {
   customerId  String
   customer    Customer @relation(fields: [customerId], references: [id])
 
+  lead Lead?
+
   createdById  String
   createdBy    User    @relation(fields: [createdById], references: [id])
 
@@ -258,6 +260,9 @@ model Lead {
   updatedAt   DateTime   @updatedAt
 
   followUpAt  DateTime?
+
+  quoteId String? @unique
+  quote   Quote?  @relation(fields: [quoteId], references: [id])
 
   createdById String
   createdBy   User   @relation(fields: [createdById], references: [id])

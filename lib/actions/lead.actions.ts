@@ -4,7 +4,8 @@ import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { verifySession } from '@/lib/dal'
-import { LeadStatus } from '@prisma/client'
+import { LeadStatus, HouseType } from '@prisma/client'
+import { calculateQuoteTotals } from '@/lib/utils'
 
 export type LeadImportRow = {
   firstName: string
@@ -181,4 +182,157 @@ export async function createLeadFromLanding({
 
   revalidatePath('/leads')
   revalidatePath('/dashboard')
+}
+
+export type IntakeFormData = {
+  // Persoonlijk
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  street?: string
+  houseNumber?: string
+  postalCode: string
+  city?: string
+  // Energieprofiel
+  currentMonthlyBill: number
+  electricityUsageKwh: number
+  hasSolarPanels: boolean
+  solarPanelKwp?: number
+  electricityFeedbackKwh?: number
+  gasUsageM3?: number
+  hasHeatPump: boolean
+  houseType?: HouseType
+  numPersons?: number
+  electricityTariff?: number
+  feedbackTariff?: number
+  // Product
+  productId: string
+  opmerkingen?: string
+}
+
+export async function createLeadWithQuote(data: IntakeFormData): Promise<{ success: boolean; quoteNumber?: string; error?: string }> {
+  const systemUser = await prisma.user.findFirst({ where: { role: 'ADMIN' }, orderBy: { createdAt: 'asc' } })
+    ?? await prisma.user.findFirst({ orderBy: { createdAt: 'asc' } })
+  if (!systemUser) return { success: false, error: 'Geen systeemgebruiker gevonden' }
+
+  const product = await prisma.product.findUnique({ where: { id: data.productId } })
+  if (!product) return { success: false, error: 'Product niet gevonden' }
+
+  // Quote number
+  const year = new Date().getFullYear()
+  const count = await prisma.quote.count({ where: { quoteNumber: { startsWith: `OFT-${year}-` } } })
+  const quoteNumber = `OFT-${year}-${String(count + 1).padStart(4, '0')}`
+
+  const lines = [{ productId: product.id, name: product.name, description: product.description ?? undefined, quantity: 1, unitPrice: product.unitPrice, vatRate: product.vatRate }]
+  const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, 0)
+
+  const validUntil = new Date()
+  validUntil.setDate(validUntil.getDate() + 30)
+
+  // Customer aanmaken
+  const customer = await prisma.customer.create({
+    data: {
+      firstName: data.firstName,
+      lastName:  data.lastName,
+      email:     data.email,
+      phone:     data.phone,
+      userId:    systemUser.id,
+      addresses: data.postalCode ? {
+        create: {
+          type:        'DELIVERY',
+          street:      data.street      || '',
+          houseNumber: data.houseNumber || '',
+          postalCode:  data.postalCode,
+          city:        data.city        || '',
+        },
+      } : undefined,
+    },
+  })
+
+  // Quote aanmaken
+  const quote = await prisma.quote.create({
+    data: {
+      quoteNumber,
+      title:      `Offerte – ${product.name} – ${data.firstName} ${data.lastName}`,
+      status:     'DRAFT',
+      validUntil,
+      subtotal,
+      vatTotal,
+      total,
+      customerId:   customer.id,
+      createdById:  systemUser.id,
+      // Energieprofiel
+      currentMonthlyBill:    data.currentMonthlyBill,
+      electricityUsageKwh:   data.electricityUsageKwh,
+      hasSolarPanels:        data.hasSolarPanels,
+      solarPanelKwp:         data.solarPanelKwp         ?? null,
+      electricityFeedbackKwh: data.electricityFeedbackKwh ?? null,
+      gasUsageM3:            data.gasUsageM3            ?? null,
+      hasHeatPump:           data.hasHeatPump,
+      houseType:             data.houseType             ?? null,
+      numPersons:            data.numPersons            ?? null,
+      electricityTariff:     data.electricityTariff     ?? 0.28,
+      feedbackTariff:        data.feedbackTariff        ?? 0.07,
+      includeBatteryAdvice:  product.category === 'BATTERY',
+      lines: {
+        create: lines.map((l, i) => ({
+          sortOrder:   i,
+          name:        l.name,
+          description: l.description ?? null,
+          quantity:    l.quantity,
+          unitPrice:   l.unitPrice,
+          vatRate:     l.vatRate,
+          lineTotal:   l.quantity * l.unitPrice,
+          productId:   l.productId,
+        })),
+      },
+    },
+  })
+
+  // Lead aanmaken
+  const houseTypeLabel: Record<string, string> = { APARTMENT: 'Appartement', TERRACED: 'Tussenwoning', CORNER: 'Hoekwoning', DETACHED: 'Vrijstaand' }
+  const lead = await prisma.lead.create({
+    data: {
+      firstName:   data.firstName,
+      lastName:    data.lastName,
+      email:       data.email,
+      phone:       data.phone,
+      street:      data.street      || null,
+      houseNumber: data.houseNumber || null,
+      postalCode:  data.postalCode,
+      city:        data.city        || null,
+      source:      'Website – offerte aanvraag',
+      status:      'NEW',
+      createdById: systemUser.id,
+      quoteId:     quote.id,
+    },
+  })
+
+  // LeadNote met samenvatting
+  const noteLines = [
+    `📋 Offerte aanvraag via website`,
+    ``,
+    `Product: ${product.name} (€${product.unitPrice.toLocaleString('nl-NL')} excl. BTW)`,
+    `Offertenummer: ${quoteNumber}`,
+    ``,
+    `Huidig maandtermijn: €${data.currentMonthlyBill}/mnd`,
+    `Stroomverbruik: ${data.electricityUsageKwh} kWh/jaar`,
+    data.hasSolarPanels
+      ? `Zonnepanelen: ja – ${data.solarPanelKwp ?? '?'} kWp, ${data.electricityFeedbackKwh ?? '?'} kWh teruglevering/jaar`
+      : `Zonnepanelen: nee`,
+    data.gasUsageM3 ? `Gasverbruik: ${data.gasUsageM3} m³/jaar` : null,
+    `Warmtepomp: ${data.hasHeatPump ? 'ja' : 'nee'}`,
+    data.houseType ? `Type woning: ${houseTypeLabel[data.houseType] ?? data.houseType}` : null,
+    data.numPersons ? `Aantal personen: ${data.numPersons}` : null,
+    data.opmerkingen ? `\nOpmerking: ${data.opmerkingen}` : null,
+  ].filter(Boolean).join('\n')
+
+  await prisma.leadNote.create({
+    data: { leadId: lead.id, content: noteLines, authorId: systemUser.id },
+  })
+
+  revalidatePath('/leads')
+  revalidatePath('/dashboard')
+  return { success: true, quoteNumber }
 }

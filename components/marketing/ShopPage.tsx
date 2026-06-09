@@ -273,7 +273,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
                           {/* CTA */}
                           <div style={{ display: 'flex', gap: 7 }}>
                             <Link
-                              href={`/gratis-advies?product=${encodeURIComponent(p.name)}`}
+                              href={`/offerte-aanvragen?product=${p.id}`}
                               style={{ flex: 1, padding: '8px 10px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
                             >
                               Vraag offerte aan
