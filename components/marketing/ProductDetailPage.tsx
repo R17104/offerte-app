@@ -120,6 +120,140 @@ const GALLERIES: Record<string, string[]> = {
     'https://www.vekto.nl/media/catalog/product/e/3/e39a2289788b5a60c838e191bab46ed5.jpg',
     'https://www.vekto.nl/media/catalog/product/5/2/52fe5fde304574bd8ece2b48755e7cf2.jpg',
   ],
+
+  // Sigenergy EC SP hybride omvormer (1-fase)
+  'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg': [
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/477042152/262x276x2/sigenergy-energy-gateway-1-fase.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg',
+  ],
+
+  // Sigenergy EC TP hybride omvormer (3-fase)
+  'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg': [
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/475447440/262x276x2/sigenergy-energy-gateway-3-fase.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg',
+  ],
+
+  // Sigenergy SigenStor BAT 6.0
+  'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg': [
+    'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/477042152/262x276x2/sigenergy-energy-gateway-1-fase.jpg',
+  ],
+
+  // Sigenergy SigenStor BAT 9.0
+  'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg': [
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/475447440/262x276x2/sigenergy-energy-gateway-3-fase.jpg',
+  ],
+
+  // Sigenergy Energy Gateway HomeMax SP (1-fase)
+  'https://cdn.webshopapp.com/shops/252094/files/477042152/262x276x2/sigenergy-energy-gateway-1-fase.jpg': [
+    'https://cdn.webshopapp.com/shops/252094/files/477042152/262x276x2/sigenergy-energy-gateway-1-fase.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/475447440/262x276x2/sigenergy-energy-gateway-3-fase.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg',
+  ],
+
+  // Sigenergy Energy Gateway HomePro TP (3-fase)
+  'https://cdn.webshopapp.com/shops/252094/files/475447440/262x276x2/sigenergy-energy-gateway-3-fase.jpg': [
+    'https://cdn.webshopapp.com/shops/252094/files/475447440/262x276x2/sigenergy-energy-gateway-3-fase.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/477042152/262x276x2/sigenergy-energy-gateway-1-fase.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/483240283/262x276x2/sigenergy-60-sigenstor-batterij-module.jpg',
+  ],
+
+  // Sigenergy AC Lader 7 kW
+  'https://cdn.webshopapp.com/shops/252094/files/486711965/262x276x2/sigenergy-ac-lader-7-kw-met-vaste-ev-kabel-5-meter.jpg': [
+    'https://cdn.webshopapp.com/shops/252094/files/486711965/262x276x2/sigenergy-ac-lader-7-kw-met-vaste-ev-kabel-5-meter.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/491189484/262x276x2/sigenergy-ac-lader-22kw.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+  ],
+
+  // Sigenergy AC Lader 22 kW
+  'https://cdn.webshopapp.com/shops/252094/files/491189484/262x276x2/sigenergy-ac-lader-22kw.jpg': [
+    'https://cdn.webshopapp.com/shops/252094/files/491189484/262x276x2/sigenergy-ac-lader-22kw.jpg',
+    'https://cdn.webshopapp.com/shops/252094/files/486711965/262x276x2/sigenergy-ac-lader-7-kw-met-vaste-ev-kabel-5-meter.jpg',
+    'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-1.jpg',
+  ],
+
+  // WeHeat Blackbird P60 warmtepomp
+  'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif': [
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68122a8431ec990a5a3ffe18_Sparrow-outside.avif',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-blackbird-p80-all-electric-compact-set-8kw-1.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68089931202a2dafe616a512_Flint-hero.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-300l.webp',
+  ],
+
+  // WeHeat Blackbird P80 warmtepomp
+  'https://www.aircozonderstek.nl/wp-content/uploads/weheat-blackbird-p80-all-electric-compact-set-8kw-1.webp': [
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-blackbird-p80-all-electric-compact-set-8kw-1.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68122a8431ec990a5a3ffe18_Sparrow-outside.avif',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-300l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-100l.webp',
+  ],
+
+  // WeHeat Sparrow P60 warmtepomp
+  'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68122a8431ec990a5a3ffe18_Sparrow-outside.avif': [
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68122a8431ec990a5a3ffe18_Sparrow-outside.avif',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68089931202a2dafe616a512_Flint-hero.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-200l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-50l.webp',
+  ],
+
+  // WeHeat Flint P40 warmtepomp
+  'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68089931202a2dafe616a512_Flint-hero.webp': [
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68089931202a2dafe616a512_Flint-hero.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68122a8431ec990a5a3ffe18_Sparrow-outside.avif',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-200l.webp',
+  ],
+
+  // WeHeat RVS Boilervat WBL-200
+  'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-200l.webp': [
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-200l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-300l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-50l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-100l.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif',
+  ],
+
+  // WeHeat RVS Boilervat WBL-300
+  'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-300l.webp': [
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-300l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-200l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-100l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-50l.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/681dea96fec3f1fba51b14e0_Blackbird%20-%20Product%20website.avif',
+  ],
+
+  // WeHeat RVS Buffervat WBF-50
+  'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-50l.webp': [
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-50l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-100l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-200l.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68089931202a2dafe616a512_Flint-hero.webp',
+  ],
+
+  // WeHeat RVS Buffervat WBF-100
+  'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-100l.webp': [
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-100l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-buffer-tank-50l.webp',
+    'https://www.aircozonderstek.nl/wp-content/uploads/weheat-rvs-boiler-tank-300l.webp',
+    'https://cdn.prod.website-files.com/67ed5695314f69c537693240/68089931202a2dafe616a512_Flint-hero.webp',
+  ],
 }
 
 const CAT: Record<string, { label: string; icon: string; gradient: string }> = {
@@ -152,12 +286,12 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
           <span style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35' }}>{feedbackKwh.toLocaleString('nl-NL')} kWh</span>
         </div>
         <input
-          type="range" min={200} max={6000} step={100} value={feedbackKwh}
+          type="range" min={200} max={20000} step={100} value={feedbackKwh}
           onChange={e => setFeedbackKwh(+e.target.value)}
           style={{ width: '100%', accentColor: '#0a5c35' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#9ca3af', marginTop: 2 }}>
-          <span>200 kWh</span><span>6.000 kWh</span>
+          <span>200 kWh</span><span>20.000 kWh</span>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
