@@ -129,15 +129,26 @@ export default async function EditProductPage({ params }: Props) {
           {/* Status */}
           <Card>
             <p style={{ fontWeight: 600, marginBottom: 16, fontSize: 13.5 }}>Status</p>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                name="active"
-                defaultChecked={product.active}
-                style={{ width: 16, height: 16, accentColor: 'var(--accent)' }}
-              />
-              <span style={{ fontSize: 13.5 }}>Product is actief (zichtbaar bij offerte aanmaken)</span>
-            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  name="active"
+                  defaultChecked={product.active}
+                  style={{ width: 16, height: 16, accentColor: 'var(--accent)' }}
+                />
+                <span style={{ fontSize: 13.5 }}>Product is actief (zichtbaar bij offerte aanmaken)</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  name="shopVisible"
+                  defaultChecked={product.shopVisible}
+                  style={{ width: 16, height: 16, accentColor: 'var(--accent)' }}
+                />
+                <span style={{ fontSize: 13.5 }}>Zichtbaar op de publieke productpagina (/producten)</span>
+              </label>
+            </div>
           </Card>
 
           <div style={{ display: 'flex', gap: 10 }}>

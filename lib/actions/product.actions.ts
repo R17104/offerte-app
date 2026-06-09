@@ -68,6 +68,7 @@ export async function updateProduct(id: string, formData: FormData) {
   const defaultQty  = formData.get('defaultQty') ? parseFloat(formData.get('defaultQty') as string) : null
   const notes       = formData.get('notes') as string | null
   const active      = formData.get('active') === 'on'
+  const shopVisible = formData.get('shopVisible') === 'on'
 
   if (!name || isNaN(unitPrice) || isNaN(vatRate)) {
     throw new Error('Naam, prijs en BTW% zijn verplicht')
@@ -83,6 +84,7 @@ export async function updateProduct(id: string, formData: FormData) {
       defaultQty,
       notes: notes || null,
       active,
+      shopVisible,
       ...parseProductFields(formData),
     },
   })
