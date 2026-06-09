@@ -58,23 +58,48 @@ const bulkBtnStyle: React.CSSProperties = {
   fontSize: 12.5, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
 }
 
+const PERIOD_OPTIONS = [
+  { value: 'all',   label: 'Alle periodes' },
+  { value: '7',     label: 'Afgelopen 7 dagen' },
+  { value: '30',    label: 'Afgelopen 30 dagen' },
+  { value: '90',    label: 'Afgelopen 90 dagen' },
+  { value: 'year',  label: 'Dit jaar' },
+]
+
 export default function QuotesList({ quotes: initialQuotes, showArchived }: { quotes: QuoteRow[]; showArchived: boolean }) {
   const router = useRouter()
   const [quotes, setQuotes] = useState(initialQuotes)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
+  const [period, setPeriod] = useState('all')
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => { setQuotes(initialQuotes); setSelected(new Set()) }, [initialQuotes])
 
-  const filtered = search.trim()
-    ? quotes.filter((q) => {
-        const s = search.toLowerCase()
-        return q.quoteNumber.toLowerCase().includes(s)
-          || q.title.toLowerCase().includes(s)
-          || `${q.customer.firstName} ${q.customer.lastName}`.toLowerCase().includes(s)
-      })
-    : quotes
+  const now = Date.now()
+
+  const periodStart: number | null = (() => {
+    if (period === '7')    return now - 7  * 86400000
+    if (period === '30')   return now - 30 * 86400000
+    if (period === '90')   return now - 90 * 86400000
+    if (period === 'year') return new Date(new Date().getFullYear(), 0, 1).getTime()
+    return null
+  })()
+
+  const filtered = quotes.filter((q) => {
+    if (search.trim()) {
+      const s = search.toLowerCase()
+      const matchesSearch = q.quoteNumber.toLowerCase().includes(s)
+        || q.title.toLowerCase().includes(s)
+        || `${q.customer.firstName} ${q.customer.lastName}`.toLowerCase().includes(s)
+      if (!matchesSearch) return false
+    }
+    if (periodStart !== null) {
+      const date = showArchived ? q.archivedAt : q.createdAt
+      if (!date || new Date(date).getTime() < periodStart) return false
+    }
+    return true
+  })
 
   const allSelected = filtered.length > 0 && filtered.every((q) => selected.has(q.id))
   const someSelected = filtered.some((q) => selected.has(q.id)) && !allSelected
@@ -99,7 +124,6 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
     })
   }
 
-  const now = Date.now()
   function daysRemaining(validUntil: Date | null | undefined) {
     if (!validUntil) return null
     return Math.ceil((new Date(validUntil).getTime() - now) / 86400000)
@@ -128,13 +152,22 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
         </div>
       )}
 
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Zoek op nummer, titel of klant…"
-          style={{ width: '100%', padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
+          style={{ flex: 1, minWidth: 200, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
         />
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+          style={{ padding: '7px 10px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}
+        >
+          {PERIOD_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </div>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
