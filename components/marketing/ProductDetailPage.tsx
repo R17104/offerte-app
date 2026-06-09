@@ -21,6 +21,107 @@ type Product = {
   notes: string | null
 }
 
+// Galerij per product — key = hoofdafbeelding URL
+const GALLERIES: Record<string, string[]> = {
+  // AlphaESS batterij 3.8kWh
+  'https://www.vekto.nl/media/catalog/product/2/4/242247_label_2_1.png': [
+    'https://www.vekto.nl/media/catalog/product/2/4/242247_label_2_1.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_006.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_007.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_008.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_002.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-008.png',
+  ],
+  // AlphaESS batterij 9.3kWh
+  'https://www.vekto.nl/media/catalog/product/2/4/242248-1.png': [
+    'https://www.vekto.nl/media/catalog/product/2/4/242248-1.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_006.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_007.png',
+    'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_002.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-008.png',
+  ],
+  // AlphaESS omvormer 5kW
+  'https://www.vekto.nl/media/catalog/product/2/4/242242_label.png': [
+    'https://www.vekto.nl/media/catalog/product/2/4/242242_label.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_002_1_2.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_003_1_2.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_001_1_1_2.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_004_1_2.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-004_1_2.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-006_1_1_2.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_2_1_2.png',
+  ],
+  // AlphaESS omvormer 10kW
+  'https://www.vekto.nl/media/catalog/product/2/4/242246_label.png': [
+    'https://www.vekto.nl/media/catalog/product/2/4/242246_label.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_002.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_003.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_001_1.png',
+    'https://www.vekto.nl/media/catalog/product/o/m/omvormer_bewerkt_004.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-004.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-006_1.png',
+    'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_2.png',
+  ],
+  // Alpha ESS Backup box KIT 3 fase
+  'https://www.vekto.nl/media/catalog/product/8/8/8847238ba12a395839ed90f6a06c793d.jpg': [
+    'https://www.vekto.nl/media/catalog/product/8/8/8847238ba12a395839ed90f6a06c793d.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/f/cfb1f3de7af008a61dcb367f199fba90.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/d/cd774ce302afd5ae7c5cd18fcd909ad3.jpg',
+    'https://www.vekto.nl/media/catalog/product/f/b/fb22480249003c9e37c76e132886a879.jpg',
+    'https://www.vekto.nl/media/catalog/product/4/3/4313977a7fc109bdd974edd9f03744b7.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/9/c9624d2949b4e1dbb1e3514f612bdd5c.jpg',
+  ],
+  // 3 fase Backup Box beveiliging C25
+  'https://www.vekto.nl/media/catalog/product/a/6/a643e6604691411778b6e53f0c18b712.jpg': [
+    'https://www.vekto.nl/media/catalog/product/a/6/a643e6604691411778b6e53f0c18b712.jpg',
+    'https://www.vekto.nl/media/catalog/product/4/b/4b0b3bae23733fb810bd17304ca38b2f.jpg',
+    'https://www.vekto.nl/media/catalog/product/1/3/1300caf29d9b27c51080f157e1198bff.jpg',
+    'https://www.vekto.nl/media/catalog/product/b/f/bfbe21249719a57396fced51a7122dfd.jpg',
+    'https://www.vekto.nl/media/catalog/product/5/7/576a191b8e33162ec6def311c12c1729.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/9/c93f6bc9e91ce05de254b6440928f334.jpg',
+    'https://www.vekto.nl/media/catalog/product/e/5/e5a776ba23b95ccd285a427de4156a67.jpg',
+    'https://www.vekto.nl/media/catalog/product/f/0/f0eff5a28d3dfded2a51987875e5684d.jpg',
+  ],
+  // ATS 3 polig
+  'https://www.vekto.nl/media/catalog/product/5/7/577a962dc0f0a04fc247e2813631adf2.jpg': [
+    'https://www.vekto.nl/media/catalog/product/5/7/577a962dc0f0a04fc247e2813631adf2.jpg',
+    'https://www.vekto.nl/media/catalog/product/0/a/0ad693ca2863fe8a4db238bf5bfd5579.jpg',
+    'https://www.vekto.nl/media/catalog/product/2/a/2a2978d7daad95c53bd03c348e50381f.jpg',
+    'https://www.vekto.nl/media/catalog/product/b/8/b857820021979a9ca851f1d0e0bec474.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/6/c6f678a7e755d065805df737c487ec29.jpg',
+    'https://www.vekto.nl/media/catalog/product/b/c/bc34b93796e235047c6b70bbc281e16a.jpg',
+    'https://www.vekto.nl/media/catalog/product/b/8/b8be3c9e7f792261edd92872e3ebaf57.jpg',
+  ],
+  // ATS 1 polig
+  'https://www.vekto.nl/media/catalog/product/4/1/41a74cd1fe8700a6ac813a34fe70fbda.jpg': [
+    'https://www.vekto.nl/media/catalog/product/4/1/41a74cd1fe8700a6ac813a34fe70fbda.jpg',
+    'https://www.vekto.nl/media/catalog/product/6/6/66485fa4157cd2d7358494fa9b26076f.jpg',
+    'https://www.vekto.nl/media/catalog/product/8/7/873d99a6cd234713f2d76e7678f859ac.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/5/c53a24671cea407117c4e0611e61ce6e.jpg',
+    'https://www.vekto.nl/media/catalog/product/6/1/61a9319577dfb83b43e8709ea849b163.jpg',
+    'https://www.vekto.nl/media/catalog/product/f/7/f781822d44316b52235774b1e0deaf44.jpg',
+    'https://www.vekto.nl/media/catalog/product/c/b/cbcc28dca58b26fb889f42506751845a.jpg',
+  ],
+  // ZinVolt 3 fase verdeler
+  'https://www.vekto.nl/media/catalog/product/0/5/05fcfc67a6184aeab9bbfa7574b04008.jpg': [
+    'https://www.vekto.nl/media/catalog/product/0/5/05fcfc67a6184aeab9bbfa7574b04008.jpg',
+    'https://www.vekto.nl/media/catalog/product/f/1/f1d6d74131e9517eb60e728a67abd08c.jpg',
+    'https://www.vekto.nl/media/catalog/product/4/a/4aa103c06bee8513230373c4948387be.jpg',
+    'https://www.vekto.nl/media/catalog/product/d/f/df0804ddaa520b36313530dc2ec590d0.jpg',
+    'https://www.vekto.nl/media/catalog/product/7/8/78a6b2814482f7ec108c3d9a65ed62c0.jpg',
+    'https://www.vekto.nl/media/catalog/product/a/3/a3ef2c6e4d0cccab938eac2c4e699a84.jpg',
+    'https://www.vekto.nl/media/catalog/product/b/8/b8c25ed158efc6d2d7112216f07ff6ae.jpg',
+    'https://www.vekto.nl/media/catalog/product/e/3/e39a2289788b5a60c838e191bab46ed5.jpg',
+    'https://www.vekto.nl/media/catalog/product/5/2/52fe5fde304574bd8ece2b48755e7cf2.jpg',
+  ],
+}
+
 const CAT: Record<string, { label: string; icon: string; gradient: string }> = {
   BATTERY:         { label: 'Thuisbatterij', icon: '🔋', gradient: 'linear-gradient(145deg,#0f2444,#1d4ed8)' },
   SOLAR:           { label: 'Zonnepanelen',  icon: '☀️', gradient: 'linear-gradient(145deg,#78350f,#ea580c)' },
@@ -79,25 +180,78 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
   )
 }
 
-function ProductImage({ product }: { product: Product }) {
-  const [err, setErr] = useState(false)
+function ProductGallery({ product }: { product: Product }) {
+  const images = (product.imageUrl && GALLERIES[product.imageUrl]) || (product.imageUrl ? [product.imageUrl] : [])
+  const [active, setActive] = useState(0)
+  const [err, setErr] = useState<Record<number, boolean>>({})
   const cat = CAT[product.category ?? '']
-  if (product.imageUrl && !err) {
+
+  if (images.length === 0) {
     return (
-      <img
-        src={product.imageUrl}
-        alt={product.name}
-        onError={() => setErr(true)}
-        style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 32, boxSizing: 'border-box', background: '#f9fafb' }}
-      />
+      <div style={{ aspectRatio: '4/3', borderRadius: 16, overflow: 'hidden', border: '1px solid #e5e7eb', background: cat?.gradient ?? 'linear-gradient(145deg,#1f2937,#374151)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+        <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'rgba(255,255,255,0.13)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>{cat?.icon ?? '📦'}</div>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{cat?.label ?? 'Product'}</span>
+      </div>
     )
   }
+
+  const prev = () => setActive(i => (i - 1 + images.length) % images.length)
+  const next = () => setActive(i => (i + 1) % images.length)
+
   return (
-    <div style={{ width: '100%', height: '100%', background: cat?.gradient ?? 'linear-gradient(145deg,#1f2937,#374151)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
-      <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'rgba(255,255,255,0.13)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>
-        {cat?.icon ?? '📦'}
+    <div>
+      {/* Hoofdafbeelding */}
+      <div style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 16, overflow: 'hidden', border: '1px solid #e5e7eb', background: '#f9fafb', marginBottom: 10 }}>
+        {!err[active] ? (
+          <img
+            key={active}
+            src={images[active]}
+            alt={`${product.name} ${active + 1}`}
+            onError={() => setErr(e => ({ ...e, [active]: true }))}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 28, boxSizing: 'border-box' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d1d5db', fontSize: 32 }}>📷</div>
+        )}
+        {images.length > 1 && (
+          <>
+            <button onClick={prev} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.92)', border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>‹</button>
+            <button onClick={next} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.92)', border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>›</button>
+            <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.45)', color: '#fff', fontSize: 11.5, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>
+              {active + 1} / {images.length}
+            </div>
+          </>
+        )}
       </div>
-      <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{cat?.label ?? 'Product'}</span>
+
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {images.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              style={{
+                width: 64, height: 64, borderRadius: 8, overflow: 'hidden', padding: 0, cursor: 'pointer',
+                border: `2px solid ${i === active ? '#0a5c35' : '#e5e7eb'}`,
+                background: '#f9fafb', flexShrink: 0,
+                boxShadow: i === active ? '0 0 0 2px rgba(10,92,53,0.2)' : 'none',
+              }}
+            >
+              {!err[i] ? (
+                <img
+                  src={src}
+                  alt=""
+                  onError={() => setErr(e => ({ ...e, [i]: true }))}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4, boxSizing: 'border-box' }}
+                />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📷</div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -154,18 +308,18 @@ export default function ProductDetailPage({ product }: { product: Product }) {
 
           {/* Image panel */}
           <div>
-            <div style={{ aspectRatio: '4/3', borderRadius: 16, overflow: 'hidden', border: '1px solid #e5e7eb', background: '#f9fafb' }}>
-              <ProductImage product={product} />
+            <ProductGallery product={product} />
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              {cat && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 12px', borderRadius: 20, background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                  <span>{cat.icon}</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: '#0a5c35' }}>{cat.label}</span>
+                </div>
+              )}
+              {articleNr && (
+                <p style={{ fontSize: 11.5, color: '#9ca3af' }}>Art. nr. {articleNr}</p>
+              )}
             </div>
-            {cat && (
-              <div style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 12px', borderRadius: 20, background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-                <span>{cat.icon}</span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: '#0a5c35' }}>{cat.label}</span>
-              </div>
-            )}
-            {articleNr && (
-              <p style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 8 }}>Art. nr. {articleNr}</p>
-            )}
           </div>
 
           {/* Info panel */}
