@@ -16,6 +16,17 @@ export default function LoginPage() {
         padding: '32px 28px',
       }}
     >
+      <Link
+        href="/"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          fontSize: 13, color: 'var(--text-tertiary)', textDecoration: 'none',
+          marginBottom: 20,
+        }}
+      >
+        ← Terug naar website
+      </Link>
+
       <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, letterSpacing: '-0.02em' }}>
         Inloggen
       </h1>
