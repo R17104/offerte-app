@@ -29,11 +29,12 @@ export default async function DashboardPage() {
   const todayStart  = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const todayEnd    = new Date(todayStart.getTime() + 86400000)
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000)
+  const tenDaysAgo    = new Date(now.getTime() - 10 * 86400000)
 
   const [
     quoteStats, recentQuotes,
     leadStats, followUpToday,
-    newLeads30, pipelineAgg,
+    newLeads30, sentLast10Agg,
     closedDealsAgg,
     quotes30, perVerkoper,
     todos, users,
@@ -50,7 +51,11 @@ export default async function DashboardPage() {
       select: { id: true, firstName: true, lastName: true, followUpAt: true, status: true, assignedTo: { select: { name: true } } },
     }),
     prisma.lead.count({ where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.quote.aggregate({ _sum: { total: true }, where: { archivedAt: null, status: { in: ['DRAFT', 'SENT'] } } }),
+    // offertes verstuurd afgelopen 10 dagen
+    prisma.quote.aggregate({
+      _sum: { total: true }, _count: true,
+      where: { archivedAt: null, sentAt: { gte: tenDaysAgo } },
+    }),
     prisma.quote.aggregate({ _sum: { total: true }, where: { archivedAt: null, status: 'ACCEPTED' } }),
     // last 30 days: accepted + sent + rejected (for conversion rate)
     prisma.quote.groupBy({
@@ -71,9 +76,10 @@ export default async function DashboardPage() {
     prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } }),
   ])
 
-  const totalLeads     = leadStats.reduce((s, r) => s + r._count, 0)
-  const pipelineValue  = pipelineAgg._sum.total ?? 0
-  const closedValue    = closedDealsAgg._sum.total ?? 0
+  const totalLeads      = leadStats.reduce((s, r) => s + r._count, 0)
+  const sentLast10Value = sentLast10Agg._sum.total ?? 0
+  const sentLast10Count = sentLast10Agg._count ?? 0
+  const closedValue     = closedDealsAgg._sum.total ?? 0
 
   // 30-day conversion
   const accepted30 = quotes30.find((r) => r.status === 'ACCEPTED')?._count ?? 0
@@ -118,10 +124,11 @@ export default async function DashboardPage() {
           href="/leads"
         />
         <StatCard
-          label="Pipeline waarde"
-          value={formatCurrency(pipelineValue)}
-          sub="openstaande offertes"
+          label="Potentiële waarde (10 dgn)"
+          value={formatCurrency(sentLast10Value)}
+          sub={`${sentLast10Count} offertes verstuurd`}
           color="#0a5c35"
+          href="/quotes"
         />
         <StatCard
           label="Leads totaal"

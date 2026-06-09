@@ -17,7 +17,7 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
 
 export default async function GetekendeOffertesPage() {
-  const { userId } = await verifySession()
+  const { userId, role } = await verifySession()
 
   const quotes = await prisma.quote.findMany({
     where: {
