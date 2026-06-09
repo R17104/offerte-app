@@ -981,26 +981,6 @@ export default async function PublicQuotePage({ params }: Props) {
               ))}
             </div>
 
-            {totalYearlyBenefit > 0 && (
-              <div style={{ background: '#111827', borderRadius: 14, padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
-                <div>
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Totaal financieel voordeel per jaar</p>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-                    {[
-                      quote.hasSolarPanels && saldingYearlyExtra > 0 ? 'saldering' : null,
-                      feedInYearlyCost > 0 ? 'terugleverkosten' : null,
-                      emsRevenue > 0 ? 'EMS' : null,
-                    ].filter(Boolean).join(' + ')}
-                  </p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: 44, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.02em' }}>
-                    €{totalYearlyBenefit.toLocaleString('nl-NL')}
-                  </p>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>= €{totalMonthlyBenefit}/maand</p>
-                </div>
-              </div>
-            )}
 
             {emsRevenue === 0 && (
               <p style={{ fontSize: 11.5, color: '#9ca3af', lineHeight: 1.6 }}>

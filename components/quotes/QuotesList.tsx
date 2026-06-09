@@ -2,7 +2,6 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { bulkArchiveQuotes, bulkUnarchiveQuotes, bulkExpireQuotes, bulkDeleteQuotes } from '@/lib/actions/quote.actions'
 import { archiveQuote, unarchiveQuote } from '@/lib/actions/quote.actions'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
@@ -120,26 +119,24 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
             const meta = STATUS_META[q.status] ?? STATUS_META.DRAFT
             const isSelected = selected.has(q.id)
             return (
-              <tr key={q.id} style={{ borderBottom: '1px solid var(--border)', background: isSelected ? 'rgba(10,92,53,0.04)' : undefined }}
+              <tr key={q.id}
+                onClick={() => router.push(`/quotes/${q.id}`)}
+                style={{ borderBottom: '1px solid var(--border)', background: isSelected ? 'rgba(10,92,53,0.04)' : undefined, cursor: 'pointer' }}
                 onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--bg-elevated)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = isSelected ? 'rgba(10,92,53,0.04)' : '' }}
               >
-                <td style={{ padding: '10px 14px' }}>
+                <td style={{ padding: '10px 14px' }} onClick={(e) => e.stopPropagation()}>
                   <Cb checked={isSelected} onChange={() => toggle(q.id)} />
                 </td>
-                <td style={{ padding: '10px 14px', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
-                  <Link href={`/quotes/${q.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>{q.quoteNumber}</Link>
-                </td>
-                <td style={{ padding: '10px 14px' }}>
-                  <Link href={`/quotes/${q.id}`} style={{ fontWeight: 500, textDecoration: 'none', color: 'var(--text-primary)' }}>{q.title}</Link>
-                </td>
+                <td style={{ padding: '10px 14px', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>{q.quoteNumber}</td>
+                <td style={{ padding: '10px 14px', fontWeight: 500, color: 'var(--text-primary)' }}>{q.title}</td>
                 <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{q.customer.firstName} {q.customer.lastName}</td>
                 <td style={{ padding: '10px 14px' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 9px', borderRadius: 20, fontSize: 12, fontWeight: 500, color: meta.color, background: meta.bg }}>{meta.label}</span>
                 </td>
                 <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-primary)', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(q.total)}</td>
                 <td style={{ padding: '10px 14px', fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(showArchived ? q.archivedAt : q.createdAt)}</td>
-                <td style={{ padding: '10px 14px' }}>
+                <td style={{ padding: '10px 14px' }} onClick={(e) => e.stopPropagation()}>
                   <ConfirmButton
                     action={showArchived ? unarchiveQuote.bind(null, q.id) : archiveQuote.bind(null, q.id)}
                     label={showArchived ? 'Terugzetten' : 'Archiveren'}
