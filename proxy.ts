@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { decrypt } from '@/lib/session'
 
-const PUBLIC_PATHS = ['/', '/login', '/register', '/offerte']
+const PUBLIC_PATHS = ['/', '/login', '/register', '/offerte', '/producten']
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl

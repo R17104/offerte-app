@@ -66,7 +66,7 @@ function Header() {
         </div>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {[['Werkwijze', '#werkwijze'], ['Diensten', '#diensten'], ['Ervaringen', '#ervaringen']].map(([l, h]) => (
+          {[['Producten', '/producten'], ['Werkwijze', '#werkwijze'], ['Diensten', '#diensten'], ['Ervaringen', '#ervaringen']].map(([l, h]) => (
             <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, fontWeight: 500 }}>{l}</a>
           ))}
           <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: '8px 18px', fontSize: 13.5, marginLeft: 6, boxShadow: 'none' }}>
