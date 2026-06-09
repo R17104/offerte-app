@@ -5,7 +5,7 @@ import { verifySession } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
 import SeoLeadsView from '@/components/leads/SeoLeadsView'
 
-const SEO_SOURCES = ['Website', 'Website – offerte aanvraag', 'thuisbatterij']
+const SEO_SOURCES = ['Website', 'Website – offerte aanvraag']
 
 export default async function SeoLeadsPage() {
   await verifySession()
