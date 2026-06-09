@@ -23,7 +23,8 @@ const nav = [
   {
     label: 'Leads',
     items: [
-      { href: '/leads', label: 'Leads', icon: IconLeads },
+      { href: '/seo-leads', label: 'SEO Leads', icon: IconGlobe },
+      { href: '/leads', label: 'Alle leads', icon: IconLeads },
     ],
   },
 ]
@@ -233,6 +234,15 @@ function IconDoc({ size = 16, color = 'currentColor' }) {
     <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
       <rect x="2" y="1" width="12" height="14" rx="2" stroke={color} strokeWidth="1.3" />
       <path d="M5 5h6M5 8h6M5 11h4" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconGlobe({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="6.5" stroke={color} strokeWidth="1.3" />
+      <path d="M8 1.5c-2 2-3 4-3 6.5s1 4.5 3 6.5M8 1.5c2 2 3 4 3 6.5s-1 4.5-3 6.5M1.5 8h13" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
     </svg>
   )
 }
