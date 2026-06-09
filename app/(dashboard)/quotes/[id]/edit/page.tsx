@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { PageContainer, PageHeader } from '@/components/ui'
 import QuoteEditForm from '@/components/quotes/QuoteEditForm'
 import { verifySession } from '@/lib/dal'
@@ -51,6 +51,7 @@ export default async function QuoteEditPage({ params }: Props) {
   ])
 
   if (!quote) notFound()
+  if (quote.status === 'ACCEPTED') redirect(`/quotes/${id}`)
 
   const warning = STATUS_WARNINGS[quote.status]
 

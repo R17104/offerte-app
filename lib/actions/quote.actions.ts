@@ -147,9 +147,10 @@ export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Pro
 
   const quote = await prisma.quote.findUnique({
     where: { id: quoteId, createdById: userId },
-    select: { id: true },
+    select: { id: true, status: true },
   })
   if (!quote) throw new Error('Offerte niet gevonden')
+  if (quote.status === 'ACCEPTED') throw new Error('Geaccepteerde offertes kunnen niet worden gewijzigd')
 
   const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, discountAmount)
 
@@ -198,9 +199,10 @@ export async function updateQuoteStatus(quoteId: string, status: string) {
 
   const quote = await prisma.quote.findUnique({
     where: { id: quoteId, createdById: userId },
-    select: { id: true },
+    select: { id: true, status: true },
   })
   if (!quote) throw new Error('Offerte niet gevonden')
+  if (quote.status === 'ACCEPTED') throw new Error('Geaccepteerde offertes kunnen niet worden gewijzigd')
 
   const data: Record<string, unknown> = { status }
   if (status === 'SENT')     data.sentAt     = new Date()
@@ -283,9 +285,10 @@ export async function deleteQuote(id: string) {
 
   const quote = await prisma.quote.findUnique({
     where: { id, createdById: userId },
-    select: { id: true },
+    select: { id: true, status: true },
   })
   if (!quote) throw new Error('Offerte niet gevonden')
+  if (quote.status === 'ACCEPTED') throw new Error('Geaccepteerde offertes kunnen niet worden verwijderd')
 
   await prisma.quoteAcceptance.deleteMany({ where: { quoteId: id } })
   await prisma.quoteLine.deleteMany({ where: { quoteId: id } })
@@ -314,14 +317,14 @@ export async function bulkUnarchiveQuotes(ids: string[]): Promise<void> {
 export async function bulkExpireQuotes(ids: string[]): Promise<void> {
   const { userId } = await verifySession()
   if (!ids.length) return
-  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { status: 'EXPIRED' } })
+  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId, status: { not: 'ACCEPTED' } }, data: { status: 'EXPIRED' } })
   revalidatePath('/quotes')
 }
 
 export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
   const { userId } = await verifySession()
   if (!ids.length) return
-  const owned = await prisma.quote.findMany({ where: { id: { in: ids }, createdById: userId }, select: { id: true } })
+  const owned = await prisma.quote.findMany({ where: { id: { in: ids }, createdById: userId, status: { not: 'ACCEPTED' } }, select: { id: true } })
   const ownedIds = owned.map((q) => q.id)
   if (!ownedIds.length) return
   await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: ownedIds } } })

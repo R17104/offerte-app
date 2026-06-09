@@ -84,9 +84,11 @@ export default async function QuoteDetailPage({ params }: Props) {
         back={{ href: isArchived ? '/quotes?archived=1' : '/quotes', label: 'Offertes' }}
         action={
           <div style={{ display: 'flex', gap: 10 }}>
-            <SecondaryButton href={`/quotes/${id}/edit`} style={{ fontSize: 12.5, padding: '6px 12px' }}>
-              Bewerken
-            </SecondaryButton>
+            {!isAccepted && (
+              <SecondaryButton href={`/quotes/${id}/edit`} style={{ fontSize: 12.5, padding: '6px 12px' }}>
+                Bewerken
+              </SecondaryButton>
+            )}
             <SecondaryButton href={publicUrl} style={{ fontSize: 12.5, padding: '6px 12px' }}>
               Publieke link ↗
             </SecondaryButton>
