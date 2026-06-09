@@ -4,16 +4,17 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 const SLIDES = [
+  // ── AlphaESS installaties (6) ────────────────────────────────────────────────
   {
-    image: 'https://zinvolt.com/cdn/shop/files/ZinVolt_Base.jpg?v=1769761959&width=1200',
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
     name: 'Familie Hoekstra',
     city: 'Leeuwarden',
     stars: 5,
     quote: 'Al na 4 maanden merk ik het enorm in mijn stroomrekening. De installatie was binnen een dag klaar, super netjes gedaan!',
-    product: 'ZinVolt 6 kWh thuisbatterij',
+    product: 'AlphaESS 9,3 kWh thuisbatterij',
   },
   {
-    image: 'https://zinvolt.com/cdn/shop/files/ZinVolt_Stack.jpg?v=1766484402&width=1920',
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png',
     name: 'Dhr. de Vries',
     city: 'Drachten',
     stars: 5,
@@ -21,23 +22,23 @@ const SLIDES = [
     product: 'AlphaESS 9,3 kWh + noodstroom',
   },
   {
-    image: 'https://images.unsplash.com/photo-1619641805634-b867f535071c?fm=jpg&q=70&w=1200&auto=format&fit=crop',
+    image: 'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_006.png',
     name: 'Mevr. Bakker',
     city: 'Sneek',
     stars: 5,
-    quote: 'Bespaarhulp Friesland dacht goed mee, geen opdringerige verkoop. Ze rekenden eerlijk uit wat het zou opleveren en dat klopte ook.',
+    quote: 'Ze rekenden eerlijk uit wat het zou opleveren en dat klopte ook. Ik bespaar nu meer dan €90 per maand.',
     product: 'AlphaESS 3,8 kWh thuisbatterij',
   },
   {
-    image: 'https://images.unsplash.com/photo-1676337167616-78853693ba3a?fm=jpg&q=70&w=1200&auto=format&fit=crop',
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png',
     name: 'Familie Visser',
     city: 'Heerenveen',
     stars: 5,
     quote: 'We combineerden de batterij met onze bestaande zonnepanelen. Nu gebruiken we overdag én \'s avonds onze eigen stroom. Geweldig!',
-    product: 'ZinVolt Power + zonnepanelen combo',
+    product: 'AlphaESS + zonnepanelen',
   },
   {
-    image: 'https://zinvolt.com/cdn/shop/files/ZinVolt_Base-01.jpg?v=1766482027&width=1200',
+    image: 'https://www.vekto.nl/media/catalog/product/t/h/thuisbatterij_bewerkt_002.png',
     name: 'Dhr. Dijkstra',
     city: 'Franeker',
     stars: 5,
@@ -45,28 +46,29 @@ const SLIDES = [
     product: 'AlphaESS SMILE-G3 systeem',
   },
   {
-    image: 'https://images.unsplash.com/photo-1605191737662-98ba90cb953e?fm=jpg&q=70&w=1200&auto=format&fit=crop',
-    name: 'Familie Meijer',
-    city: 'Bolsward',
-    stars: 5,
-    quote: 'Gewoon top advies gekregen. Ze zijn eerlijk over wat het kost én wat het oplevert. Geen verrassingen achteraf.',
-    product: 'ZinVolt Mate starter pakket',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1742899273038-67ff67477663?fm=jpg&q=70&w=1200&auto=format&fit=crop',
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-008.png',
     name: 'Mevr. Smit',
     city: 'Dokkum',
     stars: 5,
     quote: 'Na de stroomstoring vorig jaar wilde ik een noodstroomoplossing. Nu staat er een complete AlphaESS backup in de garage. Nooit meer zorgen.',
     product: 'AlphaESS BackupBox noodstroom',
   },
+  // ── Sigenergy installaties (2) ───────────────────────────────────────────────
   {
-    image: 'https://zinvolt.com/cdn/shop/files/Productfoto_s-1.jpg?v=1770039870&width=1200',
+    image: 'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
+    name: 'Familie Meijer',
+    city: 'Bolsward',
+    stars: 5,
+    quote: 'We kozen voor Sigenergy vanwege de modulaire opbouw. Begonnen met 6 kWh en later uitgebreid. Flexibel en toekomstbestendig systeem.',
+    product: 'Sigenergy SigenStor 6 kWh',
+  },
+  {
+    image: 'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-thuisbatterij-10-kwh.jpg',
     name: 'Dhr. van der Berg',
     city: 'Harlingen',
     stars: 5,
     quote: 'Professioneel bedrijf, snelle installatie en goede nazorg. Mijn energierekening is met 60% gedaald vergeleken met vorig jaar.',
-    product: 'ZinVolt Power 6 kWh compleet pakket',
+    product: 'Sigenergy SigenStor 9 kWh',
   },
 ]
 

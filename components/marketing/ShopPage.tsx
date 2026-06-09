@@ -207,7 +207,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
                 {visible.map(p => {
                   const cat = CAT[p.category ?? '']
                   const inclPrice = p.unitPrice * (1 + p.vatRate / 100)
-                  const isBestSeller = p.name.includes('ZinVolt Power')
+                  const isBestSeller = p.name.includes('9,3 kWh') || p.name.includes('9.3 kWh')
                   const isPopular = p.name.includes('9.3kWh') || p.name.includes('9,3kWh')
 
                   return (

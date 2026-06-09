@@ -108,19 +108,6 @@ const GALLERIES: Record<string, string[]> = {
     'https://www.vekto.nl/media/catalog/product/f/7/f781822d44316b52235774b1e0deaf44.jpg',
     'https://www.vekto.nl/media/catalog/product/c/b/cbcc28dca58b26fb889f42506751845a.jpg',
   ],
-  // ZinVolt 3 fase verdeler
-  'https://www.vekto.nl/media/catalog/product/0/5/05fcfc67a6184aeab9bbfa7574b04008.jpg': [
-    'https://www.vekto.nl/media/catalog/product/0/5/05fcfc67a6184aeab9bbfa7574b04008.jpg',
-    'https://www.vekto.nl/media/catalog/product/f/1/f1d6d74131e9517eb60e728a67abd08c.jpg',
-    'https://www.vekto.nl/media/catalog/product/4/a/4aa103c06bee8513230373c4948387be.jpg',
-    'https://www.vekto.nl/media/catalog/product/d/f/df0804ddaa520b36313530dc2ec590d0.jpg',
-    'https://www.vekto.nl/media/catalog/product/7/8/78a6b2814482f7ec108c3d9a65ed62c0.jpg',
-    'https://www.vekto.nl/media/catalog/product/a/3/a3ef2c6e4d0cccab938eac2c4e699a84.jpg',
-    'https://www.vekto.nl/media/catalog/product/b/8/b8c25ed158efc6d2d7112216f07ff6ae.jpg',
-    'https://www.vekto.nl/media/catalog/product/e/3/e39a2289788b5a60c838e191bab46ed5.jpg',
-    'https://www.vekto.nl/media/catalog/product/5/2/52fe5fde304574bd8ece2b48755e7cf2.jpg',
-  ],
-
   // Sigenergy EC SP hybride omvormer (1-fase)
   'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg': [
     'https://zonnigewinkel.nl/wp-content/uploads/2026/01/Sinergy-omvormer-hybride-thuisbatterij.jpg',
