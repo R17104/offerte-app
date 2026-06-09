@@ -148,13 +148,13 @@ export default function ProductDetailPage({ product }: { product: Product }) {
               <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{fmt(product.unitPrice)} excl. {product.vatRate}% btw</div>
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <Link
-                  href="/#contact"
+                  href={`/gratis-advies?product=${encodeURIComponent(product.name)}`}
                   style={{ display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 10, background: '#0a5c35', color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
                 >
                   Vraag offerte aan
                 </Link>
                 <Link
-                  href="/#contact"
+                  href={`/gratis-advies?product=${encodeURIComponent(product.name)}`}
                   style={{ display: 'block', textAlign: 'center', padding: '11px 20px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', color: '#374151', fontSize: 13.5, fontWeight: 600, textDecoration: 'none' }}
                 >
                   Gratis adviesgesprek inplannen
@@ -235,7 +235,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
             Onze adviseurs berekenen gratis of dit product rendabel is voor uw situatie. Geen verkoopdruk, gewoon eerlijk advies.
           </p>
           <Link
-            href="/#contact"
+            href={`/gratis-advies?product=${encodeURIComponent(product.name)}`}
             style={{ padding: '14px 32px', borderRadius: 12, background: '#f5c442', color: '#052e1a', fontSize: 15, fontWeight: 800, textDecoration: 'none', display: 'inline-block' }}
           >
             Gratis advies aanvragen →

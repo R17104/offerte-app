@@ -160,7 +160,7 @@ export async function createLeadFromLanding({
     ?? await prisma.user.findFirst({ orderBy: { createdAt: 'asc' } })
   if (!systemUser) return
 
-  await prisma.lead.create({
+  const lead = await prisma.lead.create({
     data: {
       firstName,
       lastName,
@@ -172,6 +172,13 @@ export async function createLeadFromLanding({
       createdById: systemUser.id,
     },
   })
+
+  if (bericht?.trim()) {
+    await prisma.leadNote.create({
+      data: { leadId: lead.id, content: bericht.trim(), authorId: systemUser.id },
+    })
+  }
+
   revalidatePath('/leads')
   revalidatePath('/dashboard')
 }

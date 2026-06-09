@@ -195,7 +195,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
               <p style={{ fontSize: 12.5, color: '#4b7c5e', lineHeight: 1.6, marginBottom: 12 }}>
                 Niet zeker welk product bij u past? Onze adviseurs helpen gratis en vrijblijvend.
               </p>
-              <Link href="/#contact" style={{ display: 'block', textAlign: 'center', padding: '8px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+              <Link href="/gratis-advies" style={{ display: 'block', textAlign: 'center', padding: '8px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
                 Gratis advies →
               </Link>
             </div>
@@ -265,7 +265,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
                           {/* CTA */}
                           <div style={{ display: 'flex', gap: 7 }}>
                             <Link
-                              href="/#contact"
+                              href={`/gratis-advies?product=${encodeURIComponent(p.name)}`}
                               style={{ flex: 1, padding: '8px 10px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
                             >
                               Vraag offerte aan
