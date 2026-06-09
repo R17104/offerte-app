@@ -174,15 +174,25 @@ export default function ShopPage({ products }: { products: Product[] }) {
               })}
             </div>
 
-            {/* Info block */}
+            {/* Quiz block */}
             <div style={{ marginTop: 28, background: '#f0fdf4', borderRadius: 12, padding: '16px 14px', border: '1px solid #bbf7d0' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35', marginBottom: 6 }}>Advies nodig?</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35', marginBottom: 6 }}>Niet zeker welk product?</p>
               <p style={{ fontSize: 12.5, color: '#4b7c5e', lineHeight: 1.6, marginBottom: 12 }}>
-                Niet zeker welk product bij u past? Onze adviseurs helpen gratis en vrijblijvend.
+                Doe de gratis quiz en ontvang een persoonlijk productadvies in 2 minuten.
               </p>
-              <Link href="/gratis-advies" style={{ display: 'block', textAlign: 'center', padding: '8px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
-                Gratis advies →
+              <Link href="/welk-product" style={{ display: 'block', textAlign: 'center', padding: '8px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+                Start de quiz →
               </Link>
+              <Link href="/gratis-advies" style={{ display: 'block', textAlign: 'center', padding: '7px', borderRadius: 8, border: '1px solid #bbf7d0', color: '#0a5c35', fontSize: 12, fontWeight: 600, textDecoration: 'none', marginTop: 6 }}>
+                Of vraag gratis advies
+              </Link>
+            </div>
+
+            {/* Pricing note */}
+            <div style={{ marginTop: 14, background: '#fffbeb', borderRadius: 10, padding: '12px 14px', border: '1px solid #fde68a' }}>
+              <p style={{ fontSize: 12, color: '#92400e', lineHeight: 1.55 }}>
+                💡 <strong>Prijzen zijn exclusief installatie.</strong> Installatiekosten worden besproken in het gratis adviesgesprek.
+              </p>
             </div>
           </aside>
 
@@ -197,6 +207,8 @@ export default function ShopPage({ products }: { products: Product[] }) {
                 {visible.map(p => {
                   const cat = CAT[p.category ?? '']
                   const inclPrice = p.unitPrice * (1 + p.vatRate / 100)
+                  const isBestSeller = p.name.includes('ZinVolt Power')
+                  const isPopular = p.name.includes('9.3kWh') || p.name.includes('9,3kWh')
 
                   return (
                     <div
@@ -211,6 +223,16 @@ export default function ShopPage({ products }: { products: Product[] }) {
                         {cat && (
                           <div style={{ position: 'absolute', top: 10, left: 10, padding: '3px 9px', borderRadius: 20, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)', fontSize: 11, fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>
                             {cat.icon} {cat.label}
+                          </div>
+                        )}
+                        {isBestSeller && (
+                          <div style={{ position: 'absolute', top: 10, right: 10, padding: '3px 9px', borderRadius: 20, background: '#f5c442', fontSize: 10.5, fontWeight: 800, color: '#052e1a' }}>
+                            ★ Meest gekozen
+                          </div>
+                        )}
+                        {isPopular && !isBestSeller && (
+                          <div style={{ position: 'absolute', top: 10, right: 10, padding: '3px 9px', borderRadius: 20, background: '#0a5c35', fontSize: 10.5, fontWeight: 800, color: '#fff' }}>
+                            Populair
                           </div>
                         )}
                       </div>

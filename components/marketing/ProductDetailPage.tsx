@@ -32,6 +32,52 @@ function fmt(n: number) {
   return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n)
 }
 
+function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPrice: number }) {
+  const [kwh, setKwh] = useState(3500)
+  const usable = capacityKwh * 0.85
+  const dailyShift = Math.min(usable, (kwh / 365) * 0.55)
+  const annualSavings = Math.round(dailyShift * 365 * 0.27)
+  const payback = annualSavings > 0 ? (inclPrice / annualSavings).toFixed(1) : '—'
+  const tenYr = annualSavings * 10 - inclPrice
+
+  return (
+    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: 18, marginBottom: 20 }}>
+      <p style={{ fontSize: 12.5, fontWeight: 700, color: '#0a5c35', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+        🧮 Bereken uw besparing
+      </p>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+          <label style={{ fontSize: 12.5, color: '#374151' }}>Jaarverbruik stroom</label>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35' }}>{kwh.toLocaleString('nl-NL')} kWh</span>
+        </div>
+        <input
+          type="range" min={1000} max={8000} step={100} value={kwh}
+          onChange={e => setKwh(+e.target.value)}
+          style={{ width: '100%', accentColor: '#0a5c35' }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#9ca3af', marginTop: 2 }}>
+          <span>1.000 kWh</span><span>8.000 kWh</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        {[
+          { label: 'Besparing/jaar', value: `€ ${annualSavings}`, highlight: true },
+          { label: 'Terugverdientijd', value: `${payback} jaar`, highlight: false },
+          { label: 'Winst na 10 jaar', value: tenYr > 0 ? `€ ${tenYr.toLocaleString('nl-NL')}` : '–', highlight: tenYr > 0 },
+        ].map(item => (
+          <div key={item.label} style={{ background: item.highlight ? '#0a5c35' : '#fff', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 8px', textAlign: 'center' }}>
+            <div style={{ fontSize: 15, fontWeight: 900, color: item.highlight ? '#fff' : '#111827' }}>{item.value}</div>
+            <div style={{ fontSize: 10.5, color: item.highlight ? 'rgba(255,255,255,0.75)' : '#9ca3af', marginTop: 2 }}>{item.label}</div>
+          </div>
+        ))}
+      </div>
+      <p style={{ fontSize: 10.5, color: '#9ca3af', marginTop: 10, lineHeight: 1.5 }}>
+        Indicatieve berekening op basis van gemiddeld stroomtarief (€0,27/kWh) en dagelijks laad-/ontlaadcyclus. Werkelijke besparing afhankelijk van situatie.
+      </p>
+    </div>
+  )
+}
+
 function ProductImage({ product }: { product: Product }) {
   const [err, setErr] = useState(false)
   const cat = CAT[product.category ?? '']
@@ -184,6 +230,11 @@ export default function ProductDetailPage({ product }: { product: Product }) {
                   )}
                 </div>
               </div>
+            )}
+
+            {/* Savings calculator — only for batteries with capacity */}
+            {product.category === 'BATTERY' && product.capacityKwh != null && (
+              <SavingsCalc capacityKwh={product.capacityKwh} inclPrice={inclPrice} />
             )}
 
             {/* USPs */}
