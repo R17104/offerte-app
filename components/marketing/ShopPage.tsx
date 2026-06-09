@@ -175,14 +175,14 @@ export default function ShopPage({ products }: { products: Product[] }) {
               })}
             </div>
 
-            {/* Quiz block */}
+            {/* Batterij check block */}
             <div style={{ marginTop: 28, background: '#f0fdf4', borderRadius: 12, padding: '16px 14px', border: '1px solid #bbf7d0' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35', marginBottom: 6 }}>Niet zeker welk product?</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35', marginBottom: 6 }}>Welke batterij past bij u?</p>
               <p style={{ fontSize: 12.5, color: '#4b7c5e', lineHeight: 1.6, marginBottom: 12 }}>
-                Doe de gratis quiz en ontvang een persoonlijk productadvies in 2 minuten.
+                Doe de gratis batterijcheck en ontdek in 2 minuten welk formaat het beste bij uw situatie past.
               </p>
               <Link href="/welk-product" style={{ display: 'block', textAlign: 'center', padding: '8px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
-                Start de quiz →
+                Start de batterijcheck →
               </Link>
               <Link href="/gratis-advies" style={{ display: 'block', textAlign: 'center', padding: '7px', borderRadius: 8, border: '1px solid #bbf7d0', color: '#0a5c35', fontSize: 12, fontWeight: 600, textDecoration: 'none', marginTop: 6 }}>
                 Of vraag gratis advies
