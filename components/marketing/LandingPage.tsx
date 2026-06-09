@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
+import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 
 // ── Calculator logic ──────────────────────────────────────────────────────────
 
@@ -595,6 +596,7 @@ export default function LandingPage() {
       <Testimonials />
       <ContactForm />
       <Footer />
+      <WhatsAppButton />
     </div>
   )
 }

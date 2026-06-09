@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 
 type Product = {
   id: string
@@ -283,6 +284,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
           <Link href="/login" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Medewerker login</Link>
         </div>
       </footer>
+      <WhatsAppButton />
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
+import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 
 const inp: React.CSSProperties = {
   width: '100%', padding: '12px 14px', borderRadius: 10, border: '1.5px solid #d1d5db',
@@ -176,6 +177,7 @@ export default function AdviesPage({ product }: { product?: string }) {
           <Link href="/login" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Medewerker login</Link>
         </div>
       </footer>
+      <WhatsAppButton />
     </div>
   )
 }
