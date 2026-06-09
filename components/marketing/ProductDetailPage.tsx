@@ -433,7 +433,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
       {/* Trust bar */}
       <div style={{ background: '#0a5c35', padding: '10px clamp(16px,4vw,48px)' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', gap: 'clamp(16px,3vw,40px)', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {['Gratis en vrijblijvend advies','Gecertificeerde installateurs','Heel Friesland','Geen verkoopdruk'].map(t => (
+          {['Gratis en vrijblijvend advies','Gecertificeerde installateurs','Heel Friesland'].map(t => (
             <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
               <span style={{ width: 17, height: 17, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>✓</span>
               <span style={{ fontSize: 12.5, fontWeight: 500, color: 'rgba(255,255,255,0.9)' }}>{t}</span>
@@ -573,7 +573,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
             Interesse in {product.name}?
           </h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', maxWidth: 500, lineHeight: 1.65 }}>
-            Onze adviseurs berekenen gratis of dit product rendabel is voor uw situatie. Geen verkoopdruk, gewoon eerlijk advies.
+            Onze adviseurs berekenen gratis of dit product rendabel is voor uw situatie.
           </p>
           <Link
             href={`/offerte-aanvragen?product=${product.id}`}

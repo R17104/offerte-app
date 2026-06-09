@@ -84,7 +84,6 @@ export default function AdviesPage({ product }: { product?: string }) {
             {[
               { icon: '📞', title: 'Wij bellen u terug', desc: 'Binnen één werkdag neemt een adviseur contact op, op een moment dat u schikt.' },
               { icon: '🧮', title: 'Persoonlijk berekening', desc: 'We berekenen precies wat uw besparing zou zijn op basis van uw situatie.' },
-              { icon: '✅', title: 'Geen verkoopdruk', desc: 'Onafhankelijk advies. U bent nergens aan verplicht.' },
               { icon: '📍', title: 'Heel Friesland', desc: 'Wij zijn actief door heel Friesland en kennen de lokale markt.' },
             ].map(item => (
               <div key={item.title} style={{ display: 'flex', gap: 14 }}>

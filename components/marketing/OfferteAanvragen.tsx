@@ -485,7 +485,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
 
             {/* Vertrouwen */}
             <div style={{ display: 'flex', gap: 24, justifyContent: 'center', marginTop: 24, flexWrap: 'wrap' }}>
-              {['100% vrijblijvend', 'Geen verkoopdruk', 'Gecertificeerde installateurs'].map(t => (
+              {['100% vrijblijvend', 'Gecertificeerde installateurs'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6b7280' }}>
                   <span style={{ color: '#0a5c35', fontWeight: 700 }}>✓</span> {t}
                 </div>

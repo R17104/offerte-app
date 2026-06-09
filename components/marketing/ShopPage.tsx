@@ -117,7 +117,6 @@ export default function ShopPage({ products }: { products: Product[] }) {
             { icon: '✓', text: 'Gratis en vrijblijvend advies' },
             { icon: '✓', text: 'Gecertificeerde installateurs' },
             { icon: '✓', text: 'Heel Friesland' },
-            { icon: '✓', text: 'Geen verkoopdruk' },
           ].map(item => (
             <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
               <span style={{ width: 17, height: 17, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{item.icon}</span>

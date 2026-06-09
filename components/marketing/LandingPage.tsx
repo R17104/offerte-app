@@ -135,7 +135,6 @@ function HeroSection() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 36 }}>
             {[
               'Gratis advies, altijd vrijblijvend',
-              'Geen verkoopdruk, eerlijk advies',
               'Gecertificeerde installateurs in uw regio',
             ].map(item => (
               <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -408,7 +407,7 @@ function Diensten() {
 
 function Testimonials() {
   const reviews = [
-    { quote: 'Na het gratis adviesgesprek waren al onze vragen beantwoord. Geen enkele verkoopdruk. Nu besparen we meer dan €1.100 per jaar op onze energierekening.', name: 'Familie Bouma', city: 'Leeuwarden', stars: 5 },
+    { quote: 'Na het gratis adviesgesprek waren al onze vragen beantwoord. Nu besparen we meer dan €1.100 per jaar op onze energierekening.', name: 'Familie Bouma', city: 'Leeuwarden', stars: 5 },
     { quote: 'Binnen een week was de warmtepomp al geïnstalleerd. Ons gasverbruik is met meer dan 60% gedaald. Wat een verschil op de maandelijkse rekening!', name: 'Dhr. Dijkstra', city: 'Franeker', stars: 5 },
     { quote: 'Eindelijk eerlijk en onafhankelijk advies. Niet de duurste oplossing, maar de beste voor onze situatie. Dat waardeer je enorm.', name: 'Familie van der Berg', city: 'Sneek', stars: 5 },
   ]
@@ -491,7 +490,7 @@ function ContactForm() {
             Laat uw gegevens achter. Eén van onze adviseurs neemt binnen één werkdag contact op voor een gratis en volledig vrijblijvend gesprek.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {['Gratis en vrijblijvend advies', 'Binnen 1 werkdag reactie', 'Onafhankelijk, geen verkoopdruk', 'Wij kennen de Friese markt'].map(item => (
+            {['Gratis en vrijblijvend advies', 'Binnen 1 werkdag reactie', 'Wij kennen de Friese markt'].map(item => (
               <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(245,196,66,0.2)', border: '1.5px solid rgba(245,196,66,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: 11, color: '#f5c442', fontWeight: 800 }}>✓</span>
@@ -559,7 +558,7 @@ function Footer() {
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.12em', marginLeft: 7, textTransform: 'uppercase' }}>Friesland</span>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
-              Onafhankelijk energieadvies voor heel Friesland. Gratis, vrijblijvend en zonder verkoopdruk.
+              Onafhankelijk energieadvies voor heel Friesland. Gratis en vrijblijvend.
             </p>
           </div>
 
