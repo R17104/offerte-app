@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 // ── Exact dezelfde formule als in EnergyProfileSection.tsx / calcBatteryAdvice ──
 const ALPHA_SIZES = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
@@ -18,7 +19,7 @@ function calcAdvice(feedbackKwh: number, kwp: number, hasHeatPump: boolean) {
   else if (kwp >= 5) kwpExtra = kwp * 0.1
 
   const baseKwh = Math.max(4, dailySurplusAvg + heatPumpExtra + kwpExtra)
-  const recommended = ALPHA_SIZES.find(s => s >= baseKwh) ?? 18.6
+  const recommended = ALPHA_SIZES.find(s => s >= baseKwh) ?? ALPHA_SIZES[ALPHA_SIZES.length - 1]
 
   const absorbable = Math.min(recommended * 365 * 0.9, feedbackKwh * 0.85)
   const annualSavings = Math.round(absorbable * (ELECTRICITY_TARIFF - FEEDBACK_TARIFF))
@@ -87,6 +88,8 @@ export default function BatterijCheck({ products, variant = 'section' }: {
   products?: Product[]
   variant?: 'section' | 'page'
 }) {
+  const w = useWindowWidth()
+  const isMobile = w < 768
   const [hasSolar, setHasSolar] = useState(true)
   const [feedbackKwh, setFeedbackKwh] = useState(2000)
   const [kwp, setKwp] = useState(6)
@@ -106,7 +109,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
   const inner = (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: isPage ? 'repeat(auto-fit, minmax(300px, 1fr))' : '1fr 1fr',
+      gridTemplateColumns: (isPage || isMobile) ? '1fr' : '1fr 1fr',
       gap: 'clamp(20px, 3vw, 40px)',
       alignItems: 'start',
     }}>
@@ -129,7 +132,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
             <SliderField
               label="Jaarlijkse teruglevering aan het net"
               hint="Staat op uw energienota of in de app van uw energiebedrijf"
-              value={feedbackKwh} min={200} max={7000} step={100} unit="kWh/jaar"
+              value={feedbackKwh} min={200} max={20000} step={100} unit="kWh/jaar"
               onChange={setFeedbackKwh}
             />
             <SliderField
