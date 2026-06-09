@@ -553,6 +553,84 @@ function Testimonials() {
   )
 }
 
+// ── FAQ ───────────────────────────────────────────────────────────────────────
+
+function FAQ() {
+  const items = [
+    {
+      q: 'Wat kost een thuisbatterij in Friesland?',
+      a: 'Een thuisbatterij kost gemiddeld €4.000 tot €12.000, afhankelijk van merk en capaciteit. Met het Nationaal Warmtefonds kunt u rentevrij lenen als uw inkomen onder €60.000 ligt. Wij adviseren u gratis over de beste optie voor uw situatie.',
+    },
+    {
+      q: 'Wanneer is een thuisbatterij rendabel?',
+      a: 'Een thuisbatterij is het meest rendabel als u zonnepanelen heeft en de salderingsregeling afloopt. U bespaart gemiddeld €1.100 tot €1.400 per jaar. De terugverdientijd ligt doorgaans tussen de 7 en 12 jaar.',
+    },
+    {
+      q: 'Welke subsidies zijn er voor een thuisbatterij?',
+      a: 'Er is geen directe subsidie voor thuisbatterijen, maar u kunt rentevrij lenen via het Nationaal Warmtefonds. Sommige Friese gemeenten bieden aanvullende energieregelingen. Wij helpen u gratis bij alle beschikbare subsidies.',
+    },
+    {
+      q: 'Wat is het verschil tussen AlphaESS en Sigenergy?',
+      a: 'AlphaESS is een bewezen merk met eenheid tussen omvormer en batterij, ideaal voor uitbreiding. Sigenergy (SigenStor) biedt een modulair alles-in-één systeem met V2X mogelijkheden. Welk merk het beste bij u past hangt af van uw installatie en wensen.',
+    },
+    {
+      q: 'Hoe snel wordt mijn aanvraag behandeld?',
+      a: 'U ontvangt binnen 1 werkdag een reactie van een van onze adviseurs. Na het eerste gesprek plannen we een schouw in en ontvangt u een vrijblijvende offerte. Van aanvraag tot installatie duurt gemiddeld 2 tot 4 weken.',
+    },
+    {
+      q: 'In welke plaatsen in Friesland zijn jullie actief?',
+      a: 'Wij zijn actief in alle 18 Friese gemeenten: Leeuwarden, Drachten, Sneek, Heerenveen, Franeker, Harlingen, Dokkum, Joure, Bolsward en alle omliggende dorpen. Onze gecertificeerde installateurs rijden door heel Friesland.',
+    },
+  ]
+
+  return (
+    <section id="veelgestelde-vragen" style={{ background: '#fff', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+      <div style={{ maxWidth: 820, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>VEELGESTELDE VRAGEN</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 900, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+            Alles over thuisbatterijen in Friesland
+          </h2>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {items.map((item, i) => (
+            <FAQItem key={i} question={item.q} answer={item.a} last={i === items.length - 1} />
+          ))}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <a href="#contact" style={{ ...btn(), display: 'inline-flex' }}>
+            Stel uw vraag aan een adviseur →
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function FAQItem({ question, answer, last }: { question: string; answer: string; last: boolean }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ borderTop: '1px solid #e5e7eb', ...(last ? { borderBottom: '1px solid #e5e7eb' } : {}) }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '20px 4px', background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: 'inherit', textAlign: 'left', gap: 16,
+        }}
+      >
+        <span style={{ fontSize: 16, fontWeight: 700, color: '#111827', lineHeight: 1.4 }}>{question}</span>
+        <span style={{ fontSize: 22, color: '#0a5c35', flexShrink: 0, lineHeight: 1, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
+      </button>
+      {open && (
+        <div style={{ padding: '0 4px 20px', fontSize: 15, color: '#4b5563', lineHeight: 1.75 }}>
+          {answer}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Contact ───────────────────────────────────────────────────────────────────
 
 function ContactForm() {
@@ -703,6 +781,7 @@ export default function LandingPage() {
       <Diensten />
       <Werkwijze />
       <InstallationGallery />
+      <FAQ />
       <ContactForm />
       <Footer />
       <WhatsAppButton />
