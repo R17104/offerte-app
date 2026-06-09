@@ -271,7 +271,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
                               Vraag offerte aan
                             </Link>
                             <Link
-                              href="/#contact"
+                              href={`/producten/${p.id}`}
                               style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', color: '#374151', fontSize: 12.5, fontWeight: 500, textDecoration: 'none', display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}
                             >
                               Meer info
