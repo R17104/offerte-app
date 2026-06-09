@@ -295,6 +295,41 @@ export async function deleteQuote(id: string) {
   redirect('/quotes')
 }
 
+// ── Bulk actions ─────────────────────────────────────────────────────────────
+
+export async function bulkArchiveQuotes(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { archivedAt: new Date() } })
+  revalidatePath('/quotes')
+}
+
+export async function bulkUnarchiveQuotes(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { archivedAt: null } })
+  revalidatePath('/quotes')
+}
+
+export async function bulkExpireQuotes(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { status: 'EXPIRED' } })
+  revalidatePath('/quotes')
+}
+
+export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  const owned = await prisma.quote.findMany({ where: { id: { in: ids }, createdById: userId }, select: { id: true } })
+  const ownedIds = owned.map((q) => q.id)
+  if (!ownedIds.length) return
+  await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: ownedIds } } })
+  await prisma.quoteLine.deleteMany({ where: { quoteId: { in: ownedIds } } })
+  await prisma.quote.deleteMany({ where: { id: { in: ownedIds } } })
+  revalidatePath('/quotes')
+}
+
 // ── Public token actions ──────────────────────────────────────────────────────
 
 export async function rejectQuoteByToken(token: string) {

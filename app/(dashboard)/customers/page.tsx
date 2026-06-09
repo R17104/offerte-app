@@ -2,14 +2,9 @@ export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import {
-  PageContainer, PageHeader, PrimaryButton,
-  Card, Table, Thead, Tbody, Tr, Th, Td, EmptyState,
-} from '@/components/ui'
-import ConfirmButton from '@/components/ui/ConfirmButton'
-import { archiveCustomer, unarchiveCustomer } from '@/lib/actions/customer.actions'
-import { formatDate } from '@/lib/utils'
+import { PageContainer, PageHeader, PrimaryButton, Card, EmptyState } from '@/components/ui'
 import { verifySession } from '@/lib/dal'
+import CustomersList from '@/components/customers/CustomersList'
 
 type Props = { searchParams: Promise<{ archived?: string }> }
 
@@ -50,14 +45,11 @@ export default async function CustomersPage({ searchParams }: Props) {
             key={tab.href}
             href={tab.href}
             style={{
-              padding: '5px 12px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: 13,
+              padding: '5px 12px', borderRadius: 'var(--radius-md)', fontSize: 13,
               fontWeight: tab.active ? 500 : 400,
               background: tab.active ? 'var(--bg-active)' : 'transparent',
               color: tab.active ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              border: '1px solid',
-              borderColor: tab.active ? 'var(--border-strong)' : 'transparent',
+              border: '1px solid', borderColor: tab.active ? 'var(--border-strong)' : 'transparent',
               transition: 'all .1s',
             }}
           >
@@ -68,16 +60,9 @@ export default async function CustomersPage({ searchParams }: Props) {
 
       {showArchived && (
         <div style={{
-          background: 'var(--warning-muted)',
-          border: '1px solid rgba(245,158,11,0.2)',
-          borderRadius: 'var(--radius-md)',
-          padding: '9px 14px',
-          fontSize: 13,
-          color: 'var(--warning)',
-          marginBottom: 16,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
+          background: 'var(--warning-muted)', border: '1px solid rgba(245,158,11,0.2)',
+          borderRadius: 'var(--radius-md)', padding: '9px 14px', fontSize: 13,
+          color: 'var(--warning)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
         }}>
           <span>Je bekijkt gearchiveerde klanten. Gebruik "Terugzetten" om een klant te herstellen.</span>
         </div>
@@ -91,55 +76,7 @@ export default async function CustomersPage({ searchParams }: Props) {
             action={!showArchived ? <PrimaryButton href="/customers/new">Klant toevoegen</PrimaryButton> : undefined}
           />
         ) : (
-          <Table>
-            <Thead>
-              <tr>
-                <Th>Naam</Th>
-                <Th>Email</Th>
-                <Th>Telefoon</Th>
-                <Th>Woonplaats</Th>
-                <Th right>Offertes</Th>
-                <Th>{showArchived ? 'Gearchiveerd op' : 'Aangemaakt'}</Th>
-                <Th></Th>
-              </tr>
-            </Thead>
-            <Tbody>
-              {customers.map((c) => {
-                const addr = c.addresses[0]
-                const archiveAction = showArchived
-                  ? unarchiveCustomer.bind(null, c.id)
-                  : archiveCustomer.bind(null, c.id)
-
-                return (
-                  <Tr key={c.id} href={`/customers/${c.id}`}>
-                    <Td>
-                      <span style={{ fontWeight: 500 }}>
-                        {c.firstName} {c.lastName}
-                      </span>
-                    </Td>
-                    <Td muted>{c.email || '—'}</Td>
-                    <Td muted>{c.phone || '—'}</Td>
-                    <Td muted>{addr ? `${addr.postalCode} ${addr.city}` : '—'}</Td>
-                    <Td right>{c._count.quotes}</Td>
-                    <Td muted>{formatDate(showArchived ? c.archivedAt : c.createdAt)}</Td>
-                    <Td>
-                      <ConfirmButton
-                        action={archiveAction}
-                        label={showArchived ? 'Terugzetten' : 'Archiveren'}
-                        confirmMessage={
-                          showArchived
-                            ? `"${c.firstName} ${c.lastName}" terugzetten uit archief?`
-                            : `"${c.firstName} ${c.lastName}" archiveren? De klant verdwijnt uit de normale lijst.`
-                        }
-                        variant={showArchived ? 'default' : 'warning'}
-                        size="sm"
-                      />
-                    </Td>
-                  </Tr>
-                )
-              })}
-            </Tbody>
-          </Table>
+          <CustomersList customers={customers} showArchived={showArchived} />
         )}
       </Card>
     </PageContainer>

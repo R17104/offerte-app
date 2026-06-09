@@ -218,6 +218,39 @@ export async function deleteCustomer(id: string) {
   redirect('/customers')
 }
 
+// ── Bulk actions ─────────────────────────────────────────────────────────────
+
+export async function bulkArchiveCustomers(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.customer.updateMany({ where: { id: { in: ids }, userId }, data: { archivedAt: new Date() } })
+  revalidatePath('/customers')
+}
+
+export async function bulkUnarchiveCustomers(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.customer.updateMany({ where: { id: { in: ids }, userId }, data: { archivedAt: null } })
+  revalidatePath('/customers')
+}
+
+export async function bulkDeleteCustomers(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  const owned = await prisma.customer.findMany({ where: { id: { in: ids }, userId }, select: { id: true } })
+  const ownedIds = owned.map((c) => c.id)
+  if (!ownedIds.length) return
+  const quotes = await prisma.quote.findMany({ where: { customerId: { in: ownedIds } }, select: { id: true } })
+  const quoteIds = quotes.map((q) => q.id)
+  if (quoteIds.length > 0) {
+    await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: quoteIds } } })
+    await prisma.quoteLine.deleteMany({ where: { quoteId: { in: quoteIds } } })
+    await prisma.quote.deleteMany({ where: { id: { in: quoteIds } } })
+  }
+  await prisma.customer.deleteMany({ where: { id: { in: ownedIds } } })
+  revalidatePath('/customers')
+}
+
 export async function assignCustomer(customerId: string, userId: string | null) {
   await verifySession()
   await prisma.customer.update({

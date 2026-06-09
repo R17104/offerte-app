@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { formatCurrency } from '@/lib/utils'
+import { bulkToggleProductActive, bulkDeleteProducts } from '@/lib/actions/product.actions'
 
 type Product = {
   id: string
@@ -71,9 +73,37 @@ function ProductImage({ product }: { product: Product }) {
   )
 }
 
-export default function ProductsGrid({ products, isAdmin }: { products: Product[]; isAdmin: boolean }) {
+const bulkBtnStyle: React.CSSProperties = {
+  padding: '5px 12px', borderRadius: 6, border: '1px solid var(--border-strong)',
+  background: 'var(--bg-surface)', color: 'var(--text-secondary)',
+  fontSize: 12.5, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
+}
+
+function exportProductsCSV(products: Product[]) {
+  const headers = ['Naam', 'Categorie', 'Prijs excl. BTW', 'BTW%', 'Capaciteit (kWh)', 'Vermogen (kW)', 'Actief']
+  const rows = products.map((p) => [
+    p.name, p.category ?? '', String(p.unitPrice), String(p.vatRate),
+    p.capacityKwh != null ? String(p.capacityKwh) : '',
+    p.powerKw != null ? String(p.powerKw) : '',
+    p.active ? 'Ja' : 'Nee',
+  ])
+  const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a'); a.href = url
+  a.download = `producten-export-${new Date().toISOString().slice(0, 10)}.csv`
+  a.click(); URL.revokeObjectURL(url)
+}
+
+export default function ProductsGrid({ products: initialProducts, isAdmin }: { products: Product[]; isAdmin: boolean }) {
+  const router = useRouter()
+  const [products, setProducts] = useState(initialProducts)
   const [activeTab, setActiveTab] = useState('all')
   const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [isPending, startTransition] = useTransition()
+
+  useEffect(() => { setProducts(initialProducts) }, [initialProducts])
 
   const filtered = products.filter(p => {
     if (activeTab !== 'all' && p.category !== activeTab) return false
@@ -85,6 +115,28 @@ export default function ProductsGrid({ products, isAdmin }: { products: Product[
   })
 
   const priceIncl = (p: Product) => p.unitPrice * (1 + p.vatRate / 100)
+
+  function toggle(id: string) {
+    setSelected((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
+
+  function run(action: () => Promise<void>, removeIds?: string[]) {
+    startTransition(async () => {
+      if (removeIds) setProducts((prev) => prev.filter((p) => !removeIds.includes(p.id)))
+      setSelected(new Set())
+      await action()
+      router.refresh()
+    })
+  }
+
+  function runUpdate(action: () => Promise<void>, updateIds: string[], active: boolean) {
+    startTransition(async () => {
+      setProducts((prev) => prev.map((p) => updateIds.includes(p.id) ? { ...p, active } : p))
+      setSelected(new Set())
+      await action()
+      router.refresh()
+    })
+  }
 
   return (
     <div>
@@ -113,7 +165,7 @@ export default function ProductsGrid({ products, isAdmin }: { products: Product[
       </div>
 
       {/* Categorie tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 28, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: isAdmin && selected.size > 0 ? 16 : 28, flexWrap: 'wrap' }}>
         {FILTER_TABS.map(tab => {
           const count = tab.key === 'all'
             ? products.length
@@ -147,6 +199,54 @@ export default function ProductsGrid({ products, isAdmin }: { products: Product[
         })}
       </div>
 
+      {/* Bulk action bar (admin only) */}
+      {isAdmin && selected.size > 0 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+          marginBottom: 20, padding: '10px 16px', borderRadius: 10,
+          background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+          border: '1.5px solid #86efac',
+        }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35', marginRight: 4 }}>
+            {selected.size} geselecteerd
+          </span>
+          <button
+            onClick={() => { const ids = [...selected]; runUpdate(() => bulkToggleProductActive(ids, true), ids, true) }}
+            disabled={isPending} style={bulkBtnStyle}
+          >
+            Activeer
+          </button>
+          <button
+            onClick={() => { const ids = [...selected]; runUpdate(() => bulkToggleProductActive(ids, false), ids, false) }}
+            disabled={isPending} style={bulkBtnStyle}
+          >
+            Deactiveer
+          </button>
+          <button
+            onClick={() => exportProductsCSV(products.filter((p) => selected.has(p.id)))}
+            style={bulkBtnStyle}
+          >
+            Exporteer CSV
+          </button>
+          <button
+            onClick={() => {
+              if (!confirm(`${selected.size} product(en) verwijderen? Producten die in offertes worden gebruikt worden gedeactiveerd.`)) return
+              const ids = [...selected]; run(() => bulkDeleteProducts(ids), ids)
+            }}
+            disabled={isPending}
+            style={{ ...bulkBtnStyle, color: '#dc2626', borderColor: '#fca5a5' }}
+          >
+            Verwijder
+          </button>
+          <button
+            onClick={() => setSelected(new Set())}
+            style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-tertiary)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px' }}
+          >
+            Deselecteer alles
+          </button>
+        </div>
+      )}
+
       {/* Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-tertiary)', fontSize: 14 }}>
@@ -157,23 +257,47 @@ export default function ProductsGrid({ products, isAdmin }: { products: Product[
           {filtered.map(p => {
             const cat = CATEGORIES[p.category ?? '']
             const inclPrice = priceIncl(p)
+            const isSelected = selected.has(p.id)
 
             return (
               <div
                 key={p.id}
                 style={{
                   background: 'var(--bg-surface)', borderRadius: 14,
-                  border: '1px solid var(--border)', overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  border: isSelected ? '2px solid #0a5c35' : '1px solid var(--border)',
+                  overflow: 'hidden',
+                  boxShadow: isSelected ? '0 0 0 3px rgba(10,92,53,0.12)' : '0 2px 8px rgba(0,0,0,0.06)',
                   display: 'flex', flexDirection: 'column',
-                  transition: 'box-shadow 0.2s, transform 0.2s',
+                  transition: 'box-shadow 0.2s, transform 0.2s, border-color 0.1s',
+                  position: 'relative',
                 }}
-                onMouseEnter={e => { const el = e.currentTarget; el.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; el.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; el.style.transform = '' }}
+                onMouseEnter={e => { if (!isSelected) { const el = e.currentTarget; el.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; el.style.transform = 'translateY(-2px)' }}}
+                onMouseLeave={e => { if (!isSelected) { const el = e.currentTarget; el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; el.style.transform = '' }}}
               >
                 {/* Product image */}
                 <div style={{ height: 200, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
                   <ProductImage product={p} />
+                  {/* Checkbox (admin only) */}
+                  {isAdmin && (
+                    <div
+                      onClick={(e) => { e.stopPropagation(); toggle(p.id) }}
+                      style={{
+                        position: 'absolute', top: 10, right: 10, zIndex: 10,
+                        width: 22, height: 22, borderRadius: 6,
+                        background: isSelected ? '#0a5c35' : 'rgba(255,255,255,0.9)',
+                        border: `2px solid ${isSelected ? '#0a5c35' : 'rgba(0,0,0,0.2)'}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', transition: 'all 0.1s',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                      }}
+                    >
+                      {isSelected && (
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                  )}
                   {/* Category badge */}
                   {cat && (
                     <div style={{
@@ -187,7 +311,7 @@ export default function ProductsGrid({ products, isAdmin }: { products: Product[
                   )}
                   {!p.active && (
                     <div style={{
-                      position: 'absolute', top: 12, right: 12,
+                      position: 'absolute', bottom: 12, right: 12,
                       padding: '3px 9px', borderRadius: 20,
                       background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)',
                       fontSize: 11, fontWeight: 700, color: '#fca5a5',

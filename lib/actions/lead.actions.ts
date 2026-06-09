@@ -341,3 +341,27 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
   revalidatePath('/dashboard')
   return { success: true, quoteNumber }
 }
+
+// ── Bulk actions ──────────────────────────────────────────────────────────────
+
+export async function bulkDeleteLeads(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.leadNote.deleteMany({ where: { leadId: { in: ids } } })
+  await prisma.lead.deleteMany({ where: { id: { in: ids }, createdById: userId } })
+  revalidatePath('/leads')
+}
+
+export async function bulkArchiveLeads(ids: string[]): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.lead.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { archivedAt: new Date() } })
+  revalidatePath('/leads')
+}
+
+export async function bulkUpdateLeadStatus(ids: string[], status: LeadStatus): Promise<void> {
+  const { userId } = await verifySession()
+  if (!ids.length) return
+  await prisma.lead.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { status } })
+  revalidatePath('/leads')
+}

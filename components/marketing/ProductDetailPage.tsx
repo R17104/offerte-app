@@ -135,10 +135,9 @@ function fmt(n: number) {
 }
 
 function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPrice: number }) {
-  const [kwh, setKwh] = useState(3500)
-  const usable = capacityKwh * 0.85
-  const dailyShift = Math.min(usable, (kwh / 365) * 0.55)
-  const annualSavings = Math.round(dailyShift * 365 * 0.27)
+  const [feedbackKwh, setFeedbackKwh] = useState(2000)
+  const absorbable = Math.min(capacityKwh * 365 * 0.9, feedbackKwh * 0.85)
+  const annualSavings = Math.round(absorbable * (0.28 - 0.07))
   const payback = annualSavings > 0 ? (inclPrice / annualSavings).toFixed(1) : '—'
   const tenYr = annualSavings * 10 - inclPrice
 
@@ -149,16 +148,16 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
       </p>
       <div style={{ marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-          <label style={{ fontSize: 12.5, color: '#374151' }}>Jaarverbruik stroom</label>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35' }}>{kwh.toLocaleString('nl-NL')} kWh</span>
+          <label style={{ fontSize: 12.5, color: '#374151' }}>Jaarlijkse teruglevering</label>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#0a5c35' }}>{feedbackKwh.toLocaleString('nl-NL')} kWh</span>
         </div>
         <input
-          type="range" min={1000} max={8000} step={100} value={kwh}
-          onChange={e => setKwh(+e.target.value)}
+          type="range" min={200} max={6000} step={100} value={feedbackKwh}
+          onChange={e => setFeedbackKwh(+e.target.value)}
           style={{ width: '100%', accentColor: '#0a5c35' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#9ca3af', marginTop: 2 }}>
-          <span>1.000 kWh</span><span>8.000 kWh</span>
+          <span>200 kWh</span><span>6.000 kWh</span>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
@@ -174,8 +173,25 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
         ))}
       </div>
       <p style={{ fontSize: 10.5, color: '#9ca3af', marginTop: 10, lineHeight: 1.5 }}>
-        Indicatieve berekening op basis van gemiddeld stroomtarief (€0,27/kWh) en dagelijks laad-/ontlaadcyclus. Werkelijke besparing afhankelijk van situatie.
+        Indicatieve berekening op basis van uw teruglevering, stroomtarief €0,28/kWh en teruglevertarief €0,07/kWh. Werkelijke besparing afhankelijk van situatie.
       </p>
+
+      {/* EMS / onbalansmarkt */}
+      <div style={{ marginTop: 14, background: '#fff', border: '1px solid #86efac', borderRadius: 10, padding: '12px 14px' }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#0a5c35', marginBottom: 6 }}>
+          Extra opbrengst met EMS (Energie Management Systeem)
+        </p>
+        <p style={{ fontSize: 12.5, color: '#374151', lineHeight: 1.6, marginBottom: 8 }}>
+          Met een EMS kan uw thuisbatterij slim handelen op de <strong>onbalansmarkt</strong> — het netbeheerder-netwerk waar energieprijzen per kwartier variëren. De batterij laadt op bij lage prijzen en levert terug bij hoge prijzen, los van uw zonnepanelen.
+        </p>
+        <div style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div>
+            <p style={{ fontSize: 11, color: '#0a5c35', fontWeight: 600, marginBottom: 2 }}>Gemiddelde extra opbrengst</p>
+            <p style={{ fontSize: 10.5, color: '#6b7280' }}>3-jaarsgemiddelde · AlphaESS 9,3 kWh + 10kW omvormer</p>
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: '#0a5c35', whiteSpace: 'nowrap' }}>+ €1.314/jaar</div>
+        </div>
+      </div>
     </div>
   )
 }

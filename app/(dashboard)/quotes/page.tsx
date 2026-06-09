@@ -2,14 +2,9 @@ export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import {
-  PageContainer, PageHeader, PrimaryButton,
-  Card, Table, Thead, Tbody, Tr, Th, Td, EmptyState, Badge,
-} from '@/components/ui'
-import ConfirmButton from '@/components/ui/ConfirmButton'
-import { archiveQuote, unarchiveQuote } from '@/lib/actions/quote.actions'
-import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
+import { PageContainer, PageHeader, PrimaryButton, Card, EmptyState } from '@/components/ui'
 import { verifySession } from '@/lib/dal'
+import QuotesList from '@/components/quotes/QuotesList'
 
 type Props = { searchParams: Promise<{ archived?: string }> }
 
@@ -24,10 +19,7 @@ export default async function QuotesPage({ searchParams }: Props) {
         ? { createdById: userId, archivedAt: { not: null } }
         : { createdById: userId, archivedAt: null },
       orderBy: { createdAt: 'desc' },
-      include: {
-        customer: true,
-        _count: { select: { lines: true } },
-      },
+      include: { customer: true },
     }),
     prisma.quote.count({ where: { createdById: userId, archivedAt: { not: null } } }),
   ])
@@ -50,14 +42,11 @@ export default async function QuotesPage({ searchParams }: Props) {
             key={tab.href}
             href={tab.href}
             style={{
-              padding: '5px 12px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: 13,
+              padding: '5px 12px', borderRadius: 'var(--radius-md)', fontSize: 13,
               fontWeight: tab.active ? 500 : 400,
               background: tab.active ? 'var(--bg-active)' : 'transparent',
               color: tab.active ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              border: '1px solid',
-              borderColor: tab.active ? 'var(--border-strong)' : 'transparent',
+              border: '1px solid', borderColor: tab.active ? 'var(--border-strong)' : 'transparent',
               transition: 'all .1s',
             }}
           >
@@ -68,13 +57,9 @@ export default async function QuotesPage({ searchParams }: Props) {
 
       {showArchived && (
         <div style={{
-          background: 'var(--warning-muted)',
-          border: '1px solid rgba(245,158,11,0.2)',
-          borderRadius: 'var(--radius-md)',
-          padding: '9px 14px',
-          fontSize: 13,
-          color: 'var(--warning)',
-          marginBottom: 16,
+          background: 'var(--warning-muted)', border: '1px solid rgba(245,158,11,0.2)',
+          borderRadius: 'var(--radius-md)', padding: '9px 14px',
+          fontSize: 13, color: 'var(--warning)', marginBottom: 16,
         }}>
           Je bekijkt gearchiveerde offertes. Gebruik "Terugzetten" om een offerte te herstellen.
         </div>
@@ -88,59 +73,7 @@ export default async function QuotesPage({ searchParams }: Props) {
             action={!showArchived ? <PrimaryButton href="/quotes/new">Offerte aanmaken</PrimaryButton> : undefined}
           />
         ) : (
-          <Table>
-            <Thead>
-              <tr>
-                <Th>Nummer</Th>
-                <Th>Titel</Th>
-                <Th>Klant</Th>
-                <Th>Status</Th>
-                <Th right>Totaal</Th>
-                <Th>{showArchived ? 'Gearchiveerd op' : 'Aangemaakt'}</Th>
-                <Th></Th>
-              </tr>
-            </Thead>
-            <Tbody>
-              {quotes.map((q) => {
-                const meta = STATUS_META[q.status] ?? STATUS_META.DRAFT
-                const archiveAction = showArchived
-                  ? unarchiveQuote.bind(null, q.id)
-                  : archiveQuote.bind(null, q.id)
-
-                return (
-                  <Tr key={q.id} href={`/quotes/${q.id}`}>
-                    <Td muted style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>
-                      {q.quoteNumber}
-                    </Td>
-                    <Td>
-                      <span style={{ fontWeight: 500 }}>{q.title}</span>
-                    </Td>
-                    <Td muted>
-                      {q.customer.firstName} {q.customer.lastName}
-                    </Td>
-                    <Td>
-                      <Badge label={meta.label} color={meta.color} bg={meta.bg} />
-                    </Td>
-                    <Td right>{formatCurrency(q.total)}</Td>
-                    <Td muted>{formatDate(showArchived ? q.archivedAt : q.createdAt)}</Td>
-                    <Td>
-                      <ConfirmButton
-                        action={archiveAction}
-                        label={showArchived ? 'Terugzetten' : 'Archiveren'}
-                        confirmMessage={
-                          showArchived
-                            ? `Offerte "${q.quoteNumber}" terugzetten uit archief?`
-                            : `Offerte "${q.quoteNumber}" archiveren? De offerte verdwijnt uit de normale lijst.`
-                        }
-                        variant={showArchived ? 'default' : 'warning'}
-                        size="sm"
-                      />
-                    </Td>
-                  </Tr>
-                )
-              })}
-            </Tbody>
-          </Table>
+          <QuotesList quotes={quotes} showArchived={showArchived} />
         )}
       </Card>
     </PageContainer>

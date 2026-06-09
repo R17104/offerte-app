@@ -58,6 +58,32 @@ export async function createProduct(formData: FormData) {
   redirect('/products')
 }
 
+export async function bulkToggleProductActive(ids: string[], active: boolean): Promise<void> {
+  await verifyAdmin()
+  if (!ids.length) return
+  await prisma.product.updateMany({ where: { id: { in: ids } }, data: { active } })
+  revalidatePath('/products')
+}
+
+export async function bulkDeleteProducts(ids: string[]): Promise<void> {
+  await verifyAdmin()
+  if (!ids.length) return
+  const used = await prisma.quoteLine.findMany({
+    where: { productId: { in: ids } },
+    select: { productId: true },
+    distinct: ['productId'],
+  })
+  const usedIds = used.map((l) => l.productId!).filter(Boolean)
+  const deletableIds = ids.filter((id) => !usedIds.includes(id))
+  if (deletableIds.length > 0) {
+    await prisma.product.deleteMany({ where: { id: { in: deletableIds } } })
+  }
+  if (usedIds.length > 0) {
+    await prisma.product.updateMany({ where: { id: { in: usedIds } }, data: { active: false } })
+  }
+  revalidatePath('/products')
+}
+
 export async function updateProduct(id: string, formData: FormData) {
   const { userId } = await verifyAdmin()
 
