@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 import InstallationGallery from '@/components/marketing/InstallationGallery'
+import BatterijCheck from '@/components/marketing/BatterijCheck'
 
 // ── Calculator logic ──────────────────────────────────────────────────────────
 
@@ -48,7 +49,7 @@ function Header() {
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <img src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" style={{ height: 46, width: 'auto', display: 'block' }} />
+          <img src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" style={{ height: 54, width: 'auto', display: 'block' }} />
         </a>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -592,6 +593,7 @@ export default function LandingPage() {
       <Header />
       <HeroSection />
       <TrustBar />
+      <BatterijCheck />
       <Werkwijze />
       <Diensten />
       <InstallationGallery />
