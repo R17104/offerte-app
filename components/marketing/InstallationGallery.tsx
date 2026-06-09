@@ -6,11 +6,19 @@ import Link from 'next/link'
 const SLIDES = [
   // ── AlphaESS (6) ─────────────────────────────────────────────────────────────
   {
+    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
+    name: 'Dhr. Dijkstra',
+    city: 'Franeker',
+    stars: 5,
+    quote: 'Vlot geïnstalleerd en goed uitgelegd. Doe er nu geen omkijken meer naar.',
+    product: 'AlphaESS SMILE-G3 systeem',
+  },
+  {
     image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png',
     name: 'Familie Hoekstra',
     city: 'Leeuwarden',
     stars: 5,
-    quote: 'Al na 4 maanden merk ik het enorm op mijn stroomrekening. De installatie was binnen een dag klaar, super netjes gedaan!',
+    quote: 'De installatie ging vlotter dan verwacht en ik merk het nu terug op mijn rekening.',
     product: 'AlphaESS 9,3 kWh thuisbatterij',
   },
   {
@@ -18,23 +26,15 @@ const SLIDES = [
     name: 'Mevr. Smit',
     city: 'Dokkum',
     stars: 5,
-    quote: 'Na de stroomstoring vorig jaar wilde ik een noodstroomoplossing. Nu staat er een complete AlphaESS backup in de garage. Nooit meer zorgen.',
+    quote: 'Na een stroomstoring vorig jaar wilde ik wat meer zekerheid. Fijn dat alles gewoon blijft werken als het net uitvalt.',
     product: 'AlphaESS BackupBox noodstroom',
-  },
-  {
-    image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png',
-    name: 'Dhr. Dijkstra',
-    city: 'Franeker',
-    stars: 5,
-    quote: 'Binnen één dag geïnstalleerd en alles uitgelegd. Nu bespaar ik zo\'n €80 per maand. Terugverdientijd van slechts 6 jaar.',
-    product: 'AlphaESS SMILE-G3 systeem',
   },
   {
     image: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png',
     name: 'Familie Visser',
     city: 'Heerenveen',
     stars: 5,
-    quote: 'We combineerden de batterij met onze bestaande zonnepanelen. Nu gebruiken we overdag én \'s avonds onze eigen stroom. Geweldig!',
+    quote: 'Werkt goed samen met onze zonnepanelen. We gebruiken nu ook \'s avonds onze eigen opgewekte stroom.',
     product: 'AlphaESS + zonnepanelen combo',
   },
   {
@@ -42,7 +42,7 @@ const SLIDES = [
     name: 'Mevr. Bakker',
     city: 'Sneek',
     stars: 5,
-    quote: 'Ze rekenden eerlijk uit wat het zou opleveren en dat klopte ook. Ik bespaar nu meer dan €90 per maand.',
+    quote: 'Ze zijn eerlijk over wat je kunt verwachten. Geen overdreven verhalen, gewoon duidelijk.',
     product: 'AlphaESS 3,8 kWh thuisbatterij',
   },
   {
@@ -50,7 +50,7 @@ const SLIDES = [
     name: 'Dhr. de Vries',
     city: 'Drachten',
     stars: 5,
-    quote: 'Eindelijk onafhankelijk van de energiemaatschappij. Zelfs bij stroomuitval draait alles gewoon door. Zou het iedereen aanraden.',
+    quote: 'Goed geholpen bij de keuze. De laadpaal combineren met de batterij was een goed idee, had ik zelf niet bedacht.',
     product: 'AlphaESS 9,3 kWh + laadpaal',
   },
   // ── Sigenergy (2) ────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ const SLIDES = [
     name: 'Familie Meijer',
     city: 'Bolsward',
     stars: 5,
-    quote: 'We kozen voor Sigenergy vanwege de modulaire opbouw. Begonnen met 6 kWh en later uitgebreid. Flexibel en toekomstbestendig systeem.',
+    quote: 'Fijn dat je later nog kunt uitbreiden. Klein begonnen en inmiddels wat bijgezet.',
     product: 'Sigenergy SigenStor 6 kWh',
   },
   {
@@ -67,7 +67,7 @@ const SLIDES = [
     name: 'Dhr. van der Berg',
     city: 'Harlingen',
     stars: 5,
-    quote: 'Professioneel bedrijf, snelle installatie en goede nazorg. Mijn energierekening is met 60% gedaald vergeleken met vorig jaar.',
+    quote: 'Nette afwerking en achteraf nog goed bereikbaar geweest voor een vraag. Dat stel je op prijs.',
     product: 'Sigenergy SigenStor 9 kWh',
   },
 ]
