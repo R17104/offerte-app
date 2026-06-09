@@ -206,7 +206,7 @@ function Calculator() {
               <div>
                 <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Type woning</label>
                 <select value={houseType} onChange={(e) => { setHouseType(e.target.value) }} style={{ ...inp, appearance: 'none' }}>
-                  <option value="">— Kies type woning —</option>
+                  <option value="">Kies type woning</option>
                   <option value="APARTMENT">Appartement</option>
                   <option value="TERRACED">Tussenwoning</option>
                   <option value="CORNER">Hoekwoning</option>
@@ -322,7 +322,7 @@ function Calculator() {
 
 function Diensten() {
   const diensten = [
-    { icon: '☀️', title: 'Zonnepanelen', desc: 'Opwek op eigen dak — terugverdientijd 5-8 jaar, 25 jaar garantie op panelen.', tag: 'Populair' },
+    { icon: '☀️', title: 'Zonnepanelen', desc: 'Opwek op eigen dak. Terugverdientijd 5-8 jaar, 25 jaar garantie op panelen.', tag: 'Populair' },
     { icon: '🔋', title: 'Thuisbatterij', desc: 'Sla zelf opgewekte stroom op en gebruik die \'s avonds. Tot €1.400/jaar extra besparing.', tag: 'Nieuw' },
     { icon: '🌡️', title: 'Warmtepomp', desc: 'Vervang uw cv-ketel door een warmtepomp. 60-70% minder gasverbruik.', tag: null },
     { icon: '🏠', title: 'Woningadvies', desc: 'Volledig onafhankelijk advies over isolatie, subsidies en de beste verduurzamingsroute.', tag: 'Gratis' },
@@ -405,7 +405,7 @@ function ContactForm() {
             Laat uw gegevens achter en één van onze adviseurs neemt binnen één werkdag contact met u op voor een gratis en vrijblijvend gesprek.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {['Gratis en vrijblijvend advies', 'Binnen 1 werkdag reactie', 'Onafhankelijk — geen druk'].map((item) => (
+            {['Gratis en vrijblijvend advies', 'Binnen 1 werkdag reactie', 'Onafhankelijk, geen druk'].map((item) => (
               <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: 11, color: '#16a34a' }}>✓</span>
@@ -480,7 +480,7 @@ function Footer() {
           </div>
         </div>
         <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.5)' }}>
-          © {new Date().getFullYear()} Bespaarhulp Friesland — Onafhankelijk energieadvies
+          © {new Date().getFullYear()} Bespaarhulp Friesland · Onafhankelijk energieadvies
         </p>
         <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
           Medewerker login
