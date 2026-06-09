@@ -67,14 +67,28 @@ export default function CustomersList({ customers: initialCustomers, showArchive
   const router = useRouter()
   const [customers, setCustomers] = useState(initialCustomers)
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [search, setSearch] = useState('')
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => { setCustomers(initialCustomers); setSelected(new Set()) }, [initialCustomers])
 
-  const allSelected = customers.length > 0 && selected.size === customers.length
-  const someSelected = selected.size > 0 && !allSelected
+  const filtered = search.trim()
+    ? customers.filter((c) => {
+        const s = search.toLowerCase()
+        return `${c.firstName} ${c.lastName}`.toLowerCase().includes(s)
+          || (c.email ?? '').toLowerCase().includes(s)
+          || (c.phone ?? '').toLowerCase().includes(s)
+          || c.addresses.some((a) => `${a.postalCode} ${a.city}`.toLowerCase().includes(s))
+      })
+    : customers
 
-  function toggleAll() { setSelected(allSelected ? new Set() : new Set(customers.map((c) => c.id))) }
+  const allSelected = filtered.length > 0 && filtered.every((c) => selected.has(c.id))
+  const someSelected = filtered.some((c) => selected.has(c.id)) && !allSelected
+
+  function toggleAll() {
+    const ids = filtered.map((c) => c.id)
+    setSelected((p) => { const n = new Set(p); if (allSelected) ids.forEach((id) => n.delete(id)); else ids.forEach((id) => n.add(id)); return n })
+  }
   function toggle(id: string) { setSelected((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n }) }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {
@@ -106,6 +120,15 @@ export default function CustomersList({ customers: initialCustomers, showArchive
         </div>
       )}
 
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Zoek op naam, email, telefoon of woonplaats…"
+          style={{ width: '100%', padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
+        />
+      </div>
+
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border)' }}>
@@ -118,7 +141,10 @@ export default function CustomersList({ customers: initialCustomers, showArchive
           </tr>
         </thead>
         <tbody>
-          {customers.map((c) => {
+          {filtered.length === 0 && (
+            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor "{search}"</td></tr>
+          )}
+          {filtered.map((c) => {
             const addr = c.addresses[0]
             const isSelected = selected.has(c.id)
             return (

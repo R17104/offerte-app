@@ -19,7 +19,11 @@ export default async function QuotesPage({ searchParams }: Props) {
         ? { createdById: userId, archivedAt: { not: null } }
         : { createdById: userId, archivedAt: null },
       orderBy: { createdAt: 'desc' },
-      include: { customer: true },
+      select: {
+        id: true, quoteNumber: true, title: true, status: true, total: true,
+        createdAt: true, archivedAt: true, validUntil: true,
+        customer: { select: { firstName: true, lastName: true } },
+      },
     }),
     prisma.quote.count({ where: { createdById: userId, archivedAt: { not: null } } }),
   ])

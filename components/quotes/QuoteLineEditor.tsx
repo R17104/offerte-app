@@ -73,7 +73,10 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [includedItems, setIncludedItems] = useState(DEFAULT_INCLUDED_ITEMS)
-  const [validUntil, setValidUntil] = useState('')
+  const [validUntil, setValidUntil] = useState(() => {
+    const d = new Date(); d.setDate(d.getDate() + 30)
+    return d.toISOString().slice(0, 10)
+  })
   const [discountAmount, setDiscountAmount] = useState(0)
   const [lines, setLines] = useState<Line[]>([emptyLine()])
   const [energy, setEnergy] = useState<EnergyState>(DEFAULT_ENERGY_STATE)

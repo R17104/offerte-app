@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp } from '@/lib/actions/lead.actions'
+import { useRouter } from 'next/navigation'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
@@ -49,6 +50,14 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
   const [notes, setNotes] = useState<Note[]>(lead.notes)
   const [noteText, setNoteText] = useState('')
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+
+  function handleConvertToQuote() {
+    startTransition(async () => {
+      const { quoteId } = await convertLeadToQuote(lead.id)
+      router.push(`/quotes/${quoteId}/edit`)
+    })
+  }
 
   function handleStatusChange(val: LeadStatus) {
     setStatus(val)
@@ -260,7 +269,21 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
             Acties
           </p>
-            <a
+          {!lead.quote && (
+            <button
+              onClick={handleConvertToQuote}
+              disabled={isPending}
+              style={{
+                display: 'block', width: '100%', padding: '8px 14px', borderRadius: 8,
+                background: '#0a5c35', color: '#fff', fontSize: 13.5, fontWeight: 600,
+                border: 'none', cursor: isPending ? 'not-allowed' : 'pointer', textAlign: 'center',
+                marginBottom: 8, boxSizing: 'border-box', opacity: isPending ? 0.7 : 1,
+              }}
+            >
+              {isPending ? 'Bezig…' : '+ Maak offerte'}
+            </button>
+          )}
+          <a
             href={`/leads/${lead.id}/bewerken`}
             style={{
               display: 'block', width: '100%', padding: '8px 14px', borderRadius: 8,

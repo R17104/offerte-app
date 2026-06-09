@@ -365,3 +365,79 @@ export async function bulkUpdateLeadStatus(ids: string[], status: LeadStatus): P
   await prisma.lead.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { status } })
   revalidatePath('/leads')
 }
+
+export async function convertLeadToQuote(leadId: string): Promise<{ quoteId: string }> {
+  const { userId } = await verifySession()
+
+  const lead = await prisma.lead.findUnique({ where: { id: leadId } })
+  if (!lead) throw new Error('Lead niet gevonden')
+
+  // Already linked — return existing quote
+  if (lead.quoteId) return { quoteId: lead.quoteId }
+
+  // Find or create customer
+  const existingCustomer = lead.email
+    ? await prisma.customer.findFirst({ where: { email: lead.email } })
+    : null
+
+  let customerId: string
+  if (existingCustomer) {
+    customerId = existingCustomer.id
+  } else {
+    const customer = await prisma.customer.create({
+      data: {
+        firstName: lead.firstName,
+        lastName: lead.lastName,
+        email: lead.email ?? null,
+        phone: lead.phone ?? null,
+        userId,
+        ...(lead.postalCode ? {
+          addresses: {
+            create: {
+              type: 'CORRESPONDENCE' as const,
+              street: lead.street ?? '',
+              houseNumber: lead.houseNumber ?? '',
+              postalCode: lead.postalCode,
+              city: lead.city ?? '',
+            },
+          },
+        } : {}),
+      },
+    })
+    customerId = customer.id
+  }
+
+  // Generate quote number
+  const year = new Date().getFullYear()
+  const count = await prisma.quote.count({ where: { quoteNumber: { startsWith: `OFT-${year}-` } } })
+  const quoteNumber = `OFT-${year}-${String(count + 1).padStart(4, '0')}`
+
+  const validUntil = new Date()
+  validUntil.setDate(validUntil.getDate() + 30)
+
+  const quote = await prisma.quote.create({
+    data: {
+      quoteNumber,
+      title: `Offerte ${lead.firstName} ${lead.lastName}`,
+      status: 'DRAFT',
+      customerId,
+      createdById: userId,
+      validUntil,
+      subtotal: 0,
+      vatTotal: 0,
+      total: 0,
+      discountAmount: 0,
+    },
+  })
+
+  await prisma.lead.update({
+    where: { id: leadId },
+    data: { quoteId: quote.id },
+  })
+
+  revalidatePath(`/leads/${leadId}`)
+  revalidatePath('/quotes')
+  revalidatePath('/dashboard')
+
+  return { quoteId: quote.id }
+}

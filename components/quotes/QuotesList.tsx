@@ -15,6 +15,7 @@ type QuoteRow = {
   total: number
   createdAt: Date
   archivedAt: Date | null
+  validUntil: Date | null
   customer: { firstName: string; lastName: string }
 }
 
@@ -61,14 +62,32 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
   const router = useRouter()
   const [quotes, setQuotes] = useState(initialQuotes)
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [search, setSearch] = useState('')
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => { setQuotes(initialQuotes); setSelected(new Set()) }, [initialQuotes])
 
-  const allSelected = quotes.length > 0 && selected.size === quotes.length
-  const someSelected = selected.size > 0 && !allSelected
+  const filtered = search.trim()
+    ? quotes.filter((q) => {
+        const s = search.toLowerCase()
+        return q.quoteNumber.toLowerCase().includes(s)
+          || q.title.toLowerCase().includes(s)
+          || `${q.customer.firstName} ${q.customer.lastName}`.toLowerCase().includes(s)
+      })
+    : quotes
 
-  function toggleAll() { setSelected(allSelected ? new Set() : new Set(quotes.map((q) => q.id))) }
+  const allSelected = filtered.length > 0 && filtered.every((q) => selected.has(q.id))
+  const someSelected = filtered.some((q) => selected.has(q.id)) && !allSelected
+
+  function toggleAll() {
+    const allFilteredIds = filtered.map((q) => q.id)
+    setSelected((p) => {
+      const n = new Set(p)
+      if (allSelected) allFilteredIds.forEach((id) => n.delete(id))
+      else allFilteredIds.forEach((id) => n.add(id))
+      return n
+    })
+  }
   function toggle(id: string) { setSelected((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n }) }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {
@@ -78,6 +97,12 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
       await action()
       router.refresh()
     })
+  }
+
+  const now = Date.now()
+  function daysRemaining(validUntil: Date | null | undefined) {
+    if (!validUntil) return null
+    return Math.ceil((new Date(validUntil).getTime() - now) / 86400000)
   }
 
   if (quotes.length === 0) {
@@ -103,6 +128,15 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
         </div>
       )}
 
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Zoek op nummer, titel of klant…"
+          style={{ width: '100%', padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
+        />
+      </div>
+
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border)' }}>
@@ -115,9 +149,17 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
           </tr>
         </thead>
         <tbody>
-          {quotes.map((q) => {
+          {filtered.length === 0 && (
+            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor "{search}"</td></tr>
+          )}
+          {filtered.map((q) => {
             const meta = STATUS_META[q.status] ?? STATUS_META.DRAFT
             const isSelected = selected.has(q.id)
+            const days = daysRemaining(q.validUntil)
+            const daysLabel = days === null ? null
+              : days < 0 ? { text: `${Math.abs(days)}d verlopen`, color: '#dc2626', bg: '#fef2f2' }
+              : days <= 7 ? { text: `${days}d geldig`, color: '#d97706', bg: '#fffbeb' }
+              : { text: `${days}d geldig`, color: '#6b7280', bg: 'var(--bg-elevated)' }
             return (
               <tr key={q.id}
                 onClick={() => router.push(`/quotes/${q.id}`)}
@@ -135,7 +177,12 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
                   <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 9px', borderRadius: 20, fontSize: 12, fontWeight: 500, color: meta.color, background: meta.bg }}>{meta.label}</span>
                 </td>
                 <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-primary)', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(q.total)}</td>
-                <td style={{ padding: '10px 14px', fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(showArchived ? q.archivedAt : q.createdAt)}</td>
+                <td style={{ padding: '10px 14px', fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>
+                  {formatDate(showArchived ? q.archivedAt : q.createdAt)}
+                  {!showArchived && daysLabel && (
+                    <span style={{ display: 'inline-block', marginLeft: 6, padding: '1px 6px', borderRadius: 10, fontSize: 11, fontWeight: 600, color: daysLabel.color, background: daysLabel.bg }}>{daysLabel.text}</span>
+                  )}
+                </td>
                 <td style={{ padding: '10px 14px' }} onClick={(e) => e.stopPropagation()}>
                   <ConfirmButton
                     action={showArchived ? unarchiveQuote.bind(null, q.id) : archiveQuote.bind(null, q.id)}

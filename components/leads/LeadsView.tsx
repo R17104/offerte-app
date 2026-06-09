@@ -133,13 +133,28 @@ const bulkBtnStyle: React.CSSProperties = {
 function ListView({ leads, setLeads }: { leads: LeadRow[]; setLeads: (fn: (prev: LeadRow[]) => LeadRow[]) => void }) {
   const router = useRouter()
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [search, setSearch] = useState('')
   const [isPending, startTransition] = useTransition()
   const [statusMenuOpen, setStatusMenuOpen] = useState(false)
 
-  const allSelected = leads.length > 0 && selected.size === leads.length
-  const someSelected = selected.size > 0 && !allSelected
+  const filtered = search.trim()
+    ? leads.filter((l) => {
+        const s = search.toLowerCase()
+        return `${l.firstName} ${l.lastName}`.toLowerCase().includes(s)
+          || (l.email ?? '').toLowerCase().includes(s)
+          || (l.phone ?? '').toLowerCase().includes(s)
+          || (l.city ?? '').toLowerCase().includes(s)
+          || (l.postalCode ?? '').toLowerCase().includes(s)
+      })
+    : leads
 
-  function toggleAll() { setSelected(allSelected ? new Set() : new Set(leads.map((l) => l.id))) }
+  const allSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id))
+  const someSelected = filtered.some((l) => selected.has(l.id)) && !allSelected
+
+  function toggleAll() {
+    const ids = filtered.map((l) => l.id)
+    setSelected((p) => { const n = new Set(p); if (allSelected) ids.forEach((id) => n.delete(id)); else ids.forEach((id) => n.add(id)); return n })
+  }
   function toggle(id: string) { setSelected((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n }) }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {
@@ -189,6 +204,15 @@ function ListView({ leads, setLeads }: { leads: LeadRow[]; setLeads: (fn: (prev:
       )}
 
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Zoek op naam, email, telefoon of woonplaats…"
+            style={{ width: '100%', padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
+          />
+        </div>
+
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)' }}>
@@ -201,7 +225,10 @@ function ListView({ leads, setLeads }: { leads: LeadRow[]; setLeads: (fn: (prev:
             </tr>
           </thead>
           <tbody>
-            {leads.map((lead) => {
+            {filtered.length === 0 && (
+              <tr><td colSpan={9} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor "{search}"</td></tr>
+            )}
+            {filtered.map((lead) => {
               const s = STATUS_CONFIG.find((s) => s.key === lead.status)!
               const overdue = isOverdue(lead.followUpAt)
               const isSelected = selected.has(lead.id)
