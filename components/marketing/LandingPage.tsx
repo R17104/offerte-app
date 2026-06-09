@@ -2,10 +2,13 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
-import InstallationGallery from '@/components/marketing/InstallationGallery'
-import BatterijCheck from '@/components/marketing/BatterijCheck'
+
+const InstallationGallery = dynamic(() => import('@/components/marketing/InstallationGallery'))
+const BatterijCheck = dynamic(() => import('@/components/marketing/BatterijCheck'))
 
 // ── Calculator logic ──────────────────────────────────────────────────────────
 
@@ -49,7 +52,7 @@ function Header() {
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <img src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" style={{ height: 54, width: 'auto', display: 'block' }} />
+          <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={216} height={54} priority style={{ display: 'block' }} />
         </a>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
