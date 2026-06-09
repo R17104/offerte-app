@@ -118,6 +118,7 @@ export default async function QuoteEditPage({ params }: Props) {
           houseType: quote.houseType,
           buildYear: quote.buildYear,
           houseSizeSqm: quote.houseSizeSqm,
+          reservationOptionEnabled: quote.reservationOptionEnabled,
         }}
         products={products}
       />

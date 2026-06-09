@@ -60,6 +60,7 @@ type Props = {
     houseType: string | null
     buildYear: number | null
     houseSizeSqm: number | null
+    reservationOptionEnabled: boolean
   }
   products: Product[]
 }
@@ -102,6 +103,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
   const [termsText, setTermsText] = useState(initialData.termsText ?? DEFAULT_TERMS_TEXT)
   const [validUntil, setValidUntil] = useState(formatDateInput(initialData.validUntil))
   const [discountAmount, setDiscountAmount] = useState(initialData.discountAmount)
+  const [reservationOptionEnabled, setReservationOptionEnabled] = useState(initialData.reservationOptionEnabled)
   const [lines, setLines] = useState<Line[]>(
     initialData.lines.length > 0 ? initialData.lines.map(fromExisting) : [emptyLine()],
   )
@@ -203,6 +205,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         termsText: termsText || undefined,
         validUntil: validUntil || undefined,
         discountAmount,
+        reservationOptionEnabled,
         lines: lines.map((l): QuoteLineInput => ({
           productId: l.productId || undefined,
           name: l.name,
@@ -263,6 +266,22 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
               placeholder="0.00"
               style={s.input}
             />
+          </div>
+          <div style={{ ...s.field, gridColumn: '1 / -1' }}>
+            <label style={{ ...s.label, marginBottom: 0, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', userSelect: 'none' }}>
+              <input
+                type="checkbox"
+                checked={reservationOptionEnabled}
+                onChange={(e) => setReservationOptionEnabled(e.target.checked)}
+                style={{ width: 16, height: 16, accentColor: '#0a5c35', cursor: 'pointer', flexShrink: 0 }}
+              />
+              <span>
+                Reservatieoptie inschakelen{' '}
+                <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>
+                  — klant ziet optie "Reserveer onder voorbehoud van financiering (€250)"
+                </span>
+              </span>
+            </label>
           </div>
           <div style={{ ...s.field, gridColumn: '1 / -1' }}>
             <label style={s.label}>Begeleidende brief tekst</label>

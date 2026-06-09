@@ -180,6 +180,7 @@ model Quote {
 
   publicToken String @unique @default(uuid())
   termsText   String?
+  reservationOptionEnabled Boolean @default(false)
 
   sentAt     DateTime?
   acceptedAt DateTime?

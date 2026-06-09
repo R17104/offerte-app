@@ -1196,7 +1196,7 @@ export default async function PublicQuotePage({ params }: Props) {
               <p style={{ fontSize: 13.5, color: '#6b7280', marginBottom: 22 }}>
                 Kies een optie en onderteken digitaal. Na ondertekening nemen wij binnen 24 uur contact op.
               </p>
-              <QuoteAcceptanceForm token={token} customerName={customerName} />
+              <QuoteAcceptanceForm token={token} customerName={customerName} reservationOptionEnabled={quote.reservationOptionEnabled} />
             </div>
           )}
 

@@ -133,13 +133,14 @@ export type UpdateQuoteInput = {
   termsText?: string
   validUntil?: string
   discountAmount: number
+  reservationOptionEnabled?: boolean
   lines: QuoteLineInput[]
   energy?: Partial<EnergyProfile>
 }
 
 export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Promise<void> {
   const { userId } = await verifySession()
-  const { title, notes, introText, includedItems, termsText, validUntil, discountAmount, lines, energy } = input
+  const { title, notes, introText, includedItems, termsText, validUntil, discountAmount, reservationOptionEnabled, lines, energy } = input
 
   if (!title || lines.length === 0) {
     throw new Error('Titel en minimaal één productregel zijn verplicht')
@@ -166,6 +167,7 @@ export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Pro
         termsText: termsText || null,
         validUntil: validUntil ? new Date(validUntil) : null,
         discountAmount,
+        reservationOptionEnabled: reservationOptionEnabled ?? false,
         subtotal,
         vatTotal,
         total,

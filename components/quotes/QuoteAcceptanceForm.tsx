@@ -8,36 +8,34 @@ type AcceptanceOption = {
   type: string
   label: string
   description: string
-  style: 'primary' | 'secondary' | 'outline'
+  style: 'primary' | 'secondary'
 }
 
-const OPTIONS: AcceptanceOption[] = [
-  {
-    type: 'accept',
-    label: 'Accepteren',
-    description: 'Ik ga akkoord met de offerte en wil de installatie inplannen.',
-    style: 'primary',
-  },
-  {
-    type: 'reserve_financing',
-    label: 'Reserveer aanbod onder voorbehoud van financiering',
-    description: 'Ik reserveer dit aanbod terwijl ik de financiering nog regel.',
-    style: 'secondary',
-  },
-  {
-    type: 'reserve_deposit',
-    label: 'Plan schouw in online of fysiek voor €250',
-    description: 'Ik plan een schouw in (online of fysiek) en betaal €250 aan om het aanbod te reserveren.',
-    style: 'outline',
-  },
-]
+const OPTION_ACCEPT: AcceptanceOption = {
+  type: 'accept',
+  label: 'Accepteren',
+  description: 'Ik ga akkoord met de offerte en wil de installatie inplannen.',
+  style: 'primary',
+}
+
+const OPTION_RESERVATION: AcceptanceOption = {
+  type: 'reserve_financing',
+  label: 'Reserveer onder voorbehoud van financiering',
+  description: 'Ik reserveer dit aanbod terwijl ik de financiering nog regel. Eenmalige reserveringsvergoeding van €250.',
+  style: 'secondary',
+}
 
 type Props = {
   token: string
   customerName?: string
+  reservationOptionEnabled?: boolean
 }
 
-export default function QuoteAcceptanceForm({ token, customerName }: Props) {
+export default function QuoteAcceptanceForm({ token, customerName, reservationOptionEnabled = false }: Props) {
+  const OPTIONS = reservationOptionEnabled
+    ? [OPTION_ACCEPT, OPTION_RESERVATION]
+    : [OPTION_ACCEPT]
+
   const sigRef = useRef<SignaturePadHandle>(null)
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [agreed, setAgreed] = useState(false)
@@ -108,14 +106,10 @@ export default function QuoteAcceptanceForm({ token, customerName }: Props) {
                   background: '#0a5c35',
                   color: '#fff',
                   border: 'none',
-                } : opt.style === 'secondary' ? {
+                } : {
                   background: '#f0fdf4',
                   color: '#0a5c35',
                   border: '1.5px solid #86efac',
-                } : {
-                  background: '#fff',
-                  color: '#374151',
-                  border: '1.5px solid #d1d5db',
                 }),
               }}
             >
@@ -178,8 +172,8 @@ export default function QuoteAcceptanceForm({ token, customerName }: Props) {
               style={pubInput}
             />
           </Field>
-          {selectedType === 'reserve_deposit' && (
-            <Field label="IBAN" required>
+          {selectedType === 'reserve_financing' && (
+            <Field label="IBAN (voor reserveringsvergoeding €250)" required>
               <input
                 value={form.iban}
                 onChange={(e) => setForm({ ...form, iban: e.target.value })}
