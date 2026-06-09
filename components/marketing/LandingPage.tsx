@@ -45,25 +45,9 @@ function Header() {
       borderBottom: '1px solid rgba(0,0,0,0.06)',
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <svg width="32" height="30" viewBox="0 0 36 34" fill="none">
-            <rect x="10" y="4" width="3.5" height="6" rx="0.5" fill="#f5c442"/>
-            <path d="M0 15L18 2L36 15H0Z" fill="#f5c442"/>
-            <rect x="2" y="15" width="32" height="19" rx="1.5" fill="#0a5c35"/>
-            <rect x="5" y="18" width="7" height="5.5" rx="0.5" fill="white" fillOpacity="0.28"/>
-            <rect x="5" y="25.5" width="7" height="6" rx="0.5" fill="white" fillOpacity="0.28"/>
-            <rect x="14" y="18" width="7" height="5.5" rx="0.5" fill="white" fillOpacity="0.28"/>
-            <rect x="14" y="25.5" width="7" height="6" rx="0.5" fill="white" fillOpacity="0.28"/>
-            <circle cx="28" cy="22" r="4.5" fill="#f5c442"/>
-            <circle cx="26.5" cy="20.5" r="3" fill="#0a5c35"/>
-          </svg>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1 }}>
-              <span style={{ color: '#0a5c35' }}>Bespaar</span><span style={{ color: '#f5c442' }}>hulp</span>
-            </div>
-            <div style={{ fontSize: 8.5, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 2 }}>Friesland</div>
-          </div>
-        </div>
+        <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+          <img src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" style={{ height: 46, width: 'auto', display: 'block' }} />
+        </a>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {[['Producten', '/producten'], ['Werkwijze', '#werkwijze'], ['Diensten', '#diensten'], ['Ervaringen', '#ervaringen']].map(([l, h]) => (
