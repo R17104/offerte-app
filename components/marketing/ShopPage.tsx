@@ -219,7 +219,7 @@ export default function ShopPage({ products }: { products: Product[] }) {
                       onMouseLeave={e => { const el = e.currentTarget; el.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'; el.style.transform = '' }}
                     >
                       {/* Image */}
-                      <div style={{ height: 200, overflow: 'hidden', position: 'relative', background: '#f9fafb', flexShrink: 0 }}>
+                      <Link href={`/producten/${p.id}`} style={{ height: 200, overflow: 'hidden', position: 'relative', background: '#f9fafb', flexShrink: 0, display: 'block', textDecoration: 'none' }}>
                         <ProductImage product={p} />
                         {cat && (
                           <div style={{ position: 'absolute', top: 10, left: 10, padding: '3px 9px', borderRadius: 20, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)', fontSize: 11, fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -236,13 +236,15 @@ export default function ShopPage({ products }: { products: Product[] }) {
                             Populair
                           </div>
                         )}
-                      </div>
+                      </Link>
 
                       {/* Body */}
                       <div style={{ padding: '14px 14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <h2 style={{ fontSize: 13.5, fontWeight: 700, color: '#111827', marginBottom: 6, lineHeight: 1.35 }}>
-                          {p.name}
-                        </h2>
+                        <Link href={`/producten/${p.id}`} style={{ textDecoration: 'none' }}>
+                          <h2 style={{ fontSize: 13.5, fontWeight: 700, color: '#111827', marginBottom: 6, lineHeight: 1.35 }}>
+                            {p.name}
+                          </h2>
+                        </Link>
 
                         {p.description && (
                           <p style={{ fontSize: 12.5, color: '#6b7280', lineHeight: 1.5, marginBottom: 10, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>
