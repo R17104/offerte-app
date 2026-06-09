@@ -361,39 +361,142 @@ function Werkwijze() {
   )
 }
 
+// ── Thuisbatterij info ────────────────────────────────────────────────────────
+
+function ThuisbatterijInfo() {
+  const reasons = [
+    { icon: '↘', label: 'Terugleververgoedingen dalen fors' },
+    { icon: '⚡', label: 'Stroomprijzen schommelen steeds meer' },
+    { icon: '⚖️', label: 'Salderingsregeling wordt afgebouwd' },
+    { icon: '🔌', label: 'Het elektriciteitsnet raakt vaker vol' },
+  ]
+  const benefits = [
+    'Meer eigen stroom gebruiken',
+    'Minder terugleververlies',
+    'Bescherming tegen stijgende prijzen',
+    'Volledig automatisch systeem',
+    'Gespreid betalen mogelijk vanaf €75/mnd',
+  ]
+
+  return (
+    <section style={{ background: '#f9fafb', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Thuisbatterij</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 900, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+            Slim besparen met een thuisbatterij
+          </h2>
+          <p style={{ fontSize: 15.5, color: '#6b7280', marginTop: 12, maxWidth: 560, margin: '12px auto 0' }}>
+            Ontdek hoe je meer van je eigen stroom gebruikt en jouw energiekosten verlaagt.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 40, alignItems: 'start' }}>
+
+          {/* Links */}
+          <div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#111827', marginBottom: 20 }}>
+              Waarom verandert je energierekening?
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
+              {reasons.map((r) => (
+                <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                    {r.icon}
+                  </div>
+                  <span style={{ fontSize: 14.5, color: '#374151', fontWeight: 500 }}>{r.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: '#fff', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>💰</span>
+              <p style={{ fontSize: 14.5, color: '#111827', lineHeight: 1.6 }}>
+                <strong>Gemiddelde besparing met een thuisbatterij: €1.100 – €1.400 per jaar</strong>
+              </p>
+            </div>
+          </div>
+
+          {/* Rechts */}
+          <div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#111827', marginBottom: 12 }}>
+              Wat doet een thuisbatterij?
+            </h3>
+            <p style={{ fontSize: 14.5, color: '#4b5563', lineHeight: 1.75, marginBottom: 20 }}>
+              Een thuisbatterij slaat energie op en gebruikt deze automatisch op het meest voordelige moment. Zo profiteer je optimaal van je zonnepanelen én van lage stroomprijzen.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+              {benefits.map((b) => (
+                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: '1.5px solid #0a5c35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 11, color: '#0a5c35', fontWeight: 800 }}>✓</span>
+                  </div>
+                  <span style={{ fontSize: 14, color: '#374151' }}>{b}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '14px 18px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <span style={{ fontSize: 18, flexShrink: 0 }}>🏦</span>
+              <p style={{ fontSize: 13.5, color: '#78350f', lineHeight: 1.6 }}>
+                <strong>Financiering:</strong> Inkomen onder €60.000? Dan kun je rentevrij lenen via het Nationaal Warmtefonds. Boetevrij aflossen is altijd mogelijk.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── Diensten ──────────────────────────────────────────────────────────────────
+
+function DienstIcon({ bg, children }: { bg: string; children: React.ReactNode }) {
+  return (
+    <div style={{ width: 52, height: 52, borderRadius: 14, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 18 }}>
+      {children}
+    </div>
+  )
+}
 
 function Diensten() {
   const list = [
-    { icon: '☀️', title: 'Zonnepanelen',  sub: 'Populair', subStyle: { background: '#dbeafe', color: '#1e40af' }, desc: 'Opwek op uw eigen dak. Terugverdientijd 5-8 jaar, 25 jaar garantie op de panelen.' },
-    { icon: '🔋', title: 'Thuisbatterij', sub: 'Nieuw',    subStyle: { background: '#dcfce7', color: '#166534' }, desc: "Sla uw zelf opgewekte stroom op en gebruik die 's avonds. Tot €1.400/jaar extra besparing." },
-    { icon: '🌡️', title: 'Warmtepomp',   sub: null,       subStyle: {}, desc: 'Vervang uw cv-ketel en verbruik 60-70% minder gas. Volledig gecertificeerde installatie.' },
-    { icon: '🏠', title: 'Woningadvies', sub: 'Gratis',   subStyle: { background: '#fef9c3', color: '#854d0e' }, desc: 'Onafhankelijk advies over isolatie, subsidies en de optimale verduurzamingsvolgorde.' },
+    { icon: '🏠', iconBg: '#dcfce7', title: 'Woningadvies',     badge: 'Populair',  badgeBg: '#dbeafe', badgeColor: '#1e40af', desc: 'Ontdek welke maatregelen jouw woning energiezuiniger maken. Van isolatie tot ventilatie.', href: '#contact' },
+    { icon: '☀️', iconBg: '#fef9c3', title: 'Zonnepanelen',     badge: 'Energie',   badgeBg: '#fef9c3', badgeColor: '#92400e', desc: 'Bereken of zonnepanelen rendabel zijn voor jouw dak. Inclusief terugverdientijd.',          href: '#contact', featured: true },
+    { icon: '🔋', iconBg: '#dcfce7', title: 'Thuisbatterij',    badge: 'Nieuw',     badgeBg: '#dcfce7', badgeColor: '#166534', desc: "Sla zonnestroom op en gebruik het wanneer het nodig is. Bespaar tot €1.400 per jaar.",     href: '#contact' },
+    { icon: '🌡️', iconBg: '#dbeafe', title: 'Warmtepomp',       badge: 'Energie',   badgeBg: '#fef9c3', badgeColor: '#92400e', desc: 'Alles over de overstap naar een warmtepomp. Kosten, subsidies en de juiste keuze.',        href: '#contact' },
+    { icon: '🏅', iconBg: '#fef9c3', title: 'Subsidiecheck',    badge: 'Subsidie',  badgeBg: '#ede9fe', badgeColor: '#5b21b6', desc: 'Check in 2 minuten welke landelijke en gemeentelijke subsidies beschikbaar zijn.',         href: '#contact' },
+    { icon: '💬', iconBg: '#f0f9ff', title: 'Persoonlijk advies', badge: 'Gratis',  badgeBg: '#fef9c3', badgeColor: '#92400e', desc: 'Gratis en onafhankelijk advies van een energiecoach uit jouw regio.',                      href: '#contact' },
   ]
 
   return (
     <section id="diensten" style={{ background: '#fff', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>ONZE DIENSTEN</span>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Onze diensten</span>
           <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 900, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
-            Alles voor een duurzaam huis
+            Je weg naar een duurzamer huis
           </h2>
+          <p style={{ fontSize: 15, color: '#6b7280', marginTop: 12 }}>
+            Ontdek welke stappen je kunt zetten om energie te besparen en subsidies te benutten.
+          </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
           {list.map(d => (
-            <div key={d.title} style={{ background: '#fff', borderRadius: 16, padding: '28px 24px', border: '1px solid #e5e7eb', position: 'relative', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s' }}>
-              {d.sub && (
-                <span style={{ position: 'absolute', top: 16, right: 16, fontSize: 10.5, fontWeight: 700, padding: '3px 9px', borderRadius: 12, ...d.subStyle }}>
-                  {d.sub}
-                </span>
-              )}
-              <div style={{ fontSize: 36, marginBottom: 16 }}>{d.icon}</div>
+            <div key={d.title} style={{
+              background: '#fff', borderRadius: 18, padding: '28px 26px',
+              border: d.featured ? '2px solid #0a5c35' : '1px solid #e5e7eb',
+              position: 'relative', boxShadow: d.featured ? '0 8px 32px rgba(10,92,53,0.12)' : '0 2px 8px rgba(0,0,0,0.04)',
+            }}>
+              <span style={{ position: 'absolute', top: 18, right: 18, fontSize: 10.5, fontWeight: 700, padding: '3px 9px', borderRadius: 12, background: d.badgeBg, color: d.badgeColor }}>
+                {d.badge}
+              </span>
+              <DienstIcon bg={d.iconBg}>{d.icon}</DienstIcon>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: '#111827', marginBottom: 10 }}>{d.title}</h3>
-              <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.7, marginBottom: 16 }}>{d.desc}</p>
-              <a href="#contact" style={{ fontSize: 13.5, fontWeight: 700, color: '#0a5c35', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                Meer info <span style={{ fontSize: 12 }}>→</span>
+              <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.75, marginBottom: 18 }}>{d.desc}</p>
+              <a href={d.href} style={{ fontSize: 13.5, fontWeight: 700, color: '#0a5c35', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                Meer informatie <span style={{ fontSize: 12 }}>›</span>
               </a>
             </div>
           ))}
@@ -596,8 +699,9 @@ export default function LandingPage() {
       <HeroSection />
       <TrustBar />
       <BatterijCheck />
-      <Werkwijze />
+      <ThuisbatterijInfo />
       <Diensten />
+      <Werkwijze />
       <InstallationGallery />
       <ContactForm />
       <Footer />
