@@ -13,11 +13,11 @@ import { verifySession } from '@/lib/dal'
 type Props = { params: Promise<{ id: string }> }
 
 export default async function EditCustomerPage({ params }: Props) {
-  const { userId } = await verifySession()
+  const { userId, role } = await verifySession()
   const { id } = await params
 
   const customer = await prisma.customer.findUnique({
-    where: { id, userId },
+    where: role === 'ADMIN' ? { id } : { id, userId },
     include: { addresses: true },
   })
 
@@ -44,8 +44,8 @@ export default async function EditCustomerPage({ params }: Props) {
               <FormGroup label="Achternaam" required>
                 <Input name="lastName" defaultValue={customer.lastName} required />
               </FormGroup>
-              <FormGroup label="Geboortedatum" required>
-                <Input name="dateOfBirth" type="date" defaultValue={formatDateInput(customer.dateOfBirth)} required />
+              <FormGroup label="Geboortedatum">
+                <Input name="dateOfBirth" type="date" defaultValue={formatDateInput(customer.dateOfBirth)} />
               </FormGroup>
               <FormGroup label="IBAN">
                 <Input name="iban" defaultValue={customer.iban ?? ''} placeholder="NL00 BANK 0000 0000 00" />
