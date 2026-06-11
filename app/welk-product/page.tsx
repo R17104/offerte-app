@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/db'
 import BatterijCheck from '@/components/marketing/BatterijCheck'
 import Link from 'next/link'
