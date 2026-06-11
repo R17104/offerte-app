@@ -11,12 +11,15 @@ import {
 import { LeadStatus } from '@prisma/client'
 
 const STATUS_CONFIG = [
-  { key: 'NEW',        label: 'Nieuw',             color: '#2563eb', bg: 'rgba(37,99,235,0.08)' },
-  { key: 'CONTACTED',  label: 'Benaderd',          color: '#d97706', bg: 'rgba(217,119,6,0.08)' },
-  { key: 'INTERESTED', label: 'Geïnteresseerd',    color: '#7c3aed', bg: 'rgba(124,58,237,0.08)' },
-  { key: 'QUOTE_SENT', label: 'Offerte verstuurd', color: '#0891b2', bg: 'rgba(8,145,178,0.08)' },
-  { key: 'WON',        label: 'Gewonnen',          color: '#16a34a', bg: 'rgba(22,163,74,0.08)' },
-  { key: 'LOST',       label: 'Verloren',          color: '#9ca3af', bg: 'rgba(156,163,175,0.08)' },
+  { key: 'NEW',                 label: 'Nieuw',               color: '#2563eb', bg: 'rgba(37,99,235,0.08)' },
+  { key: 'CONTACTED',           label: 'Benaderd',            color: '#d97706', bg: 'rgba(217,119,6,0.08)' },
+  { key: 'AFSPRAAK_INGEPLAND',  label: 'Afspraak ingepland',  color: '#7c3aed', bg: 'rgba(124,58,237,0.08)' },
+  { key: 'QUOTE_SENT',          label: 'Offerte verstuurd',   color: '#0891b2', bg: 'rgba(8,145,178,0.08)' },
+  { key: 'INSTALLATIE_GEPLAND', label: 'Installatie gepland', color: '#ea580c', bg: 'rgba(234,88,12,0.08)' },
+  { key: 'BETALING_50',         label: '50% betaald',         color: '#16a34a', bg: 'rgba(22,163,74,0.08)' },
+  { key: 'INSTALLATIE_GEDAAN',  label: 'Installatie gedaan',  color: '#059669', bg: 'rgba(5,150,105,0.08)' },
+  { key: 'BETALING_100',        label: '100% betaald',        color: '#065f46', bg: 'rgba(6,95,70,0.08)' },
+  { key: 'LOST',                label: 'Verloren',            color: '#9ca3af', bg: 'rgba(156,163,175,0.08)' },
 ]
 
 type LeadRow = {

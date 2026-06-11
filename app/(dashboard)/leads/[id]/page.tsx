@@ -20,6 +20,7 @@ export default async function LeadDetailPage({ params }: Props) {
         orderBy: { createdAt: 'desc' },
       },
       assignedTo: { select: { id: true, name: true, email: true } },
+      appointmentPlannedBy: { select: { id: true, name: true, email: true } },
       quote: { select: { id: true, quoteNumber: true, title: true, total: true, status: true } },
     },
   })

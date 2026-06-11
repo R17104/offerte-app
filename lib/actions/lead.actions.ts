@@ -123,6 +123,15 @@ export async function assignLead(leadId: string, assignedToId: string | null) {
   revalidatePath(`/leads/${leadId}`)
 }
 
+export async function setAppointmentPlanner(leadId: string, appointmentPlannedById: string | null) {
+  await verifySession()
+  await prisma.lead.update({
+    where: { id: leadId },
+    data: { appointmentPlannedById },
+  })
+  revalidatePath(`/leads/${leadId}`)
+}
+
 export async function createLead(data: LeadImportRow) {
   const { userId } = await verifySession()
   const lead = await prisma.lead.create({

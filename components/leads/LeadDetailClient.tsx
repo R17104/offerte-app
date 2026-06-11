@@ -2,17 +2,20 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote } from '@/lib/actions/lead.actions'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
 const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
-  { value: 'NEW',        label: 'Nieuw',               color: '#2563eb' },
-  { value: 'CONTACTED',  label: 'Benaderd',            color: '#d97706' },
-  { value: 'INTERESTED', label: 'Geïnteresseerd',      color: '#7c3aed' },
-  { value: 'QUOTE_SENT', label: 'Offerte verstuurd',   color: '#0891b2' },
-  { value: 'WON',        label: 'Gewonnen',            color: '#16a34a' },
-  { value: 'LOST',       label: 'Verloren',            color: '#9ca3af' },
+  { value: 'NEW',                label: 'Nieuw',                color: '#2563eb' },
+  { value: 'CONTACTED',          label: 'Benaderd',             color: '#d97706' },
+  { value: 'AFSPRAAK_INGEPLAND', label: 'Afspraak ingepland',   color: '#7c3aed' },
+  { value: 'QUOTE_SENT',         label: 'Offerte verstuurd',    color: '#0891b2' },
+  { value: 'INSTALLATIE_GEPLAND',label: 'Installatie gepland',  color: '#ea580c' },
+  { value: 'BETALING_50',        label: '50% betaald',          color: '#16a34a' },
+  { value: 'INSTALLATIE_GEDAAN', label: 'Installatie gedaan',   color: '#059669' },
+  { value: 'BETALING_100',       label: '100% betaald',         color: '#065f46' },
+  { value: 'LOST',               label: 'Verloren',             color: '#9ca3af' },
 ]
 
 type Note = { id: string; content: string; createdAt: Date; author: { name: string | null } }
@@ -35,6 +38,7 @@ type Lead = {
   quote: { id: string; quoteNumber: string; title: string; total: number; status: string } | null
   notes: Note[]
   assignedTo: SalesUser | null
+  appointmentPlannedBy: SalesUser | null
 }
 
 const row = (label: string, value: string | null) =>
@@ -253,7 +257,7 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
         {isAdmin && (
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
             <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
-              Verkoper
+              Verkoper (closer)
             </p>
             <AssignSalesperson
               entityType="lead"
@@ -261,6 +265,30 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
               currentId={lead.assignedTo?.id ?? null}
               users={users}
             />
+          </div>
+        )}
+
+        {/* Ingepland door */}
+        {isAdmin && (
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
+              Ingepland door (planner)
+            </p>
+            <select
+              defaultValue={lead.appointmentPlannedBy?.id ?? ''}
+              onChange={(e) => startTransition(() => setAppointmentPlanner(lead.id, e.target.value || null))}
+              style={{
+                width: '100%', padding: '7px 10px', borderRadius: 8,
+                border: '1px solid var(--border-strong)', background: 'var(--bg-elevated)',
+                color: 'var(--text-primary)', fontSize: 13.5,
+                fontFamily: 'var(--font-sans)', boxSizing: 'border-box' as const,
+              }}
+            >
+              <option value="">— Niet ingesteld —</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>{u.name ?? u.email}</option>
+              ))}
+            </select>
           </div>
         )}
 

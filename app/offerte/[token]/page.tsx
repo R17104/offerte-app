@@ -170,7 +170,7 @@ export default async function PublicQuotePage({ params }: Props) {
         }
         /* Mobile */
         @media (max-width: 600px) {
-          .doc-page { margin-bottom: 12px !important; }
+          .doc-page { margin-bottom: 12px !important; overflow-x: hidden !important; }
           .lh  { padding: 16px 18px !important; flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
           .lh-right { text-align: left !important; }
           .li  { padding: 24px 18px !important; }
@@ -179,14 +179,19 @@ export default async function PublicQuotePage({ params }: Props) {
           .pf  { padding: 10px 18px !important; flex-direction: column !important; gap: 6px !important; }
           .g2  { grid-template-columns: 1fr !important; gap: 20px !important; }
           .g2r { grid-template-columns: 1fr !important; }
+          .g3  { grid-template-columns: 1fr !important; }
+          .prod-card { flex-direction: column !important; }
+          .prod-img { width: 100% !important; min-width: unset !important; height: 180px !important; }
           .hide-mobile { display: none !important; }
           .doc-page h2 { font-size: 20px !important; }
           .num-big { font-size: 36px !important; }
+          .price-grid { grid-template-columns: 1fr !important; }
+          .nav-bar { padding: 8px 14px !important; }
         }
       ` }} />
 
       {/* ── Nav ────────────────────────────────────────────────────────────── */}
-      <div className="no-print" style={{
+      <div className="no-print nav-bar" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: '#fff', borderBottom: '1px solid #e5e7eb',
         padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -646,7 +651,7 @@ export default async function PublicQuotePage({ params }: Props) {
             <p style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
               Wat lost de batterij voor u op?
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            <div className="g3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               {[
                 {
                   icon: '⚡',
@@ -1039,8 +1044,8 @@ export default async function PublicQuotePage({ params }: Props) {
               {quote.lines.map((line) => {
                 const p2 = line.product
                 return (
-                  <div key={line.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden', display: 'flex' }}>
-                    <div style={{ width: 140, minWidth: 140, background: p2?.imageUrl ? '#f9fafb' : '#f0faf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div key={line.id} className="prod-card" style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden', display: 'flex' }}>
+                    <div className="prod-img" style={{ width: 140, minWidth: 140, background: p2?.imageUrl ? '#f9fafb' : '#f0faf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {p2?.imageUrl
                         ? <img src={p2.imageUrl} alt={line.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         : <span style={{ fontSize: 40 }}>
@@ -1118,7 +1123,7 @@ export default async function PublicQuotePage({ params }: Props) {
           </div>
 
           <div className="sec" style={{ padding: '44px 52px', flex: 1 }}>
-            <div className="g2r" style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start', marginBottom: 36 }}>
+            <div className="g2r price-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start', marginBottom: 36 }}>
               <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
                 {quote.lines.map((line, i) => (
                   <div key={line.id} style={{ padding: '14px 20px', borderBottom: i < quote.lines.length - 1 ? '1px solid #e5e7eb' : 'none', display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center' }}>

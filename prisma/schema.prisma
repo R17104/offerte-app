@@ -57,9 +57,14 @@ enum UserRole {
 enum LeadStatus {
   NEW
   CONTACTED
-  INTERESTED
+  INTERESTED          // legacy → migrated to AFSPRAAK_INGEPLAND
+  AFSPRAAK_INGEPLAND
   QUOTE_SENT
-  WON
+  INSTALLATIE_GEPLAND
+  BETALING_50
+  INSTALLATIE_GEDAAN
+  BETALING_100
+  WON                 // legacy → migrated to BETALING_100
   LOST
 }
 
@@ -80,8 +85,9 @@ model User {
   leads      Lead[]
   leadNotes  LeadNote[]
 
-  assignedQuotes Quote[] @relation("QuoteAssignee")
-  assignedLeads  Lead[]  @relation("LeadAssignee")
+  assignedQuotes      Quote[] @relation("QuoteAssignee")
+  assignedLeads       Lead[]  @relation("LeadAssignee")
+  appointmentsPlanned Lead[]  @relation("AppointmentPlanner")
 
   salesTodos     SalesTodo[]
   assignedTodos  SalesTodo[] @relation("TodoAssignee")
@@ -288,6 +294,9 @@ model Lead {
 
   assignedToId String?
   assignedTo   User?   @relation("LeadAssignee", fields: [assignedToId], references: [id])
+
+  appointmentPlannedById String?
+  appointmentPlannedBy   User?   @relation("AppointmentPlanner", fields: [appointmentPlannedById], references: [id])
 
   notes LeadNote[]
 }

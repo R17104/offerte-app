@@ -22,7 +22,6 @@ export default async function GetekendeOffertesPage() {
   const quotes = await prisma.quote.findMany({
     where: {
       status: 'ACCEPTED',
-      acceptance: { isNot: null },
       ...(role !== 'ADMIN' && { createdById: userId }),
     },
     include: {
@@ -67,7 +66,7 @@ export default async function GetekendeOffertesPage() {
                     {q.customer.firstName} {q.customer.lastName}
                   </Td>
                   <Td>
-                    {q.acceptance!.firstName} {q.acceptance!.lastName}
+                    {q.acceptance ? `${q.acceptance.firstName} ${q.acceptance.lastName}` : '—'}
                   </Td>
                   <Td>{formatDate(q.acceptedAt)}</Td>
                   <Td>
@@ -76,7 +75,7 @@ export default async function GetekendeOffertesPage() {
                     </span>
                   </Td>
                   <Td>
-                    {q.acceptance!.signatureData ? (
+                    {q.acceptance?.signatureData ? (
                       <a
                         href={`/offerte/${q.publicToken}`}
                         target="_blank"
