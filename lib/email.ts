@@ -1,10 +1,9 @@
-import nodemailer from 'nodemailer'
-
-function createTransporter() {
+async function createTransporter() {
   const user = process.env.GMAIL_USER
   const pass = process.env.GMAIL_APP_PASSWORD
   if (!user || !pass) throw new Error('GMAIL_USER en GMAIL_APP_PASSWORD zijn niet ingesteld in Vercel')
 
+  const nodemailer = (await import('nodemailer')).default
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
@@ -30,7 +29,7 @@ export async function sendQuoteEmail({
   quoteUrl: string
   quoteNumber: string
 }) {
-  const transporter = createTransporter()
+  const transporter = await createTransporter()
   const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
 
   const html = `
