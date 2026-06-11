@@ -164,13 +164,21 @@ export default function CustomersList({ customers: initialCustomers, showArchive
                 <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)', textAlign: 'right' }}>{c._count.quotes}</td>
                 <td style={{ padding: '10px 14px', fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(showArchived ? c.archivedAt : c.createdAt)}</td>
                 <td style={{ padding: '10px 14px' }}>
-                  <ConfirmButton
-                    action={showArchived ? unarchiveCustomer.bind(null, c.id) : archiveCustomer.bind(null, c.id)}
-                    label={showArchived ? 'Terugzetten' : 'Archiveren'}
-                    confirmMessage={showArchived ? `"${c.firstName} ${c.lastName}" terugzetten?` : `"${c.firstName} ${c.lastName}" archiveren?`}
-                    variant={showArchived ? 'default' : 'warning'}
-                    size="sm"
-                  />
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <Link
+                      href={`/customers/${c.id}/edit`}
+                      style={{ padding: '4px 10px', fontSize: 12.5, fontWeight: 500, borderRadius: 6, border: '1px solid var(--border-strong)', background: 'var(--bg-surface)', color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}
+                    >
+                      Bewerken
+                    </Link>
+                    <ConfirmButton
+                      action={showArchived ? unarchiveCustomer.bind(null, c.id) : archiveCustomer.bind(null, c.id)}
+                      label={showArchived ? 'Terugzetten' : 'Archiveren'}
+                      confirmMessage={showArchived ? `"${c.firstName} ${c.lastName}" terugzetten?` : `"${c.firstName} ${c.lastName}" archiveren?`}
+                      variant={showArchived ? 'default' : 'warning'}
+                      size="sm"
+                    />
+                  </div>
                 </td>
               </tr>
             )

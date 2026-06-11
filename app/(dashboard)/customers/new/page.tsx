@@ -26,11 +26,11 @@ export default function NewCustomerPage() {
               <FormGroup label="IBAN">
                 <Input name="iban" placeholder="NL00 BANK 0000 0000 00" />
               </FormGroup>
-              <FormGroup label="Email">
-                <Input name="email" type="email" placeholder="jan@bedrijf.nl" />
+              <FormGroup label="Email" required>
+                <Input name="email" type="email" placeholder="jan@bedrijf.nl" required />
               </FormGroup>
-              <FormGroup label="Telefoonnummer">
-                <Input name="phone" placeholder="06 1234 5678" />
+              <FormGroup label="Telefoonnummer" required>
+                <Input name="phone" placeholder="06 1234 5678" required />
               </FormGroup>
             </div>
           </Card>

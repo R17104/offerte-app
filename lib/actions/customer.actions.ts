@@ -21,7 +21,7 @@ export async function createCustomer(formData: FormData) {
   const postalCode  = formData.get('postalCode') as string | null
   const city        = formData.get('city') as string | null
 
-  if (!firstName || !lastName) {
+  if (!firstName || !lastName || !email || !phone) {
     throw new Error('Verplichte velden ontbreken')
   }
 
@@ -119,7 +119,7 @@ export async function updateCustomer(id: string, formData: FormData) {
   const postalCode  = formData.get('postalCode') as string | null
   const city        = formData.get('city') as string | null
 
-  if (!firstName || !lastName) {
+  if (!firstName || !lastName || !email || !phone) {
     throw new Error('Verplichte velden ontbreken')
   }
 

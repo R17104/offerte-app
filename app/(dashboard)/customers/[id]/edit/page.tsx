@@ -50,11 +50,11 @@ export default async function EditCustomerPage({ params }: Props) {
               <FormGroup label="IBAN">
                 <Input name="iban" defaultValue={customer.iban ?? ''} placeholder="NL00 BANK 0000 0000 00" />
               </FormGroup>
-              <FormGroup label="Email">
-                <Input name="email" type="email" defaultValue={customer.email ?? ''} />
+              <FormGroup label="Email" required>
+                <Input name="email" type="email" defaultValue={customer.email ?? ''} required />
               </FormGroup>
-              <FormGroup label="Telefoonnummer">
-                <Input name="phone" defaultValue={customer.phone ?? ''} />
+              <FormGroup label="Telefoonnummer" required>
+                <Input name="phone" defaultValue={customer.phone ?? ''} required />
               </FormGroup>
             </div>
           </Card>
