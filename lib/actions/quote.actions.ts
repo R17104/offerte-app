@@ -376,10 +376,10 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
     })
     if (!quote) return { ok: false, error: 'Offerte niet gevonden' }
     if (!quote.customer.email) return { ok: false, error: 'Klant heeft geen e-mailadres' }
-    if (!process.env.RESEND_API_KEY) return { ok: false, error: 'E-mail niet geconfigureerd — voeg RESEND_API_KEY toe in Vercel' }
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return { ok: false, error: 'E-mail niet geconfigureerd — voeg GMAIL_USER en GMAIL_APP_PASSWORD toe in Vercel' }
 
     const { sendQuoteEmail } = await import('@/lib/email')
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland-black.vercel.app'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
 
     await sendQuoteEmail({
       to: quote.customer.email,

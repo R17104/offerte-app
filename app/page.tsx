@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import LandingPage from '@/components/marketing/LandingPage'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland-black.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
 
 export const metadata: Metadata = {
   title: 'Thuisbatterij & Zonnepanelen Friesland — Gratis Energieadvies',

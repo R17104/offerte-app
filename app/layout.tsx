@@ -15,7 +15,7 @@ const dmMono = DM_Mono({
   display: 'swap',
 })
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland-black.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
