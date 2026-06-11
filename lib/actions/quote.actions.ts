@@ -383,6 +383,7 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
 
     await sendQuoteEmail({
       to: quote.customer.email,
+      cc: sender?.email ?? undefined,
       customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
       senderName: sender?.name ?? sender?.email ?? 'Bespaarhulp Friesland',
       quoteTitle: quote.title,

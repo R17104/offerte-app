@@ -20,8 +20,8 @@ export default function NewCustomerPage() {
               <FormGroup label="Achternaam" required>
                 <Input name="lastName" placeholder="de Vries" required />
               </FormGroup>
-              <FormGroup label="Geboortedatum" required>
-                <Input name="dateOfBirth" type="date" required />
+              <FormGroup label="Geboortedatum">
+                <Input name="dateOfBirth" type="date" />
               </FormGroup>
               <FormGroup label="IBAN">
                 <Input name="iban" placeholder="NL00 BANK 0000 0000 00" />

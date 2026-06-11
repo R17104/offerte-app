@@ -1,5 +1,6 @@
 export async function sendQuoteEmail({
   to,
+  cc,
   customerName,
   senderName,
   quoteTitle,
@@ -7,6 +8,7 @@ export async function sendQuoteEmail({
   quoteNumber,
 }: {
   to: string
+  cc?: string
   customerName: string
   senderName: string
   quoteTitle: string
@@ -67,6 +69,7 @@ export async function sendQuoteEmail({
   await resend.emails.send({
     from,
     to,
+    ...(cc ? { cc } : {}),
     subject: `Uw offerte van Bespaarhulp Friesland — ${quoteTitle}`,
     html,
   })

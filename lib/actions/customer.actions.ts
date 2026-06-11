@@ -21,7 +21,7 @@ export async function createCustomer(formData: FormData) {
   const postalCode  = formData.get('postalCode') as string | null
   const city        = formData.get('city') as string | null
 
-  if (!firstName || !lastName || !dateOfBirth) {
+  if (!firstName || !lastName) {
     throw new Error('Verplichte velden ontbreken')
   }
 
@@ -29,7 +29,7 @@ export async function createCustomer(formData: FormData) {
     data: {
       firstName,
       lastName,
-      dateOfBirth: new Date(dateOfBirth),
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       email: email || null,
       phone: phone || null,
       iban: iban || null,
@@ -59,7 +59,7 @@ export async function createCustomer(formData: FormData) {
 export async function createCustomerInline(data: {
   firstName: string
   lastName: string
-  dateOfBirth: string
+  dateOfBirth?: string
   email?: string
   phone?: string
   street?: string
@@ -69,7 +69,7 @@ export async function createCustomerInline(data: {
 }): Promise<{ id: string; firstName: string; lastName: string }> {
   const { userId } = await verifySession()
 
-  if (!data.firstName || !data.lastName || !data.dateOfBirth) {
+  if (!data.firstName || !data.lastName) {
     throw new Error('Verplichte velden ontbreken')
   }
 
@@ -77,7 +77,7 @@ export async function createCustomerInline(data: {
     data: {
       firstName: data.firstName,
       lastName: data.lastName,
-      dateOfBirth: new Date(data.dateOfBirth),
+      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
       email: data.email || null,
       phone: data.phone || null,
       userId,
@@ -119,7 +119,7 @@ export async function updateCustomer(id: string, formData: FormData) {
   const postalCode  = formData.get('postalCode') as string | null
   const city        = formData.get('city') as string | null
 
-  if (!firstName || !lastName || !dateOfBirth) {
+  if (!firstName || !lastName) {
     throw new Error('Verplichte velden ontbreken')
   }
 
@@ -130,7 +130,7 @@ export async function updateCustomer(id: string, formData: FormData) {
       lastName,
       email: email || null,
       phone: phone || null,
-      dateOfBirth: new Date(dateOfBirth),
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       iban: iban || null,
     },
   })

@@ -144,13 +144,14 @@ export async function createLead(data: LeadImportRow) {
 }
 
 export async function createLeadFromLanding({
-  naam, email, telefoon, postcode, bericht,
+  naam, email, telefoon, postcode, bericht, herkomst,
 }: {
   naam: string
   email: string
   telefoon?: string
   postcode?: string
   bericht?: string
+  herkomst?: string
 }) {
   const parts = naam.trim().split(' ')
   const firstName = parts[0] ?? naam
@@ -168,7 +169,7 @@ export async function createLeadFromLanding({
       email:    email || null,
       phone:    telefoon || null,
       postalCode: postcode || null,
-      source:   'Website',
+      source:   herkomst ? `Website – ${herkomst}` : 'Website',
       status:   'NEW',
       createdById: systemUser.id,
     },
