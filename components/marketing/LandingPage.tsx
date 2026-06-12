@@ -261,8 +261,8 @@ function HeroSection() {
 
         {/* Left: hero text */}
         <div style={{ flex: '1 1 340px', minWidth: 280 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(245,196,66,0.12)', border: '1px solid rgba(245,196,66,0.25)', borderRadius: 4, padding: '5px 14px', marginBottom: 24 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 600, color: '#f5c442', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Salderingsregeling eindigt in 2027</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(239,68,68,0.16)', border: '1px solid rgba(248,113,113,0.45)', borderRadius: 4, padding: '5px 14px', marginBottom: 24 }}>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#fca5a5', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Salderingsregeling eindigt in 2027</span>
           </div>
 
           <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 52px)', fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: 18, letterSpacing: '-0.03em' }}>
