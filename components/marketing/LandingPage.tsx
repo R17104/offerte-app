@@ -784,8 +784,11 @@ function Diensten() {
 }
 
 // ── Reviews ───────────────────────────────────────────────────────────────────
-// LET OP: vervang deze voorbeelden door échte Google-reviews vóór livegang.
+// LET OP: de sectie staat UIT (SHOW_REVIEWS) tot er échte Google-reviews zijn.
+// Vervang de voorbeelden hieronder door echte reviews en zet dan de vlag aan.
 // Verzonnen reviews publiceren is misleidend en wettelijk niet toegestaan.
+
+const SHOW_REVIEWS = false
 
 const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=Bespaarhulp+Friesland+reviews'
 
@@ -1094,7 +1097,7 @@ export default function LandingPage({ products = [] }: { products?: ShopProduct[
       <Diensten />
       <Werkwijze />
       <InstallationGallery />
-      <ReviewsSection />
+      {SHOW_REVIEWS && <ReviewsSection />}
       <FAQ />
       <ContactForm />
       <Footer />
