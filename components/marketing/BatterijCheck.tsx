@@ -4,35 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
-// ── Exact dezelfde formule als in EnergyProfileSection.tsx / calcBatteryAdvice ──
-const ALPHA_SIZES = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
-const ELECTRICITY_TARIFF = 0.28
-const FEEDBACK_TARIFF = 0.07
+import { calcBatteryAdvice, DEFAULT_ELECTRICITY_TARIFF, DEFAULT_FEEDBACK_TARIFF } from '@/lib/battery-advice'
 
 function calcAdvice(feedbackKwh: number, kwp: number, hasHeatPump: boolean) {
-  if (feedbackKwh <= 0) return null
-
-  const dailySurplusAvg = feedbackKwh / 365
-  const heatPumpExtra = hasHeatPump ? 2.5 : 0
-  let kwpExtra = 0
-  if (kwp >= 8) kwpExtra = kwp * 0.15
-  else if (kwp >= 5) kwpExtra = kwp * 0.1
-
-  const baseKwh = Math.max(4, dailySurplusAvg + heatPumpExtra + kwpExtra)
-  const recommended = ALPHA_SIZES.find(s => s >= baseKwh) ?? ALPHA_SIZES[ALPHA_SIZES.length - 1]
-
-  const absorbable = Math.min(recommended * 365 * 0.9, feedbackKwh * 0.85)
-  const annualSavings = Math.round(absorbable * (ELECTRICITY_TARIFF - FEEDBACK_TARIFF))
-
-  return {
-    dailySurplusAvg: Math.round(dailySurplusAvg * 10) / 10,
-    heatPumpExtra,
-    kwpExtra: Math.round(kwpExtra * 10) / 10,
-    baseKwh: Math.round(baseKwh * 10) / 10,
-    recommended,
-    annualSavings,
-    selfUseKwh: Math.round(absorbable),
-  }
+  return calcBatteryAdvice({ feedbackKwh, solarKwp: kwp, hasHeatPump })
 }
 
 type Product = {
@@ -186,6 +161,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {[
                   { label: 'Gemiddeld dagelijks overschot', value: `${adv.dailySurplusAvg} kWh/dag` },
+                  { label: 'Zomers dagoverschot (basis)', value: `${adv.summerDailySurplus} kWh/dag` },
                   ...(adv.heatPumpExtra > 0 ? [{ label: 'Warmtepomp toeslag', value: `+${adv.heatPumpExtra} kWh` }] : []),
                   ...(adv.kwpExtra > 0 ? [{ label: `Paneelvermogen toeslag (${kwp} kWp)`, value: `+${adv.kwpExtra} kWh` }] : []),
                   { label: 'Minimaal benodigde capaciteit', value: `${adv.baseKwh} kWh` },
@@ -206,7 +182,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
                 <div style={{ fontSize: 11, color: '#6b7280', marginTop: 1 }}>besparing per jaar</div>
               </div>
               <div style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', border: '1px solid #bbf7d0' }}>
-                <div style={{ fontSize: 18, fontWeight: 900, color: '#0a5c35' }}>{adv.selfUseKwh} kWh</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#0a5c35' }}>{adv.absorbableKwh} kWh</div>
                 <div style={{ fontSize: 11, color: '#6b7280', marginTop: 1 }}>meer zelfverbruik/jaar</div>
               </div>
             </div>
@@ -237,7 +213,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
             </Link>
 
             <p style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', lineHeight: 1.5 }}>
-              Op basis van €{ELECTRICITY_TARIFF}/kWh inkooptarief en €{FEEDBACK_TARIFF}/kWh teruglevertarief (na salderingsafbouw 2027). Niet meegenomen: dakoriëntatie, schaduw, EV-laden.
+              Op basis van €{DEFAULT_ELECTRICITY_TARIFF}/kWh inkooptarief en €{DEFAULT_FEEDBACK_TARIFF}/kWh teruglevertarief (na salderingsafbouw 2027). Niet meegenomen: dakoriëntatie, schaduw, EV-laden.
             </p>
           </div>
         ) : (

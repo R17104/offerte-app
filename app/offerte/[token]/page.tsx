@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import QuoteAcceptanceForm from '@/components/quotes/QuoteAcceptanceForm'
+import { calcBatteryAdvice, EMS_EXAMPLE_REVENUE_EUR } from '@/lib/battery-advice'
 import PrintButton from '@/components/quotes/PrintButton'
 import TermsAndConditions from '@/components/quotes/TermsAndConditions'
 import { formatDate, formatCurrency } from '@/lib/utils'
@@ -50,7 +51,8 @@ export default async function PublicQuotePage({ params }: Props) {
 
   if (!quote) notFound()
 
-  const canInteract = ['DRAFT', 'SENT'].includes(quote.status)
+  const isExpired = quote.status === 'EXPIRED' || (quote.validUntil != null && quote.validUntil < new Date())
+  const canInteract = ['DRAFT', 'SENT'].includes(quote.status) && !isExpired
   const addr = quote.customer.addresses[0]
   const customerName = `${quote.customer.firstName} ${quote.customer.lastName}`
   const addrLine = addr ? `${addr.street} ${addr.houseNumber}, ${addr.postalCode} ${addr.city}` : ''
@@ -69,7 +71,6 @@ export default async function PublicQuotePage({ params }: Props) {
   // Verlies door afschaffing = alleen het tariffsverschil over het gesaldeerde deel
   const saldingYearlyExtra    = Math.round(saldeerbaar * (quote.electricityTariff - quote.feedbackTariff))
   const saldingMonthlyExtra   = Math.round(saldingYearlyExtra / 12)
-  const feedbackIncomeLow     = Math.round(feedbackKwh * quote.feedbackTariff)
   const feedInYearlyCost      = Math.round(feedbackKwh * quote.feedInCostTariff)
 
   const totalBatteryKwh = quote.lines
@@ -79,9 +80,6 @@ export default async function PublicQuotePage({ params }: Props) {
   const emsRevenue = quote.emsAnnualRevenueEur > 0
     ? Math.round(quote.emsAnnualRevenueEur)
     : 0
-
-  const totalYearlyBenefit  = saldingYearlyExtra + feedInYearlyCost + emsRevenue
-  const totalMonthlyBenefit = Math.round(totalYearlyBenefit / 12)
 
   const showBespaarplan = quote.hasSolarPanels || emsRevenue > 0 || feedbackKwh > 0 || totalBatteryKwh > 0
 
@@ -113,29 +111,28 @@ export default async function PublicQuotePage({ params }: Props) {
 
   const showSalderingPage = quote.hasSolarPanels && feedbackKwh > 0 && solarKwh > 0
   const currentMonthlyBill = quote.currentMonthlyBill ?? 0
-  const totalMonthlyExtra = Math.round((saldingYearlyExtra + feedInYearlyCost) / 12)
+  // Alleen het salderingsverlies komt er na 2027 bíj; de terugleverkosten
+  // betaalt de klant nu al en zitten dus al in het huidige termijnbedrag.
+  const totalMonthlyExtra = Math.round(saldingYearlyExtra / 12)
   const monthlyBill2027 = currentMonthlyBill > 0
     ? Math.round(currentMonthlyBill + totalMonthlyExtra)
     : 0
 
-  // ── Batterijadvies berekening (herbruikbaar op offertepagina) ─────────────
-  const kwp             = quote.solarPanelKwp ?? 0
-  const summerSurplus   = feedbackKwh > 0 ? (feedbackKwh * 0.65) / 182 : 0
-  const heatPumpExtra   = quote.hasHeatPump ? 2.5 : 0
-  let advBaseKwh        = feedbackKwh > 0 ? feedbackKwh / 365 : 0
-  advBaseKwh           += heatPumpExtra
-  let kwpExtra          = 0
-  if (kwp >= 8)       kwpExtra = kwp * 0.15
-  else if (kwp >= 5)  kwpExtra = kwp * 0.1
-  advBaseKwh           += kwpExtra
-  advBaseKwh            = Math.max(4, advBaseKwh)
-  const ALPHA_SIZES     = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
-  const advRecommended  = ALPHA_SIZES.find(s => s >= advBaseKwh) ?? 55.8
-  const tariffDiff      = quote.electricityTariff - quote.feedbackTariff
-  const advAbsorbable   = Math.min(advRecommended * 365 * 0.9, feedbackKwh * 0.85)
-  const advAnnualSavings = Math.round(advAbsorbable * tariffDiff)
-  const advSelfUseKwh   = Math.round(advAbsorbable)
-  const showBatteryAdvicePage = quote.includeBatteryAdvice && quote.hasSolarPanels && feedbackKwh > 0 && solarKwh > 0
+  // ── Batterijadvies (centrale formule in lib/battery-advice.ts) ────────────
+  const batteryAdvice = calcBatteryAdvice({
+    feedbackKwh,
+    solarKwp: quote.solarPanelKwp ?? 0,
+    hasHeatPump: quote.hasHeatPump,
+    electricityTariff: quote.electricityTariff,
+    feedbackTariff: quote.feedbackTariff,
+  })
+  const kwp              = batteryAdvice?.kwp ?? 0
+  const kwpExtra         = batteryAdvice?.kwpExtra ?? 0
+  const advBaseKwh       = batteryAdvice?.baseKwh ?? 0
+  const advRecommended   = batteryAdvice?.recommended ?? 0
+  const advAnnualSavings = batteryAdvice?.annualSavings ?? 0
+  const advSelfUseKwh    = batteryAdvice?.absorbableKwh ?? 0
+  const showBatteryAdvicePage = quote.includeBatteryAdvice && quote.hasSolarPanels && batteryAdvice !== null && solarKwh > 0
 
   const pageCount = 1
     + (showSalderingPage ? 1 : 0)
@@ -456,8 +453,8 @@ export default async function PublicQuotePage({ params }: Props) {
                       { label: 'Terugleververgoeding na 2027', value: `${saldeerbaar.toLocaleString('nl-NL')} × €${quote.feedbackTariff.toFixed(2).replace('.', ',')}`, sub: `€${Math.round(saldeerbaar * quote.feedbackTariff).toLocaleString('nl-NL')}/jr` },
                       { label: 'Verlies door afschaffing saldering', value: `€${saldingYearlyExtra.toLocaleString('nl-NL')}/jr`, sub: `(€${currentSalderingValue.toLocaleString('nl-NL')} - €${Math.round(saldeerbaar * quote.feedbackTariff).toLocaleString('nl-NL')})` },
                       { label: 'Terugleverkosten leverancier', value: `${feedbackKwh.toLocaleString('nl-NL')} × €${quote.feedInCostTariff.toFixed(3).replace('.', ',')}`, sub: `€${feedInYearlyCost.toLocaleString('nl-NL')}/jr` },
-                      { label: 'Totaal extra kosten per jaar', value: `€${(saldingYearlyExtra + feedInYearlyCost).toLocaleString('nl-NL')}`, bold: true },
-                      { label: 'Totaal extra kosten per maand', value: `€${Math.round((saldingYearlyExtra + feedInYearlyCost) / 12)}`, bold: true },
+                      { label: 'Totale kosten zonder batterij per jaar', value: `€${(saldingYearlyExtra + feedInYearlyCost).toLocaleString('nl-NL')}`, sub: '(salderingsverlies vanaf 2027 + huidige terugleverkosten)', bold: true },
+                      { label: 'Waarvan extra per maand vanaf 2027', value: `€${Math.round(saldingYearlyExtra / 12)}`, bold: true },
                     ].map((row, i) => (
                       <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid #f1f5f9', fontSize: 13, color: '#374151', background: row.bold ? '#f1f5f9' : 'transparent', marginLeft: row.bold ? -18 : 0, marginRight: row.bold ? -18 : 0, paddingLeft: row.bold ? 18 : 0, paddingRight: row.bold ? 18 : 0 }}>
                         <span style={{ fontWeight: row.bold ? 700 : 400 }}>{row.label}</span>
@@ -487,7 +484,7 @@ export default async function PublicQuotePage({ params }: Props) {
                 ) : (
                   <div style={{ background: '#fef9c3', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 16px' }}>
                     <p style={{ fontSize: 13, color: '#92400e' }}>
-                      Uw maandelijkse kostenstijging bedraagt <strong>€{totalMonthlyExtra} per maand</strong> na 2027 (saldering + terugleverkosten).
+                      Uw maandelijkse kostenstijging bedraagt <strong>€{totalMonthlyExtra} per maand</strong> na 2027 door de afschaffing van de saldering. De terugleverkosten (€{Math.round(feedInYearlyCost / 12)}/maand) betaalt u nu al.
                     </p>
                   </div>
                 )}
@@ -535,7 +532,7 @@ export default async function PublicQuotePage({ params }: Props) {
                 <div style={{ marginTop: 16, display: 'flex', gap: 16 }}>
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 16px', textAlign: 'center', flex: 1 }}>
                     <div style={{ fontSize: 22, fontWeight: 800, color: '#2563eb' }}>€{advAnnualSavings.toLocaleString('nl-NL')}</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>verwachte besparing/jaar</div>
+                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>verwachte besparing/jaar vanaf einde saldering (2027)</div>
                   </div>
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 16px', textAlign: 'center', flex: 1 }}>
                     <div style={{ fontSize: 22, fontWeight: 800, color: green }}>{advSelfUseKwh.toLocaleString('nl-NL')}</div>
@@ -637,7 +634,7 @@ export default async function PublicQuotePage({ params }: Props) {
                   <p style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginBottom: 6 }}>Zelfvoorzieningsgraad stijgt</p>
                   <p style={{ fontSize: 12.5, color: '#374151', lineHeight: 1.5 }}>
                     Door {advSelfUseKwh.toLocaleString('nl-NL')} kWh/jaar zelf te gebruiken in plaats van terug te leveren,
-                    ontvangt u €{tariffDiff.toFixed(2).replace('.', ',')} meer per kWh.
+                    ontvangt u €{(quote.electricityTariff - quote.feedbackTariff).toFixed(2).replace('.', ',')} meer per kWh.
                     Dat levert u circa <strong>€{advAnnualSavings.toLocaleString('nl-NL')}/jaar</strong> op.
                     Stroom die toch wordt teruggeleverd wordt via de EMS automatisch verhandeld op de onbalansmarkt — gemiddeld voor <strong>€0,15 tot €0,40/kWh</strong>.
                   </p>
@@ -863,7 +860,7 @@ export default async function PublicQuotePage({ params }: Props) {
                     <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>EMS-opbrengst: illustratief voorbeeld</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
                       <span>Alpha ESS 9,3 kWh batterij</span>
-                      <span style={{ fontWeight: 700 }}>€1.314/jaar</span>
+                      <span style={{ fontWeight: 700 }}>€{EMS_EXAMPLE_REVENUE_EUR.toLocaleString('nl-NL')}/jaar</span>
                     </div>
                     <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 8, lineHeight: 1.5 }}>Gemiddelde op basis van de Alpha ESS-vloot over de afgelopen 3 jaar.</p>
                   </div>
@@ -960,8 +957,8 @@ export default async function PublicQuotePage({ params }: Props) {
                   title: 'Netcongestie / onbalansmarkt',
                   desc: emsRevenue > 0
                     ? 'Uw Alpha ESS EMS handelt automatisch op de onbalansmarkt.'
-                    : 'Voorbeeld: 9,3 kWh Alpha ESS genereert gemiddeld €1.314/jr via de onbalansmarkt.*',
-                  value: emsRevenue > 0 ? `€${emsRevenue.toLocaleString('nl-NL')}/jr` : '€1.314/jr*',
+                    : `Voorbeeld: 9,3 kWh Alpha ESS genereert gemiddeld €${EMS_EXAMPLE_REVENUE_EUR.toLocaleString('nl-NL')}/jr via de onbalansmarkt.*`,
+                  value: emsRevenue > 0 ? `€${emsRevenue.toLocaleString('nl-NL')}/jr` : `€${EMS_EXAMPLE_REVENUE_EUR.toLocaleString('nl-NL')}/jr*`,
                 },
                 {
                   title: 'Energielabel & woningwaarde',
@@ -1170,6 +1167,14 @@ export default async function PublicQuotePage({ params }: Props) {
             {quote.status === 'REJECTED' && (
               <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
                 <p style={{ fontSize: 14, fontWeight: 600, color: '#b91c1c' }}>Afgewezen op {formatDate(quote.rejectedAt)}</p>
+              </div>
+            )}
+            {isExpired && quote.status !== 'ACCEPTED' && quote.status !== 'REJECTED' && (
+              <div style={{ background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#b45309' }}>Deze offerte is verlopen</p>
+                <p style={{ fontSize: 13, color: '#92400e', marginTop: 4 }}>
+                  De geldigheidsdatum {quote.validUntil ? `(${formatDate(quote.validUntil)}) ` : ''}is verstreken. Neem contact met ons op voor een nieuwe offerte — de actuele prijzen kunnen afwijken.
+                </p>
               </div>
             )}
           </div>

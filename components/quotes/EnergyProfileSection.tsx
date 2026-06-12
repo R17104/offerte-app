@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useEffectEvent } from 'react'
 import { estimateEnergyUsage } from '@/lib/savings'
+import { calcBatteryAdvice } from '@/lib/battery-advice'
 export type EnergyState = {
   quoteType: 'EIGEN_INVESTERING' | 'GEFINANCIERD'
   financingType: string
@@ -103,64 +104,23 @@ const s = {
   }),
 }
 
-const ALPHA_SIZES = [9.3, 18.6, 27.9, 37.2, 46.5, 55.8]
-
-function calcBatteryAdvice(state: EnergyState) {
+function calcAdviceFromState(state: EnergyState) {
   const feedbackKwh = parseFloat(state.electricityFeedbackKwh) || 0
   const solarKwh    = parseFloat(state.solarProductionKwh) || 0
-  const usageKwh    = parseFloat(state.electricityUsageKwh) || 0
-  const kwp         = parseFloat(state.solarPanelKwp) || 0
 
   if (!state.hasSolarPanels || feedbackKwh <= 0 || solarKwh <= 0) return null
 
-  // Average daily surplus (full year)
-  const dailySurplusAvg = feedbackKwh / 365
-
-  // Summer accounts for ~65% of annual feedback, spread over 182 days
-  const summerDailySurplus = (feedbackKwh * 0.65) / 182
-
-  // Base: average daily surplus is what the battery needs to store
-  let baseKwh = dailySurplusAvg
-
-  // Heat pump: adds evening/morning load that battery can serve → needs more capacity
-  const heatPumpExtra = state.hasHeatPump ? 2.5 : 0
-  baseKwh += heatPumpExtra
-
-  // High kWp → fast charge, more instantaneous power → need larger buffer
-  let kwpExtra = 0
-  if (kwp >= 8) kwpExtra = kwp * 0.15
-  else if (kwp >= 5) kwpExtra = kwp * 0.1
-  baseKwh += kwpExtra
-
-  // Minimum viable battery
-  baseKwh = Math.max(4, baseKwh)
-
-  const recommended = ALPHA_SIZES.find((s) => s >= baseKwh) ?? 18.6
-
-  // Self-use gain: the amount of feedback we can now use ourselves instead of selling cheap
-  // Assume battery absorbs ~85% of daily feedback (limited by battery size vs surplus)
-  const absorbable = Math.min(recommended * 365 * 0.9, feedbackKwh * 0.85)
-  const tariffDiff = (parseFloat(state.electricityTariff) || 0.28) - (parseFloat(state.feedbackTariff) || 0.07)
-  const annualSavings = Math.round(absorbable * tariffDiff)
-
-  return {
+  return calcBatteryAdvice({
     feedbackKwh,
-    solarKwh,
-    usageKwh,
-    kwp,
-    dailySurplusAvg: Math.round(dailySurplusAvg * 10) / 10,
-    summerDailySurplus: Math.round(summerDailySurplus * 10) / 10,
-    heatPumpExtra,
-    kwpExtra: Math.round(kwpExtra * 10) / 10,
-    baseKwh: Math.round(baseKwh * 10) / 10,
-    recommended,
-    annualSavings,
-    selfUseKwh: Math.round(absorbable),
-  }
+    solarKwp: parseFloat(state.solarPanelKwp) || 0,
+    hasHeatPump: state.hasHeatPump,
+    electricityTariff: parseFloat(state.electricityTariff) || undefined,
+    feedbackTariff: parseFloat(state.feedbackTariff) || undefined,
+  })
 }
 
 function BatteryAdvice({ state, onChange }: { state: EnergyState; onChange: (patch: Partial<EnergyState>) => void }) {
-  const adv = calcBatteryAdvice(state)
+  const adv = calcAdviceFromState(state)
   if (!adv) return null
 
   const row = (label: string, value: string, sub?: string) => (
@@ -198,7 +158,7 @@ function BatteryAdvice({ state, onChange }: { state: EnergyState; onChange: (pat
           <tbody>
             {row('Gemiddeld dagelijks overschot', `${adv.dailySurplusAvg} kWh/dag`, `(${adv.feedbackKwh} kWh/jaar ÷ 365)`)}
             {row('Zomers dagelijks overschot', `${adv.summerDailySurplus} kWh/dag`, '(65% van jaaropbrengst in ~182 zomerdagen)')}
-            {row('Startpunt berekening', `${adv.dailySurplusAvg} kWh`, 'gemiddeld dagelijks overschot als basis')}
+            {row('Startpunt berekening', `${adv.summerDailySurplus} kWh`, 'zomers dagoverschot als basis, zodat ook zonnige dagen volledig worden opgevangen')}
             {adv.heatPumpExtra > 0 && row('Warmtepomp toeslag', `+${adv.heatPumpExtra} kWh`, 'verschuiving warmtevraag naar zonne-uren')}
             {adv.kwp > 0 && adv.kwpExtra > 0 && row(`Hoog vermogen (${adv.kwp} kWp)`, `+${adv.kwpExtra} kWh`, 'snelle laadpiek vraagt grotere buffer')}
             {row('Minimaal benodigde capaciteit', `${adv.baseKwh} kWh`, '')}
@@ -209,10 +169,10 @@ function BatteryAdvice({ state, onChange }: { state: EnergyState; onChange: (pat
 
       <div style={{ marginTop: 12, background: 'rgba(10,92,53,0.04)', borderRadius: 8, padding: '10px 14px' }}>
         <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0 }}>
-          <strong>Toelichting:</strong> Met {adv.recommended} kWh batterij kan de klant circa {adv.selfUseKwh} kWh/jaar meer zelf gebruiken
+          <strong>Toelichting:</strong> Met {adv.recommended} kWh batterij kan de klant circa {adv.absorbableKwh} kWh/jaar meer zelf gebruiken
           in plaats van terug te leveren tegen {parseFloat(state.feedbackTariff) || 0.07}€/kWh.
           Dit levert een tariffsverschil op van €{Math.round(((parseFloat(state.electricityTariff) || 0.28) - (parseFloat(state.feedbackTariff) || 0.07)) * 100) / 100}/kWh,
-          dus circa €{adv.annualSavings}/jaar{state.hasHeatPump ? ' (inclusief warmtepomp-toeslag)' : ''}.
+          dus circa €{adv.annualSavings}/jaar vanaf het einde van de saldering (2027){state.hasHeatPump ? ' (inclusief warmtepomp-toeslag)' : ''}.
           {adv.kwp >= 8 ? ` Door het hoge paneelvermogen (${adv.kwp} kWp) is een grotere batterij nodig om de piekopwek volledig te bufferen.` : ''}
         </p>
       </div>
@@ -248,6 +208,9 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
   const [inputMode, setInputMode] = useState<'estimate' | 'manual'>('manual')
   const [billManuallyEdited, setBillManuallyEdited] = useState(false)
 
+  // Effect event: altijd de nieuwste onChange, zonder dat die in de deps hoeft.
+  const emitChange = useEffectEvent(onChange)
+
   useEffect(() => {
     if (billManuallyEdited) return
     const usage    = parseFloat(state.electricityUsageKwh) || 0
@@ -260,7 +223,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
     const feedInCost  = parseFloat(state.feedInCostTariff) || 0
     const netElec = Math.max(0, usage - (state.hasSolarPanels ? solar : 0))
     const monthly = Math.round(netElec * tariff / 12 + gas * gasTariff / 12 + feedback * feedInCost / 12)
-    onChange({ currentMonthlyBill: String(monthly) })
+    emitChange({ currentMonthlyBill: String(monthly) })
   }, [state.electricityUsageKwh, state.solarProductionKwh, state.electricityTariff, state.gasUsageM3, state.gasTariff, state.hasSolarPanels, state.electricityFeedbackKwh, state.feedInCostTariff, billManuallyEdited])
 
   function runEstimate() {
