@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { assignLead, updateLeadStatus } from '@/lib/actions/lead.actions'
+import type { LeadStatus } from '@prisma/client'
 
 type Lead = {
   id: string
@@ -58,7 +59,8 @@ export default function SeoLeadsView({ leads, users }: { leads: Lead[]; users: U
   const [filterStatus, setFilterStatus] = useState('all')
   const [pending, startTransition] = useTransition()
 
-  const now = Date.now()
+  // Eén keer vastleggen bij mount: Date.now() tijdens render is niet puur.
+  const [now] = useState(() => Date.now())
   const weekAgo = now - 7 * 86400000
 
   const filtered = leads.filter((l) => {
@@ -89,7 +91,7 @@ export default function SeoLeadsView({ leads, users }: { leads: Lead[]; users: U
 
   function handleStatus(leadId: string, status: string) {
     startTransition(async () => {
-      await updateLeadStatus(leadId, status as any)
+      await updateLeadStatus(leadId, status as LeadStatus)
       router.refresh()
     })
   }

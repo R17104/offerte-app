@@ -37,7 +37,7 @@ const inp: React.CSSProperties = {
 
 const label: React.CSSProperties = { fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 5 }
 
-function ToggleBtn({ value, label: lbl, active, onClick }: { value: string; label: string; active: boolean; onClick: () => void }) {
+function ToggleBtn({ label: lbl, active, onClick }: { value?: string; label: string; active: boolean; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} style={{
       flex: 1, padding: '10px 8px', borderRadius: 8,
@@ -81,6 +81,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
   const [fbTariff,         setFbTariff]         = useState('0.07')
   const [includeInstallation, setIncludeInstallation] = useState(false)
   const [opmerkingen,      setOpmerkingen]      = useState('')
+  const [website,          setWebsite]          = useState('') // honeypot
 
   function applyHouseDefaults(type: string) {
     const d = HOUSE_DEFAULTS[type]
@@ -118,6 +119,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
         productId: product.id,
         includeInstallation,
         opmerkingen: opmerkingen || undefined,
+        website,
       })
       if (result.success) {
         setDone(result.quoteNumber ?? '')
@@ -222,6 +224,9 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
                 <div>
                   <h2 style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 4 }}>Uw gegevens</h2>
                   <p style={{ fontSize: 13.5, color: '#6b7280', marginBottom: 24 }}>Hoe kunnen wij u bereiken?</p>
+
+                  {/* Honeypot: onzichtbaar voor bezoekers, bots vullen het in */}
+                  <input type="text" name="website" value={website} onChange={e => setWebsite(e.target.value)} autoComplete="off" tabIndex={-1} aria-hidden="true" style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }} />
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     <div>

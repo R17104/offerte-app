@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
 import { PageContainer, PageHeader, Card, CardHeader, Badge, Divider } from '@/components/ui'
-import { formatCurrency, formatDate, STATUS_META } from '@/lib/utils'
+import { formatCurrency, STATUS_META } from '@/lib/utils'
 import Link from 'next/link'
 import { verifySession } from '@/lib/dal'
 import SalesTodoPanel from '@/components/dashboard/SalesTodoPanel'
@@ -23,7 +23,7 @@ function StatCard({ label, value, sub, color, href }: { label: string; value: st
 }
 
 export default async function DashboardPage() {
-  const { userId, role } = await verifySession()
+  await verifySession()
 
   const now = new Date()
   const todayStart  = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -32,14 +32,13 @@ export default async function DashboardPage() {
   const tenDaysAgo    = new Date(now.getTime() - 10 * 86400000)
 
   const [
-    quoteStats, recentQuotes,
+    recentQuotes,
     leadStats, followUpToday,
     newLeads30, sentLast10Agg,
     closedDealsAgg,
     quotes30, perVerkoper,
     todos, users,
   ] = await Promise.all([
-    prisma.quote.groupBy({ by: ['status'], _count: true, _sum: { total: true }, where: { archivedAt: null } }),
     prisma.quote.findMany({
       take: 5, orderBy: { createdAt: 'desc' }, where: { archivedAt: null },
       include: { customer: true, assignedTo: { select: { name: true } } },

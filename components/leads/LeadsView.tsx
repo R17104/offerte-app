@@ -158,7 +158,7 @@ function ListView({ leads, setLeads }: { leads: LeadRow[]; setLeads: (fn: (prev:
     const ids = filtered.map((l) => l.id)
     setSelected((p) => { const n = new Set(p); if (allSelected) ids.forEach((id) => n.delete(id)); else ids.forEach((id) => n.add(id)); return n })
   }
-  function toggle(id: string) { setSelected((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n }) }
+  function toggle(id: string) { setSelected((p) => { const n = new Set(p); if (n.has(id)) { n.delete(id) } else { n.add(id) } return n }) }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {
     startTransition(async () => {
@@ -229,7 +229,7 @@ function ListView({ leads, setLeads }: { leads: LeadRow[]; setLeads: (fn: (prev:
           </thead>
           <tbody>
             {filtered.length === 0 && (
-              <tr><td colSpan={9} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor "{search}"</td></tr>
+              <tr><td colSpan={9} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor &quot;{search}&quot;</td></tr>
             )}
             {filtered.map((lead) => {
               const s = STATUS_CONFIG.find((s) => s.key === lead.status)!

@@ -18,6 +18,7 @@ export default function AdviesPage({ product }: { product?: string }) {
   const [telefoon, setTelefoon] = useState('')
   const [postcode, setPostcode] = useState('')
   const [bericht, setBericht] = useState(product ? `Interesse in: ${product}` : '')
+  const [website, setWebsite] = useState('') // honeypot
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -27,10 +28,10 @@ export default function AdviesPage({ product }: { product?: string }) {
     setError('')
     startTransition(async () => {
       try {
-        await createLeadFromLanding({ naam, email, telefoon, postcode, bericht })
+        await createLeadFromLanding({ naam, email, telefoon, postcode, bericht, website })
         setSent(true)
-      } catch {
-        setError('Er ging iets mis. Probeer het opnieuw.')
+      } catch (err) {
+        setError(err instanceof Error && err.message ? err.message : 'Er ging iets mis. Probeer het opnieuw.')
       }
     })
   }
@@ -115,6 +116,9 @@ export default function AdviesPage({ product }: { product?: string }) {
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: '#111827', marginBottom: 4 }}>Uw gegevens</h3>
+
+              {/* Honeypot: onzichtbaar voor bezoekers, bots vullen het in */}
+              <input type="text" name="website" value={website} onChange={e => setWebsite(e.target.value)} autoComplete="off" tabIndex={-1} aria-hidden="true" style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }} />
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>

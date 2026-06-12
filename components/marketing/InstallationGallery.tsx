@@ -133,7 +133,7 @@ export default function InstallationGallery() {
             <div style={{ maxWidth: 600 }}>
               <Stars n={slide.stars} />
               <p style={{ fontSize: 'clamp(13px,1.5vw,16px)', color: 'rgba(255,255,255,0.92)', lineHeight: 1.6, marginTop: 8, fontStyle: 'italic' }}>
-                "{slide.quote}"
+                &quot;{slide.quote}&quot;
               </p>
               <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0a5c35', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0 }}>

@@ -5,8 +5,6 @@ import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import ProductDetailPage from '@/components/marketing/ProductDetailPage'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
-
 type Props = { params: Promise<{ id: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

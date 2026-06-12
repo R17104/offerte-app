@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { verifySession } from '@/lib/dal'
+import { verifySession, customerAccessFilter } from '@/lib/dal'
 
 // ── Create ────────────────────────────────────────────────────────────────────
 
@@ -106,7 +106,7 @@ export async function createCustomerInline(data: {
 // ── Update ────────────────────────────────────────────────────────────────────
 
 export async function updateCustomer(id: string, formData: FormData) {
-  const { userId } = await verifySession()
+  const session = await verifySession()
 
   const firstName   = formData.get('firstName') as string
   const lastName    = formData.get('lastName') as string
@@ -123,8 +123,8 @@ export async function updateCustomer(id: string, formData: FormData) {
     throw new Error('Verplichte velden ontbreken')
   }
 
-  await prisma.customer.update({
-    where: { id, userId },
+  const result = await prisma.customer.updateMany({
+    where: { id, ...customerAccessFilter(session) },
     data: {
       firstName,
       lastName,
@@ -134,6 +134,7 @@ export async function updateCustomer(id: string, formData: FormData) {
       iban: iban || null,
     },
   })
+  if (result.count === 0) throw new Error('Klant niet gevonden of geen toegang')
 
   if (street && city) {
     const existing = await prisma.address.findFirst({
@@ -170,9 +171,9 @@ export async function updateCustomer(id: string, formData: FormData) {
 // ── Archive / unarchive ───────────────────────────────────────────────────────
 
 export async function archiveCustomer(id: string) {
-  const { userId } = await verifySession()
-  await prisma.customer.update({
-    where: { id, userId },
+  const session = await verifySession()
+  await prisma.customer.updateMany({
+    where: { id, ...customerAccessFilter(session) },
     data: { archivedAt: new Date() },
   })
   revalidatePath('/customers')
@@ -180,9 +181,9 @@ export async function archiveCustomer(id: string) {
 }
 
 export async function unarchiveCustomer(id: string) {
-  const { userId } = await verifySession()
-  await prisma.customer.update({
-    where: { id, userId },
+  const session = await verifySession()
+  await prisma.customer.updateMany({
+    where: { id, ...customerAccessFilter(session) },
     data: { archivedAt: null },
   })
   revalidatePath('/customers')
@@ -192,13 +193,13 @@ export async function unarchiveCustomer(id: string) {
 // ── Delete ────────────────────────────────────────────────────────────────────
 
 export async function deleteCustomer(id: string) {
-  const { userId } = await verifySession()
+  const session = await verifySession()
 
-  const customer = await prisma.customer.findUnique({
-    where: { id, userId },
+  const customer = await prisma.customer.findFirst({
+    where: { id, ...customerAccessFilter(session) },
     select: { id: true },
   })
-  if (!customer) throw new Error('Klant niet gevonden')
+  if (!customer) throw new Error('Klant niet gevonden of geen toegang')
 
   const quotes = await prisma.quote.findMany({
     where: { customerId: id },
@@ -206,13 +207,16 @@ export async function deleteCustomer(id: string) {
   })
   const quoteIds = quotes.map((q) => q.id)
 
-  if (quoteIds.length > 0) {
-    await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: quoteIds } } })
-    await prisma.quoteLine.deleteMany({ where: { quoteId: { in: quoteIds } } })
-    await prisma.quote.deleteMany({ where: { id: { in: quoteIds } } })
-  }
-
-  await prisma.customer.delete({ where: { id } })
+  await prisma.$transaction([
+    ...(quoteIds.length > 0
+      ? [
+          prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: quoteIds } } }),
+          prisma.quoteLine.deleteMany({ where: { quoteId: { in: quoteIds } } }),
+          prisma.quote.deleteMany({ where: { id: { in: quoteIds } } }),
+        ]
+      : []),
+    prisma.customer.delete({ where: { id } }),
+  ])
 
   revalidatePath('/customers')
   redirect('/customers')
@@ -221,42 +225,47 @@ export async function deleteCustomer(id: string) {
 // ── Bulk actions ─────────────────────────────────────────────────────────────
 
 export async function bulkArchiveCustomers(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.customer.updateMany({ where: { id: { in: ids }, userId }, data: { archivedAt: new Date() } })
+  await prisma.customer.updateMany({ where: { id: { in: ids }, ...customerAccessFilter(session) }, data: { archivedAt: new Date() } })
   revalidatePath('/customers')
 }
 
 export async function bulkUnarchiveCustomers(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.customer.updateMany({ where: { id: { in: ids }, userId }, data: { archivedAt: null } })
+  await prisma.customer.updateMany({ where: { id: { in: ids }, ...customerAccessFilter(session) }, data: { archivedAt: null } })
   revalidatePath('/customers')
 }
 
 export async function bulkDeleteCustomers(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  const owned = await prisma.customer.findMany({ where: { id: { in: ids }, userId }, select: { id: true } })
+  const owned = await prisma.customer.findMany({ where: { id: { in: ids }, ...customerAccessFilter(session) }, select: { id: true } })
   const ownedIds = owned.map((c) => c.id)
   if (!ownedIds.length) return
   const quotes = await prisma.quote.findMany({ where: { customerId: { in: ownedIds } }, select: { id: true } })
   const quoteIds = quotes.map((q) => q.id)
-  if (quoteIds.length > 0) {
-    await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: quoteIds } } })
-    await prisma.quoteLine.deleteMany({ where: { quoteId: { in: quoteIds } } })
-    await prisma.quote.deleteMany({ where: { id: { in: quoteIds } } })
-  }
-  await prisma.customer.deleteMany({ where: { id: { in: ownedIds } } })
+  await prisma.$transaction([
+    ...(quoteIds.length > 0
+      ? [
+          prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: quoteIds } } }),
+          prisma.quoteLine.deleteMany({ where: { quoteId: { in: quoteIds } } }),
+          prisma.quote.deleteMany({ where: { id: { in: quoteIds } } }),
+        ]
+      : []),
+    prisma.customer.deleteMany({ where: { id: { in: ownedIds } } }),
+  ])
   revalidatePath('/customers')
 }
 
 export async function assignCustomer(customerId: string, userId: string | null) {
-  await verifySession()
-  await prisma.customer.update({
-    where: { id: customerId },
+  const session = await verifySession()
+  const result = await prisma.customer.updateMany({
+    where: { id: customerId, ...customerAccessFilter(session) },
     data: { userId },
   })
+  if (result.count === 0) throw new Error('Klant niet gevonden of geen toegang')
   revalidatePath(`/customers/${customerId}`)
   revalidatePath('/customers')
 }

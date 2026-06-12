@@ -1,3 +1,12 @@
+function escapeHtml(s: string): string {
+  return s
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
 async function createTransporter() {
   const user = process.env.GMAIL_USER
   const pass = process.env.GMAIL_APP_PASSWORD
@@ -31,6 +40,13 @@ export async function sendQuoteEmail({
 }) {
   const transporter = await createTransporter()
   const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
+
+  const subject = `Uw offerte van Bespaarhulp Friesland — ${quoteTitle}`
+
+  customerName = escapeHtml(customerName)
+  senderName = escapeHtml(senderName)
+  quoteTitle = escapeHtml(quoteTitle)
+  quoteNumber = escapeHtml(quoteNumber)
 
   const html = `
 <!DOCTYPE html>
@@ -77,7 +93,125 @@ export async function sendQuoteEmail({
     from,
     to,
     ...(cc ? { cc } : {}),
-    subject: `Uw offerte van Bespaarhulp Friesland — ${quoteTitle}`,
+    subject,
     html,
   })
+}
+
+// ── Bevestiging naar de aanvrager van een lead/offerte ────────────────────────
+
+export async function sendLeadConfirmationEmail({
+  to,
+  name,
+  quoteNumber,
+}: {
+  to: string
+  name: string
+  quoteNumber?: string
+}) {
+  const transporter = await createTransporter()
+  const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
+  const safeName = escapeHtml(name)
+
+  const html = `
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:'DM Sans',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <tr><td style="background:#0a5c35;padding:28px 36px;">
+          <p style="margin:0;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">Bespaarhulp Friesland</p>
+          <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.7);">Uw persoonlijk energieadvies</p>
+        </td></tr>
+        <tr><td style="padding:36px 36px 28px;">
+          <p style="margin:0 0 8px;font-size:16px;color:#111827;">Beste ${safeName},</p>
+          <p style="margin:0 0 18px;font-size:14px;color:#4b5563;line-height:1.7;">
+            Bedankt voor uw aanvraag! Eén van onze adviseurs neemt <strong>binnen één werkdag</strong> persoonlijk contact met u op — geen callcenter, gewoon iemand uit Friesland die uw situatie doorneemt.
+          </p>
+          ${quoteNumber ? `<p style="margin:0 0 18px;font-size:13px;color:#6b7280;">Uw offerte wordt voorbereid onder nummer <strong style="color:#111827;">${escapeHtml(quoteNumber)}</strong>.</p>` : ''}
+          <p style="margin:0 0 8px;font-size:14px;color:#4b5563;line-height:1.7;">
+            Heeft u in de tussentijd een vraag? App ons gerust via WhatsApp: <a href="https://wa.me/31638922513" style="color:#0a5c35;font-weight:600;">06 38 92 25 13</a>.
+          </p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;padding:20px 36px;border-top:1px solid #e5e7eb;">
+          <p style="margin:0;font-size:12px;color:#9ca3af;">
+            Bespaarhulp Friesland · KVK 71128174 · Actief in heel Friesland
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject: 'Aanvraag ontvangen — wij bellen u binnen één werkdag',
+    html,
+  })
+}
+
+// ── Interne notificatie bij acceptatie/afwijzing ──────────────────────────────
+
+export async function sendQuoteStatusNotification({
+  to,
+  outcome,
+  customerName,
+  quoteTitle,
+  quoteNumber,
+  quoteTotal,
+  dashboardUrl,
+}: {
+  to: string[]
+  outcome: 'accepted' | 'rejected'
+  customerName: string
+  quoteTitle: string
+  quoteNumber: string
+  quoteTotal: string
+  dashboardUrl: string
+}) {
+  if (!to.length) return
+  const transporter = await createTransporter()
+  const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
+
+  const accepted = outcome === 'accepted'
+  const subject = accepted
+    ? `✅ Offerte ondertekend: ${quoteTitle} (${quoteNumber})`
+    : `❌ Offerte afgewezen: ${quoteTitle} (${quoteNumber})`
+
+  const safeCustomer = escapeHtml(customerName)
+  const safeTitle = escapeHtml(quoteTitle)
+  const safeNumber = escapeHtml(quoteNumber)
+  const color = accepted ? '#0a5c35' : '#b91c1c'
+
+  const html = `
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:24px;background:#f4f6f8;font-family:'DM Sans',Arial,sans-serif;">
+  <table width="560" cellpadding="0" cellspacing="0" style="margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;">
+    <tr><td style="background:${color};padding:20px 28px;">
+      <p style="margin:0;font-size:17px;font-weight:700;color:#ffffff;">
+        Offerte ${accepted ? 'ondertekend' : 'afgewezen'}
+      </p>
+    </td></tr>
+    <tr><td style="padding:24px 28px;">
+      <p style="margin:0 0 14px;font-size:14px;color:#111827;">
+        <strong>${safeCustomer}</strong> heeft offerte <strong>${safeTitle}</strong> (${safeNumber}, ${escapeHtml(quoteTotal)}) ${accepted ? 'ondertekend' : 'afgewezen'}.
+      </p>
+      <p style="margin:0 0 20px;font-size:13px;color:#6b7280;">
+        ${accepted ? 'Neem binnen 24 uur contact op met de klant om de installatie in te plannen.' : 'Bekijk de offerte in het dashboard voor een eventuele opvolging.'}
+      </p>
+      <a href="${dashboardUrl}" style="display:inline-block;padding:11px 22px;background:${color};border-radius:8px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
+        Bekijk in dashboard →
+      </a>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  await transporter.sendMail({ from, to, subject, html })
 }

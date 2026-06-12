@@ -90,8 +90,6 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
     startTransition(() => deleteLeadNote(noteId, lead.id))
   }
 
-  const currentStatus = STATUS_OPTIONS.find((s) => s.value === status)!
-
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
 

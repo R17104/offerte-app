@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const nav = [
   {
@@ -32,8 +32,6 @@ const nav = [
 export default function Sidebar() {
   const path = usePathname()
   const [open, setOpen] = useState(false)
-
-  useEffect(() => { setOpen(false) }, [path])
 
   return (
     <>
@@ -140,6 +138,7 @@ export default function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setOpen(false)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -177,6 +176,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setOpen(false)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 9,
                 padding: '6px 8px', borderRadius: 'var(--radius-md)',

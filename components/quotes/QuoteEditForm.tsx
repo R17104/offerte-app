@@ -278,7 +278,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
               <span>
                 Reservatieoptie inschakelen{' '}
                 <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>
-                  — klant ziet optie "Reserveer onder voorbehoud van financiering (€250)"
+                  — klant ziet optie &quot;Reserveer onder voorbehoud van financiering (€250)&quot;
                 </span>
               </span>
             </label>
@@ -293,7 +293,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
               style={{ ...s.input, resize: 'vertical' }}
             />
             <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
-              Tekst voor de begeleidende brief bovenin de offerte. Gebruik lege regels voor nieuwe alinea's. Laat leeg voor een standaard tekst.
+              Tekst voor de begeleidende brief bovenin de offerte. Gebruik lege regels voor nieuwe alinea&apos;s. Laat leeg voor een standaard tekst.
             </span>
           </div>
           <div style={{ ...s.field, gridColumn: '1 / -1' }}>

@@ -16,8 +16,8 @@ export async function GET() {
     try {
       await prisma.$queryRawUnsafe(sql)
       checks[key] = 'OK'
-    } catch (e: any) {
-      checks[key] = 'FAIL: ' + e.message
+    } catch (e) {
+      checks[key] = 'FAIL: ' + (e instanceof Error ? e.message : String(e))
     }
   }
 
@@ -41,8 +41,8 @@ export async function GET() {
     try {
       await fn()
       checks[key] = 'OK'
-    } catch (e: any) {
-      checks[key] = 'FAIL: ' + e.message
+    } catch (e) {
+      checks[key] = 'FAIL: ' + (e instanceof Error ? e.message : String(e))
     }
   }
 

@@ -4,19 +4,9 @@ import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { calculateQuoteTotals } from '@/lib/utils'
-import { verifySession } from '@/lib/dal'
+import { verifySession, quoteAccessFilter } from '@/lib/dal'
+import { withQuoteNumber } from '@/lib/quote-number'
 import { QuoteType, FinancingType, HouseType } from '@prisma/client'
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-async function generateQuoteNumber(): Promise<string> {
-  const year = new Date().getFullYear()
-  const count = await prisma.quote.count({
-    where: { quoteNumber: { startsWith: `OFT-${year}-` } },
-  })
-  const seq = String(count + 1).padStart(4, '0')
-  return `OFT-${year}-${seq}`
-}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,6 +68,45 @@ export type AcceptQuoteInput = {
   acceptanceType?: string
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+// Stuurt een interne notificatie naar maker + toegewezen verkoper. Mag nooit
+// de acceptatie/afwijzing zelf laten falen.
+async function notifyQuoteOutcome(quoteId: string, outcome: 'accepted' | 'rejected') {
+  try {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return
+
+    const quote = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      select: {
+        title: true,
+        quoteNumber: true,
+        total: true,
+        customer: { select: { firstName: true, lastName: true } },
+        createdBy: { select: { email: true } },
+        assignedTo: { select: { email: true } },
+      },
+    })
+    if (!quote) return
+
+    const to = [...new Set([quote.createdBy.email, quote.assignedTo?.email].filter((e): e is string => !!e))]
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
+
+    const { sendQuoteStatusNotification } = await import('@/lib/email')
+    await sendQuoteStatusNotification({
+      to,
+      outcome,
+      customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
+      quoteTitle: quote.title,
+      quoteNumber: quote.quoteNumber,
+      quoteTotal: new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(quote.total),
+      dashboardUrl: `${baseUrl}/quotes/${quoteId}`,
+    })
+  } catch (e) {
+    console.error('Notificatie-mail versturen mislukt:', e)
+  }
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 export async function createQuote(input: CreateQuoteInput): Promise<{ id: string }> {
@@ -89,9 +118,8 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
   }
 
   const { subtotal, vatTotal, total } = calculateQuoteTotals(lines, discountAmount)
-  const quoteNumber = await generateQuoteNumber()
 
-  const quote = await prisma.quote.create({
+  const quote = await withQuoteNumber((quoteNumber) => prisma.quote.create({
     data: {
       quoteNumber,
       title,
@@ -120,7 +148,7 @@ export async function createQuote(input: CreateQuoteInput): Promise<{ id: string
         })),
       },
     },
-  })
+  }))
 
   return { id: quote.id }
 }
@@ -139,15 +167,15 @@ export type UpdateQuoteInput = {
 }
 
 export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   const { title, notes, introText, includedItems, termsText, validUntil, discountAmount, reservationOptionEnabled, lines, energy } = input
 
   if (!title || lines.length === 0) {
     throw new Error('Titel en minimaal één productregel zijn verplicht')
   }
 
-  const quote = await prisma.quote.findUnique({
-    where: { id: quoteId, createdById: userId },
+  const quote = await prisma.quote.findFirst({
+    where: { id: quoteId, ...quoteAccessFilter(session) },
     select: { id: true, status: true },
   })
   if (!quote) throw new Error('Offerte niet gevonden')
@@ -194,13 +222,13 @@ export async function updateQuote(quoteId: string, input: UpdateQuoteInput): Pro
 }
 
 export async function updateQuoteStatus(quoteId: string, status: string) {
-  const { userId } = await verifySession()
+  const session = await verifySession()
 
   const allowed = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED']
   if (!allowed.includes(status)) throw new Error('Ongeldige status')
 
-  const quote = await prisma.quote.findUnique({
-    where: { id: quoteId, createdById: userId },
+  const quote = await prisma.quote.findFirst({
+    where: { id: quoteId, ...quoteAccessFilter(session) },
     select: { id: true, status: true },
   })
   if (!quote) throw new Error('Offerte niet gevonden')
@@ -227,13 +255,16 @@ export async function acceptQuoteByToken(token: string, input: AcceptQuoteInput)
 
   const quote = await prisma.quote.findUnique({
     where: { publicToken: token },
-    select: { id: true, status: true },
+    select: { id: true, status: true, validUntil: true },
   })
 
   if (!quote) throw new Error('Offerte niet gevonden')
   if (quote.status === 'ACCEPTED') throw new Error('Offerte is al geaccepteerd')
   if (quote.status === 'REJECTED') throw new Error('Offerte is al afgewezen')
   if (quote.status === 'EXPIRED')  throw new Error('Offerte is verlopen')
+  if (quote.validUntil && quote.validUntil < new Date()) {
+    throw new Error('Deze offerte is verlopen. Neem contact met ons op voor een nieuwe offerte.')
+  }
 
   await prisma.$transaction([
     prisma.quote.update({
@@ -255,15 +286,17 @@ export async function acceptQuoteByToken(token: string, input: AcceptQuoteInput)
     }),
   ])
 
+  await notifyQuoteOutcome(quote.id, 'accepted')
+
   redirect(`/offerte/${token}/bevestiging?type=accepted`)
 }
 
 // ── Archive / unarchive ───────────────────────────────────────────────────────
 
 export async function archiveQuote(id: string) {
-  const { userId } = await verifySession()
-  await prisma.quote.update({
-    where: { id, createdById: userId },
+  const session = await verifySession()
+  await prisma.quote.updateMany({
+    where: { id, ...quoteAccessFilter(session) },
     data: { archivedAt: new Date() },
   })
   revalidatePath('/quotes')
@@ -271,9 +304,9 @@ export async function archiveQuote(id: string) {
 }
 
 export async function unarchiveQuote(id: string) {
-  const { userId } = await verifySession()
-  await prisma.quote.update({
-    where: { id, createdById: userId },
+  const session = await verifySession()
+  await prisma.quote.updateMany({
+    where: { id, ...quoteAccessFilter(session) },
     data: { archivedAt: null },
   })
   revalidatePath('/quotes')
@@ -283,18 +316,20 @@ export async function unarchiveQuote(id: string) {
 // ── Delete ────────────────────────────────────────────────────────────────────
 
 export async function deleteQuote(id: string) {
-  const { userId } = await verifySession()
+  const session = await verifySession()
 
-  const quote = await prisma.quote.findUnique({
-    where: { id, createdById: userId },
+  const quote = await prisma.quote.findFirst({
+    where: { id, ...quoteAccessFilter(session) },
     select: { id: true, status: true },
   })
   if (!quote) throw new Error('Offerte niet gevonden')
   if (quote.status === 'ACCEPTED') throw new Error('Geaccepteerde offertes kunnen niet worden verwijderd')
 
-  await prisma.quoteAcceptance.deleteMany({ where: { quoteId: id } })
-  await prisma.quoteLine.deleteMany({ where: { quoteId: id } })
-  await prisma.quote.delete({ where: { id } })
+  await prisma.$transaction([
+    prisma.quoteAcceptance.deleteMany({ where: { quoteId: id } }),
+    prisma.quoteLine.deleteMany({ where: { quoteId: id } }),
+    prisma.quote.delete({ where: { id } }),
+  ])
 
   revalidatePath('/quotes')
   redirect('/quotes')
@@ -303,35 +338,37 @@ export async function deleteQuote(id: string) {
 // ── Bulk actions ─────────────────────────────────────────────────────────────
 
 export async function bulkArchiveQuotes(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { archivedAt: new Date() } })
+  await prisma.quote.updateMany({ where: { id: { in: ids }, ...quoteAccessFilter(session) }, data: { archivedAt: new Date() } })
   revalidatePath('/quotes')
 }
 
 export async function bulkUnarchiveQuotes(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { archivedAt: null } })
+  await prisma.quote.updateMany({ where: { id: { in: ids }, ...quoteAccessFilter(session) }, data: { archivedAt: null } })
   revalidatePath('/quotes')
 }
 
 export async function bulkExpireQuotes(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.quote.updateMany({ where: { id: { in: ids }, createdById: userId, status: { not: 'ACCEPTED' } }, data: { status: 'EXPIRED' } })
+  await prisma.quote.updateMany({ where: { id: { in: ids }, ...quoteAccessFilter(session), status: { not: 'ACCEPTED' } }, data: { status: 'EXPIRED' } })
   revalidatePath('/quotes')
 }
 
 export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  const owned = await prisma.quote.findMany({ where: { id: { in: ids }, createdById: userId, status: { not: 'ACCEPTED' } }, select: { id: true } })
+  const owned = await prisma.quote.findMany({ where: { id: { in: ids }, ...quoteAccessFilter(session), status: { not: 'ACCEPTED' } }, select: { id: true } })
   const ownedIds = owned.map((q) => q.id)
   if (!ownedIds.length) return
-  await prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: ownedIds } } })
-  await prisma.quoteLine.deleteMany({ where: { quoteId: { in: ownedIds } } })
-  await prisma.quote.deleteMany({ where: { id: { in: ownedIds } } })
+  await prisma.$transaction([
+    prisma.quoteAcceptance.deleteMany({ where: { quoteId: { in: ownedIds } } }),
+    prisma.quoteLine.deleteMany({ where: { quoteId: { in: ownedIds } } }),
+    prisma.quote.deleteMany({ where: { id: { in: ownedIds } } }),
+  ])
   revalidatePath('/quotes')
 }
 
@@ -352,26 +389,29 @@ export async function rejectQuoteByToken(token: string) {
     data: { status: 'REJECTED', rejectedAt: new Date() },
   })
 
+  await notifyQuoteOutcome(quote.id, 'rejected')
+
   redirect(`/offerte/${token}/bevestiging?type=rejected`)
 }
 
 export async function assignQuote(quoteId: string, assignedToId: string | null) {
-  await verifySession()
-  await prisma.quote.update({
-    where: { id: quoteId },
+  const session = await verifySession()
+  const result = await prisma.quote.updateMany({
+    where: { id: quoteId, ...quoteAccessFilter(session) },
     data: { assignedToId },
   })
+  if (result.count === 0) throw new Error('Offerte niet gevonden of geen toegang')
   revalidatePath(`/quotes/${quoteId}`)
   revalidatePath('/quotes')
 }
 
 export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; error?: string }> {
   try {
-    const { userId } = await verifySession()
-    const sender = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } })
+    const session = await verifySession()
+    const sender = await prisma.user.findUnique({ where: { id: session.userId }, select: { name: true, email: true } })
 
-    const quote = await prisma.quote.findUnique({
-      where: { id: quoteId },
+    const quote = await prisma.quote.findFirst({
+      where: { id: quoteId, ...quoteAccessFilter(session) },
       include: { customer: true },
     })
     if (!quote) return { ok: false, error: 'Offerte niet gevonden' }
@@ -394,7 +434,7 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
     await prisma.quote.update({ where: { id: quoteId }, data: { sentAt: new Date() } })
     revalidatePath(`/quotes/${quoteId}`)
     return { ok: true }
-  } catch (e: any) {
-    return { ok: false, error: e?.message ?? 'Versturen mislukt' }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Versturen mislukt' }
   }
 }

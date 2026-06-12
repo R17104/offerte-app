@@ -46,9 +46,15 @@ export async function register(prevState: AuthState, formData: FormData): Promis
     return { error: 'Wachtwoorden komen niet overeen' }
   }
 
+  // De standaardcode '1234' geldt alleen zolang er nog geen enkele gebruiker
+  // bestaat (eerste installatie). Daarna moet een admin een code instellen.
   const setting = await prisma.setting.findUnique({ where: { key: 'registration_code' } })
-  const validCode = setting?.value ?? '1234'
-  if (!registrationCode || registrationCode !== validCode) {
+  let validCode = setting?.value
+  if (!validCode) {
+    const userCount = await prisma.user.count()
+    if (userCount === 0) validCode = '1234'
+  }
+  if (!validCode || !registrationCode || registrationCode !== validCode) {
     return { error: 'Ongeldige registratiecode' }
   }
 

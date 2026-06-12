@@ -11,7 +11,6 @@ type Props = {
 }
 
 const ROLE_LABEL: Record<string, string> = { ADMIN: 'Beheerder', SALES: 'Verkoper' }
-const ROLE_COLOR: Record<string, string> = { ADMIN: '#0a5c35', SALES: '#2563eb' }
 
 export default function AccountClient({ name, email, role }: Props) {
   const [isPending, startTransition] = useTransition()

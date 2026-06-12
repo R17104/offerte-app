@@ -3,9 +3,22 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { verifySession } from '@/lib/dal'
+import { verifySession, leadAccessFilter } from '@/lib/dal'
 import { LeadStatus, HouseType } from '@prisma/client'
 import { calculateQuoteTotals } from '@/lib/utils'
+import { withQuoteNumber } from '@/lib/quote-number'
+import { checkPublicForm, isValidEmail } from '@/lib/public-form-guard'
+
+// Bevestiging naar de aanvrager; mag de aanvraag zelf nooit laten falen.
+async function sendConfirmationSafe(to: string, name: string, quoteNumber?: string) {
+  try {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return
+    const { sendLeadConfirmationEmail } = await import('@/lib/email')
+    await sendLeadConfirmationEmail({ to, name, quoteNumber })
+  } catch (e) {
+    console.error('Bevestigingsmail versturen mislukt:', e)
+  }
+}
 
 export type LeadImportRow = {
   firstName: string
@@ -40,11 +53,12 @@ export async function importLeads(rows: LeadImportRow[], source: string) {
 }
 
 export async function updateLeadStatus(leadId: string, status: LeadStatus) {
-  const { userId } = await verifySession()
-  await prisma.lead.update({
-    where: { id: leadId, createdById: userId },
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
     data: { status },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath('/leads')
   revalidatePath(`/leads/${leadId}`)
 }
@@ -58,27 +72,29 @@ export async function addLeadNote(leadId: string, content: string) {
 }
 
 export async function deleteLeadNote(noteId: string, leadId: string) {
-  const { userId } = await verifySession()
-  await prisma.leadNote.delete({
-    where: { id: noteId, authorId: userId },
+  const session = await verifySession()
+  // Auteur mag eigen notities verwijderen; admin mag alle notities verwijderen.
+  await prisma.leadNote.deleteMany({
+    where: { id: noteId, ...(session.role === 'ADMIN' ? {} : { authorId: session.userId }) },
   })
   revalidatePath(`/leads/${leadId}`)
 }
 
 export async function archiveLead(leadId: string) {
-  const { userId } = await verifySession()
-  await prisma.lead.update({
-    where: { id: leadId, createdById: userId },
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
     data: { archivedAt: new Date() },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath('/leads')
   redirect('/leads')
 }
 
 export async function updateLead(leadId: string, data: LeadImportRow) {
-  const { userId } = await verifySession()
-  await prisma.lead.update({
-    where: { id: leadId, createdById: userId },
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
     data: {
       firstName:   data.firstName,
       lastName:    data.lastName,
@@ -90,45 +106,50 @@ export async function updateLead(leadId: string, data: LeadImportRow) {
       city:        data.city        || null,
     },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath('/leads')
   revalidatePath(`/leads/${leadId}`)
   redirect(`/leads/${leadId}`)
 }
 
 export async function deleteLead(leadId: string) {
-  const { userId } = await verifySession()
-  await prisma.lead.delete({
-    where: { id: leadId, createdById: userId },
+  const session = await verifySession()
+  const result = await prisma.lead.deleteMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath('/leads')
   redirect('/leads')
 }
 
 export async function updateFollowUp(leadId: string, date: string | null) {
-  await verifySession()
-  await prisma.lead.update({
-    where: { id: leadId },
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
     data: { followUpAt: date ? new Date(date) : null },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath(`/leads/${leadId}`)
   revalidatePath('/')
 }
 
 export async function assignLead(leadId: string, assignedToId: string | null) {
-  await verifySession()
-  await prisma.lead.update({
-    where: { id: leadId },
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
     data: { assignedToId },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath(`/leads/${leadId}`)
 }
 
 export async function setAppointmentPlanner(leadId: string, appointmentPlannedById: string | null) {
-  await verifySession()
-  await prisma.lead.update({
-    where: { id: leadId },
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
     data: { appointmentPlannedById },
   })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   revalidatePath(`/leads/${leadId}`)
 }
 
@@ -153,7 +174,7 @@ export async function createLead(data: LeadImportRow) {
 }
 
 export async function createLeadFromLanding({
-  naam, email, telefoon, postcode, bericht, herkomst,
+  naam, email, telefoon, postcode, bericht, herkomst, website,
 }: {
   naam: string
   email: string
@@ -161,7 +182,16 @@ export async function createLeadFromLanding({
   postcode?: string
   bericht?: string
   herkomst?: string
+  website?: string // honeypot — hoort leeg te blijven
 }) {
+  const guard = await checkPublicForm(website)
+  if (!guard.allowed) {
+    if (guard.silent) return
+    throw new Error(guard.error)
+  }
+  if (!naam.trim()) throw new Error('Vul je naam in')
+  if (!isValidEmail(email)) throw new Error('Vul een geldig e-mailadres in')
+
   const parts = naam.trim().split(' ')
   const firstName = parts[0] ?? naam
   const lastName  = parts.slice(1).join(' ') || '-'
@@ -189,6 +219,8 @@ export async function createLeadFromLanding({
       data: { leadId: lead.id, content: bericht.trim(), authorId: systemUser.id },
     })
   }
+
+  await sendConfirmationSafe(email, firstName)
 
   revalidatePath('/leads')
   revalidatePath('/dashboard')
@@ -220,20 +252,25 @@ export type IntakeFormData = {
   productId: string
   includeInstallation: boolean
   opmerkingen?: string
+  website?: string // honeypot — hoort leeg te blijven
 }
 
 export async function createLeadWithQuote(data: IntakeFormData): Promise<{ success: boolean; quoteNumber?: string; error?: string }> {
+  const guard = await checkPublicForm(data.website)
+  if (!guard.allowed) {
+    // Honeypot-hit: doe alsof het gelukt is zodat bots niets leren.
+    if (guard.silent) return { success: true }
+    return { success: false, error: guard.error }
+  }
+  if (!data.firstName?.trim() || !data.lastName?.trim()) return { success: false, error: 'Vul je naam in' }
+  if (!isValidEmail(data.email)) return { success: false, error: 'Vul een geldig e-mailadres in' }
+
   const systemUser = await prisma.user.findFirst({ where: { role: 'ADMIN' }, orderBy: { createdAt: 'asc' } })
     ?? await prisma.user.findFirst({ orderBy: { createdAt: 'asc' } })
   if (!systemUser) return { success: false, error: 'Geen systeemgebruiker gevonden' }
 
   const product = await prisma.product.findUnique({ where: { id: data.productId } })
   if (!product) return { success: false, error: 'Product niet gevonden' }
-
-  // Quote number
-  const year = new Date().getFullYear()
-  const count = await prisma.quote.count({ where: { quoteNumber: { startsWith: `OFT-${year}-` } } })
-  const quoteNumber = `OFT-${year}-${String(count + 1).padStart(4, '0')}`
 
   const lines: { productId?: string; name: string; description?: string; quantity: number; unitPrice: number; vatRate: number }[] = [
     { productId: product.id, name: product.name, description: product.description ?? undefined, quantity: 1, unitPrice: product.unitPrice, vatRate: product.vatRate },
@@ -265,7 +302,7 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
   })
 
   // Quote aanmaken
-  const quote = await prisma.quote.create({
+  const quote = await withQuoteNumber((quoteNumber) => prisma.quote.create({
     data: {
       quoteNumber,
       title:      `Offerte – ${product.name} – ${data.firstName} ${data.lastName}`,
@@ -297,12 +334,12 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
           quantity:    l.quantity,
           unitPrice:   l.unitPrice,
           vatRate:     l.vatRate,
-          lineTotal:   l.quantity * l.unitPrice,
+          lineTotal:   l.quantity * l.unitPrice * (1 + l.vatRate / 100),
           productId:   l.productId,
         })),
       },
     },
-  })
+  }))
 
   // Lead aanmaken
   const houseTypeLabel: Record<string, string> = { APARTMENT: 'Appartement', TERRACED: 'Tussenwoning', CORNER: 'Hoekwoning', DETACHED: 'Vrijstaand' }
@@ -329,7 +366,7 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
     ``,
     `Product: ${product.name} (€${product.unitPrice.toLocaleString('nl-NL')} excl. BTW)`,
     data.includeInstallation ? `Installatie: ja (+€1.250 excl. BTW)` : `Installatie: nee (alleen product)`,
-    `Offertenummer: ${quoteNumber}`,
+    `Offertenummer: ${quote.quoteNumber}`,
     ``,
     `Huidig maandtermijn: €${data.currentMonthlyBill}/mnd`,
     `Stroomverbruik: ${data.electricityUsageKwh} kWh/jaar`,
@@ -347,40 +384,43 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
     data: { leadId: lead.id, content: noteLines, authorId: systemUser.id },
   })
 
+  await sendConfirmationSafe(data.email, data.firstName, quote.quoteNumber)
+
   revalidatePath('/leads')
   revalidatePath('/dashboard')
-  return { success: true, quoteNumber }
+  return { success: true, quoteNumber: quote.quoteNumber }
 }
 
 // ── Bulk actions ──────────────────────────────────────────────────────────────
 
 export async function bulkDeleteLeads(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.leadNote.deleteMany({ where: { leadId: { in: ids } } })
-  await prisma.lead.deleteMany({ where: { id: { in: ids }, createdById: userId } })
+  // Notities verdwijnen automatisch via onDelete: Cascade op LeadNote.
+  await prisma.lead.deleteMany({ where: { id: { in: ids }, ...leadAccessFilter(session) } })
   revalidatePath('/leads')
 }
 
 export async function bulkArchiveLeads(ids: string[]): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.lead.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { archivedAt: new Date() } })
+  await prisma.lead.updateMany({ where: { id: { in: ids }, ...leadAccessFilter(session) }, data: { archivedAt: new Date() } })
   revalidatePath('/leads')
 }
 
 export async function bulkUpdateLeadStatus(ids: string[], status: LeadStatus): Promise<void> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
   if (!ids.length) return
-  await prisma.lead.updateMany({ where: { id: { in: ids }, createdById: userId }, data: { status } })
+  await prisma.lead.updateMany({ where: { id: { in: ids }, ...leadAccessFilter(session) }, data: { status } })
   revalidatePath('/leads')
 }
 
 export async function convertLeadToQuote(leadId: string): Promise<{ quoteId: string }> {
-  const { userId } = await verifySession()
+  const session = await verifySession()
+  const { userId } = session
 
-  const lead = await prisma.lead.findUnique({ where: { id: leadId } })
-  if (!lead) throw new Error('Lead niet gevonden')
+  const lead = await prisma.lead.findFirst({ where: { id: leadId, ...leadAccessFilter(session) } })
+  if (!lead) throw new Error('Lead niet gevonden of geen toegang')
 
   // Already linked — return existing quote
   if (lead.quoteId) return { quoteId: lead.quoteId }
@@ -417,15 +457,10 @@ export async function convertLeadToQuote(leadId: string): Promise<{ quoteId: str
     customerId = customer.id
   }
 
-  // Generate quote number
-  const year = new Date().getFullYear()
-  const count = await prisma.quote.count({ where: { quoteNumber: { startsWith: `OFT-${year}-` } } })
-  const quoteNumber = `OFT-${year}-${String(count + 1).padStart(4, '0')}`
-
   const validUntil = new Date()
   validUntil.setDate(validUntil.getDate() + 30)
 
-  const quote = await prisma.quote.create({
+  const quote = await withQuoteNumber((quoteNumber) => prisma.quote.create({
     data: {
       quoteNumber,
       title: `Offerte ${lead.firstName} ${lead.lastName}`,
@@ -438,7 +473,7 @@ export async function convertLeadToQuote(leadId: string): Promise<{ quoteId: str
       total: 0,
       discountAmount: 0,
     },
-  })
+  }))
 
   await prisma.lead.update({
     where: { id: leadId },

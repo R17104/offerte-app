@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { bulkArchiveQuotes, bulkUnarchiveQuotes, bulkExpireQuotes, bulkDeleteQuotes } from '@/lib/actions/quote.actions'
 import { archiveQuote, unarchiveQuote } from '@/lib/actions/quote.actions'
@@ -74,9 +74,17 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
   const [period, setPeriod] = useState('all')
   const [isPending, startTransition] = useTransition()
 
-  useEffect(() => { setQuotes(initialQuotes); setSelected(new Set()) }, [initialQuotes])
+  // Sync met nieuwe server-data tijdens render (officieel React-patroon),
+  // zonder extra render-cyclus via een effect.
+  const [prevInitialQuotes, setPrevInitialQuotes] = useState(initialQuotes)
+  if (prevInitialQuotes !== initialQuotes) {
+    setPrevInitialQuotes(initialQuotes)
+    setQuotes(initialQuotes)
+    setSelected(new Set())
+  }
 
-  const now = Date.now()
+  // Eén keer vastleggen bij mount: Date.now() tijdens render is niet puur.
+  const [now] = useState(() => Date.now())
 
   const periodStart: number | null = (() => {
     if (period === '7')    return now - 7  * 86400000
@@ -113,7 +121,7 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
       return n
     })
   }
-  function toggle(id: string) { setSelected((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n }) }
+  function toggle(id: string) { setSelected((p) => { const n = new Set(p); if (n.has(id)) { n.delete(id) } else { n.add(id) } return n }) }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {
     startTransition(async () => {
@@ -183,7 +191,7 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
         </thead>
         <tbody>
           {filtered.length === 0 && (
-            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor "{search}"</td></tr>
+            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor &quot;{search}&quot;</td></tr>
           )}
           {filtered.map((q) => {
             const meta = STATUS_META[q.status] ?? STATUS_META.DRAFT

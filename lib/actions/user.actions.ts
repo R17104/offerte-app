@@ -37,7 +37,34 @@ export async function adminDeleteUser(userId: string) {
   const { role, userId: callerId } = await verifySession()
   if (role !== 'ADMIN') throw new Error('Geen toegang')
   if (userId === callerId) throw new Error('Je kunt jezelf niet verwijderen')
-  await prisma.user.delete({ where: { id: userId } })
+
+  // Verplichte relaties (offertes, leads, notities, todo's) blokkeren een delete
+  // op databaseniveau — geef daarom vooraf een duidelijke melding.
+  const [quotes, leads, notes, todos] = await Promise.all([
+    prisma.quote.count({ where: { createdById: userId } }),
+    prisma.lead.count({ where: { createdById: userId } }),
+    prisma.leadNote.count({ where: { authorId: userId } }),
+    prisma.salesTodo.count({ where: { authorId: userId } }),
+  ])
+  const blockers: string[] = []
+  if (quotes) blockers.push(`${quotes} offerte(s)`)
+  if (leads)  blockers.push(`${leads} lead(s)`)
+  if (notes)  blockers.push(`${notes} notitie(s)`)
+  if (todos)  blockers.push(`${todos} todo('s)`)
+  if (blockers.length) {
+    throw new Error(`Kan gebruiker niet verwijderen: er zijn nog ${blockers.join(', ')} aan deze gebruiker gekoppeld. Draag deze eerst over of archiveer ze.`)
+  }
+
+  // Optionele koppelingen (toewijzingen, klanten, producten) loskoppelen.
+  await prisma.$transaction([
+    prisma.quote.updateMany({ where: { assignedToId: userId }, data: { assignedToId: null } }),
+    prisma.lead.updateMany({ where: { assignedToId: userId }, data: { assignedToId: null } }),
+    prisma.lead.updateMany({ where: { appointmentPlannedById: userId }, data: { appointmentPlannedById: null } }),
+    prisma.salesTodo.updateMany({ where: { assignedToId: userId }, data: { assignedToId: null } }),
+    prisma.customer.updateMany({ where: { userId }, data: { userId: null } }),
+    prisma.product.updateMany({ where: { userId }, data: { userId: null } }),
+    prisma.user.delete({ where: { id: userId } }),
+  ])
   revalidatePath('/instellingen')
 }
 

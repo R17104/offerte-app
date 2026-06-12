@@ -1,16 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
+
+function subscribe(onChange: () => void) {
+  window.addEventListener('resize', onChange)
+  return () => window.removeEventListener('resize', onChange)
+}
 
 export function useWindowWidth(): number {
-  const [width, setWidth] = useState(1280)
-
-  useEffect(() => {
-    setWidth(window.innerWidth)
-    const handler = () => setWidth(window.innerWidth)
-    window.addEventListener('resize', handler)
-    return () => window.removeEventListener('resize', handler)
-  }, [])
-
-  return width
+  // 1280 als server-snapshot, zodat SSR dezelfde eerste render geeft als voorheen.
+  return useSyncExternalStore(subscribe, () => window.innerWidth, () => 1280)
 }

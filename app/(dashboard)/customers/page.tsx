@@ -64,7 +64,7 @@ export default async function CustomersPage({ searchParams }: Props) {
           borderRadius: 'var(--radius-md)', padding: '9px 14px', fontSize: 13,
           color: 'var(--warning)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
         }}>
-          <span>Je bekijkt gearchiveerde klanten. Gebruik "Terugzetten" om een klant te herstellen.</span>
+          <span>Je bekijkt gearchiveerde klanten. Gebruik &quot;Terugzetten&quot; om een klant te herstellen.</span>
         </div>
       )}
 

@@ -85,7 +85,7 @@ export async function bulkDeleteProducts(ids: string[]): Promise<void> {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-  const { userId } = await verifyAdmin()
+  await verifyAdmin()
 
   const name        = formData.get('name') as string
   const description = formData.get('description') as string | null
@@ -101,7 +101,7 @@ export async function updateProduct(id: string, formData: FormData) {
   }
 
   await prisma.product.update({
-    where: { id, userId },
+    where: { id },
     data: {
       name,
       description: description || null,

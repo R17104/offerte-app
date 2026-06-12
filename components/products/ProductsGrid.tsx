@@ -117,7 +117,7 @@ export default function ProductsGrid({ products: initialProducts, isAdmin }: { p
   const priceIncl = (p: Product) => p.unitPrice * (1 + p.vatRate / 100)
 
   function toggle(id: string) {
-    setSelected((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+    setSelected((prev) => { const n = new Set(prev); if (n.has(id)) { n.delete(id) } else { n.add(id) } return n })
   }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {

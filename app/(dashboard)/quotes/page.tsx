@@ -65,7 +65,7 @@ export default async function QuotesPage({ searchParams }: Props) {
           borderRadius: 'var(--radius-md)', padding: '9px 14px',
           fontSize: 13, color: 'var(--warning)', marginBottom: 16,
         }}>
-          Je bekijkt gearchiveerde offertes. Gebruik "Terugzetten" om een offerte te herstellen.
+          Je bekijkt gearchiveerde offertes. Gebruik &quot;Terugzetten&quot; om een offerte te herstellen.
         </div>
       )}
 

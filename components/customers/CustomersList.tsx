@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { bulkArchiveCustomers, bulkUnarchiveCustomers, bulkDeleteCustomers } from '@/lib/actions/customer.actions'
@@ -70,7 +70,14 @@ export default function CustomersList({ customers: initialCustomers, showArchive
   const [search, setSearch] = useState('')
   const [isPending, startTransition] = useTransition()
 
-  useEffect(() => { setCustomers(initialCustomers); setSelected(new Set()) }, [initialCustomers])
+  // Sync met nieuwe server-data tijdens render (officieel React-patroon),
+  // zonder extra render-cyclus via een effect.
+  const [prevInitialCustomers, setPrevInitialCustomers] = useState(initialCustomers)
+  if (prevInitialCustomers !== initialCustomers) {
+    setPrevInitialCustomers(initialCustomers)
+    setCustomers(initialCustomers)
+    setSelected(new Set())
+  }
 
   const filtered = search.trim()
     ? customers.filter((c) => {
@@ -89,7 +96,7 @@ export default function CustomersList({ customers: initialCustomers, showArchive
     const ids = filtered.map((c) => c.id)
     setSelected((p) => { const n = new Set(p); if (allSelected) ids.forEach((id) => n.delete(id)); else ids.forEach((id) => n.add(id)); return n })
   }
-  function toggle(id: string) { setSelected((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n }) }
+  function toggle(id: string) { setSelected((p) => { const n = new Set(p); if (n.has(id)) { n.delete(id) } else { n.add(id) } return n }) }
 
   function run(action: () => Promise<void>, removeIds?: string[]) {
     startTransition(async () => {
@@ -142,7 +149,7 @@ export default function CustomersList({ customers: initialCustomers, showArchive
         </thead>
         <tbody>
           {filtered.length === 0 && (
-            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor "{search}"</td></tr>
+            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor &quot;{search}&quot;</td></tr>
           )}
           {filtered.map((c) => {
             const addr = c.addresses[0]
