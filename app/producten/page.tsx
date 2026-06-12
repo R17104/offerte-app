@@ -15,7 +15,8 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function ProductenPage() {
+export default async function ProductenPage({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
+  const { cat } = await searchParams
   const products = await prisma.product.findMany({
     where: { active: true, shopVisible: true },
     orderBy: [{ category: 'asc' }, { name: 'asc' }],
@@ -26,5 +27,5 @@ export default async function ProductenPage() {
     },
   })
 
-  return <ShopPage products={products} />
+  return <ShopPage products={products} initialCategory={cat} />
 }

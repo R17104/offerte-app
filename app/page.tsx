@@ -1,4 +1,7 @@
+export const dynamic = 'force-dynamic'
+
 import type { Metadata } from 'next'
+import { prisma } from '@/lib/db'
 import LandingPage from '@/components/marketing/LandingPage'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
@@ -92,7 +95,19 @@ const faqSchema = {
   ],
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Topproducten voor de assortiment-sectie; faalt stil zodat de homepage
+  // ook zonder database gewoon rendert.
+  const products = await prisma.product.findMany({
+    where: { active: true, shopVisible: true },
+    orderBy: [{ category: 'asc' }, { unitPrice: 'asc' }],
+    select: {
+      id: true, name: true, description: true, unitPrice: true, vatRate: true,
+      imageUrl: true, category: true, capacityKwh: true, powerKw: true,
+      warrantyYears: true, isMaatwerk: true,
+    },
+  }).catch(() => [])
+
   return (
     <>
       <script
@@ -103,7 +118,7 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <LandingPage />
+      <LandingPage products={products} />
     </>
   )
 }

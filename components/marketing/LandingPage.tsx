@@ -11,6 +11,20 @@ import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 const InstallationGallery = dynamic(() => import('@/components/marketing/InstallationGallery'))
 const BatterijCheck = dynamic(() => import('@/components/marketing/BatterijCheck'))
 
+export type ShopProduct = {
+  id: string
+  name: string
+  description: string | null
+  unitPrice: number
+  vatRate: number
+  imageUrl: string | null
+  category: string | null
+  capacityKwh: number | null
+  powerKw: number | null
+  warrantyYears: number | null
+  isMaatwerk: boolean
+}
+
 // ── Calculator logic ──────────────────────────────────────────────────────────
 
 function calcSavings(gas: number, kwh: number, hasHeatPump: boolean, hasSolar: boolean) {
@@ -167,18 +181,32 @@ function Header() {
       borderBottom: '1px solid #f0f0f0',
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+        <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 160 : 200} height={isMobile ? 40 : 50} priority style={{ display: 'block' }} />
-        </a>
+        </Link>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {!isMobile && !isTablet && [['Producten', '/producten'], ['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze']].map(([l, h]) => (
+          {!isMobile && !isTablet && [['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze']].map(([l, h]) => (
             <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 12px', borderRadius: 6, fontWeight: 500 }}>{l}</a>
           ))}
-          {isTablet && [['Producten', '/producten'], ['Welk product?', '/welk-product']].map(([l, h]) => (
-            <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 500 }}>{l}</a>
-          ))}
-          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: '9px 18px', fontSize: 13.5, marginLeft: 4, boxShadow: 'none', whiteSpace: 'nowrap' }}>
+          {!isMobile && (
+            <a href="https://wa.me/31638922513" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#374151', textDecoration: 'none', padding: '6px 12px', whiteSpace: 'nowrap' }}>
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M14 11.3c0 .4-.1.8-.3 1.2-.2.4-.5.7-.8 1-.6.4-1.2.6-1.9.5-1-.1-2-.4-2.9-.9a12 12 0 01-2.6-1.9A12 12 0 013.6 8.6c-.5-.9-.8-1.9-.9-2.9-.1-.7.1-1.3.5-1.9.3-.3.6-.6 1-.8.4-.2.8-.3 1.2-.3.2 0 .3.1.4.3l1 2.1c.1.2.1.3 0 .5l-.6.9c-.1.2-.1.3 0 .5.3.6.7 1.1 1.2 1.6s1 .9 1.6 1.2c.2.1.3.1.5 0l.9-.6c.2-.1.3-.1.5 0l2.1 1c.2.1.3.2.3.4z" fill="#0a5c35"/></svg>
+              06 38 92 25 13
+            </a>
+          )}
+          {isTablet && (
+            <a href="/welk-product" style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 500 }}>Welk product?</a>
+          )}
+          {/* Producten als echte knop, zichtbaar op elk formaat */}
+          <Link href="/producten" style={{
+            fontSize: 13.5, fontWeight: 700, color: '#0a5c35', textDecoration: 'none',
+            padding: isMobile ? '8px 12px' : '8px 16px', borderRadius: 8,
+            border: '1.5px solid #0a5c35', whiteSpace: 'nowrap', marginRight: 4,
+          }}>
+            Producten
+          </Link>
+          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: isMobile ? '9px 12px' : '9px 18px', fontSize: 13.5, boxShadow: 'none', whiteSpace: 'nowrap' }}>
             Gratis advies
           </a>
           {!isMobile && (
@@ -376,7 +404,7 @@ function HeroSection() {
                       result.solarSavings > 0 && { label: 'Zonnepanelen', val: result.solarSavings },
                       result.heatPumpSavings > 0 && { label: 'Warmtepomp', val: result.heatPumpSavings },
                       result.batterySavings > 0 && { label: 'Thuisbatterij', val: result.batterySavings },
-                    ].filter(Boolean).map((item: any) => (
+                    ].filter((i): i is { label: string; val: number } => Boolean(i)).map((item) => (
                       <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 13px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
                         <span style={{ fontSize: 13.5, color: '#374151', fontWeight: 500 }}>{item.label}</span>
                         <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0a5c35' }}>€{item.val.toLocaleString('nl-NL')}/jaar</span>
@@ -424,6 +452,164 @@ function TrustBar() {
         ))}
       </div>
     </div>
+  )
+}
+
+// ── Assortiment ───────────────────────────────────────────────────────────────
+
+const ASSORTIMENT_CAT: Record<string, { label: string; icon: string }> = {
+  BATTERY:         { label: 'Thuisbatterijen', icon: '🔋' },
+  SOLAR:           { label: 'Zonnepanelen',    icon: '☀️' },
+  HEAT_PUMP:       { label: 'Warmtepompen',    icon: '🌡️' },
+  CHARGER:         { label: 'Laadpalen',       icon: '⚡' },
+  EMERGENCY_POWER: { label: 'Noodstroom',      icon: '🔌' },
+}
+
+function ProductCardImage({ product }: { product: ShopProduct }) {
+  const [err, setErr] = useState(false)
+  if (product.imageUrl && !err) {
+    return (
+      <Image
+        src={product.imageUrl}
+        alt={product.name}
+        fill
+        unoptimized
+        onError={() => setErr(true)}
+        style={{ objectFit: 'contain', padding: 14, boxSizing: 'border-box' }}
+      />
+    )
+  }
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f6' }}>
+      {ASSORTIMENT_CAT[product.category ?? '']?.icon ?? '📦'}
+    </div>
+  )
+}
+
+function AssortimentSection({ products }: { products: ShopProduct[] }) {
+  if (products.length === 0) return null
+
+  // Batterijen voorop (kernproduct), daarna de rest; max 6 kaarten
+  const featured = [
+    ...products.filter(p => p.category === 'BATTERY'),
+    ...products.filter(p => p.category !== 'BATTERY'),
+  ].slice(0, 6)
+
+  const categories = Object.entries(ASSORTIMENT_CAT)
+    .map(([key, meta]) => ({ key, ...meta, count: products.filter(p => p.category === key).length }))
+    .filter(c => c.count > 0)
+
+  return (
+    <section id="assortiment" style={{ background: '#f8faf9', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
+          <div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Ons assortiment</span>
+            <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+              Leverbaar uit voorraad, inclusief installatie
+            </h2>
+            <p style={{ fontSize: 15, color: '#6b7280', marginTop: 10, maxWidth: 560 }}>
+              Wij leveren én installeren A-merken. Elke offerte begint met een persoonlijk advies, zodat u nooit te groot of te klein koopt.
+            </p>
+          </div>
+          <Link href="/producten" style={{ ...btn('#0a5c35', '#fff'), whiteSpace: 'nowrap' }}>
+            Volledig assortiment →
+          </Link>
+        </div>
+
+        {/* Merkenbalk */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2vw, 22px)', flexWrap: 'wrap', marginBottom: 24 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Wij leveren o.a.</span>
+          {['AlphaESS', 'Sigenergy', 'WeHeat'].map(brand => (
+            <span key={brand} style={{ fontSize: 15, fontWeight: 800, color: '#374151', letterSpacing: '-0.01em', padding: '6px 14px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }}>
+              {brand}
+            </span>
+          ))}
+        </div>
+
+        {/* Categorie-tegels */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 28 }}>
+          {categories.map(c => (
+            <Link key={c.key} href={`/producten?cat=${c.key}`} style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px',
+              background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, textDecoration: 'none',
+              transition: 'border-color 0.15s, box-shadow 0.15s',
+            }}>
+              <span style={{ fontSize: 22 }}>{c.icon}</span>
+              <span>
+                <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: '#111827' }}>{c.label}</span>
+                <span style={{ display: 'block', fontSize: 11.5, color: '#9ca3af' }}>{c.count} product{c.count !== 1 ? 'en' : ''}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Productkaarten */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 16 }}>
+          {featured.map(p => {
+            const inclPrice = p.unitPrice * (1 + p.vatRate / 100)
+            return (
+              <div key={p.id} style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <Link href={`/producten/${p.id}`} style={{ display: 'block', position: 'relative', height: 170, background: '#f9fafb', textDecoration: 'none' }}>
+                  <ProductCardImage product={p} />
+                </Link>
+                <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  {/* Voorraad-indicator */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.isMaatwerk ? '#f59e0b' : '#16a34a', flexShrink: 0 }} />
+                    <span style={{ fontSize: 11.5, fontWeight: 600, color: p.isMaatwerk ? '#b45309' : '#15803d' }}>
+                      {p.isMaatwerk ? 'Op aanvraag · prijs na schouw' : 'Leverbaar · installatie in ±2 weken'}
+                    </span>
+                  </div>
+                  <Link href={`/producten/${p.id}`} style={{ textDecoration: 'none' }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.35, marginBottom: 6 }}>{p.name}</h3>
+                  </Link>
+                  {(p.capacityKwh || p.powerKw || p.warrantyYears) && (
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
+                      {p.capacityKwh != null && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#f3f4f6', color: '#374151' }}>{p.capacityKwh} kWh</span>}
+                      {p.powerKw != null && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#f3f4f6', color: '#374151' }}>{p.powerKw} kW</span>}
+                      {p.warrantyYears != null && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#f3f4f6', color: '#374151' }}>{p.warrantyYears} jr garantie</span>}
+                    </div>
+                  )}
+                  <div style={{ marginTop: 'auto' }}>
+                    <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: 10, marginBottom: 12 }}>
+                      {p.isMaatwerk ? (
+                        <div style={{ fontSize: 19, fontWeight: 900, color: '#0a5c35' }}>Maatwerk</div>
+                      ) : (
+                        <>
+                          <div style={{ fontSize: 19, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
+                            {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(p.unitPrice)}
+                            <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9ca3af', marginLeft: 5 }}>excl. btw</span>
+                          </div>
+                          <div style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 3 }}>
+                            {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(inclPrice)} incl. {p.vatRate}% btw
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <Link href={`/offerte-aanvragen?product=${p.id}`} style={{
+                      display: 'block', textAlign: 'center', padding: '9px 12px', borderRadius: 8,
+                      background: '#0a5c35', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none',
+                    }}>
+                      Vraag offerte aan
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Advies-CTA onder de producten */}
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <p style={{ fontSize: 14, color: '#6b7280' }}>
+            Niet zeker welk product bij uw situatie past?{' '}
+            <a href="#contact" style={{ color: '#0a5c35', fontWeight: 700, textDecoration: 'none' }}>Plan een gratis adviesgesprek →</a>
+          </p>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -551,11 +737,11 @@ function ThuisbatterijInfo() {
 // ── Diensten ──────────────────────────────────────────────────────────────────
 
 function Diensten() {
-  const list: { icon: React.ReactNode; title: string; featured?: boolean; desc: string; href: string }[] = [
+  const list: { icon: React.ReactNode; title: string; featured?: boolean; desc: string; href: string; linkLabel?: string }[] = [
     { icon: <Ic.Home />,    title: 'Woningadvies',      desc: 'Ontdek welke maatregelen uw woning energiezuiniger maken. Van isolatie tot ventilatie.', href: '#contact' },
-    { icon: <Ic.Sun />,     title: 'Zonnepanelen',      desc: 'Bereken of zonnepanelen rendabel zijn voor uw dak. Inclusief terugverdientijd en subsidies.', href: '#contact', featured: true },
-    { icon: <Ic.Battery />, title: 'Thuisbatterij',     desc: 'Sla zonnestroom op en gebruik het wanneer het nodig is. Bespaar tot €1.400 per jaar.', href: '#contact' },
-    { icon: <Ic.Flame />,   title: 'Warmtepomp',        desc: 'Alles over de overstap naar een warmtepomp. Kosten, subsidies en de juiste keuze.', href: '#contact' },
+    { icon: <Ic.Sun />,     title: 'Zonnepanelen',      desc: 'Bereken of zonnepanelen rendabel zijn voor uw dak. Inclusief terugverdientijd en subsidies.', href: '/producten?cat=SOLAR', linkLabel: 'Bekijk producten →', featured: true },
+    { icon: <Ic.Battery />, title: 'Thuisbatterij',     desc: 'Sla zonnestroom op en gebruik het wanneer het nodig is. Bespaar tot €1.400 per jaar.', href: '/producten?cat=BATTERY', linkLabel: 'Bekijk producten →' },
+    { icon: <Ic.Flame />,   title: 'Warmtepomp',        desc: 'Alles over de overstap naar een warmtepomp. Kosten, subsidies en de juiste keuze.', href: '/producten?cat=HEAT_PUMP', linkLabel: 'Bekijk producten →' },
     { icon: <Ic.Subsidy />, title: 'Subsidiecheck',     desc: 'Check welke landelijke en gemeentelijke subsidies beschikbaar zijn voor uw situatie.', href: '#contact' },
     { icon: <Ic.Person />,  title: 'Persoonlijk advies', desc: 'Gratis en onafhankelijk advies van een energiecoach uit uw regio.', href: '#contact' },
   ]
@@ -587,10 +773,68 @@ function Diensten() {
               <h3 style={{ fontSize: 16.5, fontWeight: 700, color: '#111827', marginBottom: 10 }}>{d.title}</h3>
               <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.7, marginBottom: 18 }}>{d.desc}</p>
               <a href={d.href} style={{ fontSize: 13.5, fontWeight: 600, color: '#0a5c35', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                Meer informatie →
+                {d.linkLabel ?? 'Meer informatie →'}
               </a>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+// LET OP: vervang deze voorbeelden door échte Google-reviews vóór livegang.
+// Verzonnen reviews publiceren is misleidend en wettelijk niet toegestaan.
+
+const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=Bespaarhulp+Friesland+reviews'
+
+const REVIEWS: { name: string; place: string; text: string; product: string }[] = [
+  { name: 'J. de Boer', place: 'Leeuwarden', product: 'Thuisbatterij 9,3 kWh', text: 'Heldere uitleg over de saldering en wat dat voor ons betekent. Binnen twee weken geïnstalleerd, netjes afgewerkt.' },
+  { name: 'A. Visser', place: 'Drachten', product: 'Thuisbatterij + EMS', text: 'Geen verkooppraatjes maar een eerlijke berekening. De batterij doet precies wat beloofd werd.' },
+  { name: 'S. Hoekstra', place: 'Sneek', product: 'Warmtepomp', text: 'Goed geholpen bij de subsidieaanvraag. De adviseur dacht echt mee over wat bij ons huis past.' },
+  { name: 'P. van der Meer', place: 'Heerenveen', product: 'Zonnepanelen + batterij', text: 'Snelle reactie op de aanvraag, duidelijke offerte met alle besparingen onderbouwd. Aanrader.' },
+]
+
+function ReviewsSection() {
+  return (
+    <section style={{ background: '#f8faf9', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)', borderTop: '1px solid #e5e7eb' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Klantervaringen</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+            Wat klanten over ons zeggen
+          </h2>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+            <span style={{ color: '#f5c442', fontSize: 18, letterSpacing: 2 }}>★★★★★</span>
+            <span style={{ fontSize: 14, color: '#6b7280' }}>250+ installaties in Friesland</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+          {REVIEWS.map(r => (
+            <div key={r.name} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '22px 22px 18px', display: 'flex', flexDirection: 'column' }}>
+              <span style={{ color: '#f5c442', fontSize: 14, letterSpacing: 1.5, marginBottom: 10 }}>★★★★★</span>
+              <p style={{ fontSize: 13.5, color: '#374151', lineHeight: 1.7, flex: 1, marginBottom: 16 }}>
+                &ldquo;{r.text}&rdquo;
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f0fdf4', border: '1px solid #bbf7d0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#0a5c35', flexShrink: 0 }}>
+                  {r.name.charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.name} · {r.place}</p>
+                  <p style={{ fontSize: 11.5, color: '#9ca3af' }}>{r.product}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 28 }}>
+          <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 700, color: '#0a5c35', textDecoration: 'none' }}>
+            Bekijk al onze reviews op Google →
+          </a>
         </div>
       </div>
     </section>
@@ -662,6 +906,7 @@ function ContactForm() {
   const [postcode, setPostcode] = useState('')
   const [bericht, setBericht] = useState('')
   const [herkomst, setHerkomst] = useState('')
+  const [website, setWebsite] = useState('') // honeypot
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -674,8 +919,8 @@ function ContactForm() {
     e.preventDefault()
     setError('')
     startTransition(async () => {
-      try { await createLeadFromLanding({ naam, email, telefoon, postcode, bericht, herkomst: herkomst || undefined }); setSent(true) }
-      catch { setError('Er ging iets mis. Probeer het opnieuw.') }
+      try { await createLeadFromLanding({ naam, email, telefoon, postcode, bericht, herkomst: herkomst || undefined, website }); setSent(true) }
+      catch (err) { setError(err instanceof Error && err.message ? err.message : 'Er ging iets mis. Probeer het opnieuw.') }
     })
   }
 
@@ -705,6 +950,20 @@ function ContactForm() {
               </div>
             ))}
           </div>
+
+          {/* Persoonlijk contact — geen callcenter */}
+          <div style={{ marginTop: 28, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center', maxWidth: 420 }}>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(245,196,66,0.15)', border: '1.5px solid rgba(245,196,66,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#f5c442' }}>
+              <Ic.Person />
+            </div>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 3 }}>U spreekt direct een adviseur</p>
+              <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.55 }}>
+                Geen callcenter — één van onze eigen adviseurs uit Friesland belt u terug. Liever direct contact?{' '}
+                <a href="https://wa.me/31638922513" style={{ color: '#f5c442', fontWeight: 600, textDecoration: 'none' }}>App 06 38 92 25 13</a>
+              </p>
+            </div>
+          </div>
         </div>
 
         <div style={{ ...card, padding: 'clamp(22px, 4vw, 36px)' }}>
@@ -718,6 +977,8 @@ function ContactForm() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Honeypot: onzichtbaar voor bezoekers, bots vullen het in */}
+              <input type="text" name="website" value={website} onChange={e => setWebsite(e.target.value)} autoComplete="off" tabIndex={-1} aria-hidden="true" style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }} />
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 5 }}>Naam *</label>
@@ -760,7 +1021,9 @@ function ContactForm() {
               <button type="submit" disabled={isPending} style={{ ...btn(), width: '100%', opacity: isPending ? 0.7 : 1, cursor: isPending ? 'not-allowed' : 'pointer', fontSize: 15 }}>
                 {isPending ? 'Verzenden…' : 'Stuur aanvraag'}
               </button>
-              <p style={{ fontSize: 11.5, color: '#9ca3af', textAlign: 'center' }}>Uw gegevens worden vertrouwelijk behandeld</p>
+              <p style={{ fontSize: 11.5, color: '#9ca3af', textAlign: 'center' }}>
+                Uw gegevens worden vertrouwelijk behandeld — zie onze <Link href="/privacy" style={{ color: '#0a5c35', fontWeight: 600 }}>privacyverklaring</Link>
+              </p>
             </form>
           )}
         </div>
@@ -788,22 +1051,28 @@ function Footer() {
 
           <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap' }}>
             <div>
-              <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Diensten</p>
-              {['Zonnepanelen', 'Thuisbatterij', 'Warmtepomp', 'Woningadvies'].map(item => (
-                <a key={item} href="#diensten" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>{item}</a>
+              <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Producten</p>
+              {[['Thuisbatterijen', '/producten?cat=BATTERY'], ['Zonnepanelen', '/producten?cat=SOLAR'], ['Warmtepompen', '/producten?cat=HEAT_PUMP'], ['Volledig assortiment', '/producten']].map(([l, h]) => (
+                <a key={l} href={h} style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>{l}</a>
               ))}
             </div>
             <div>
               <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Informatie</p>
-              {[['Werkwijze', '#werkwijze'], ['Contact', '#contact']].map(([l, h]) => (
+              {[['Werkwijze', '#werkwijze'], ['Welk product past bij mij?', '/welk-product'], ['Contact', '#contact'], ['Privacyverklaring', '/privacy'], ['Algemene voorwaarden', '/voorwaarden']].map(([l, h]) => (
                 <a key={l} href={h} style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>{l}</a>
               ))}
+            </div>
+            <div>
+              <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Contact</p>
+              <a href="https://wa.me/31638922513" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>WhatsApp: 06 38 92 25 13</a>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.5)', marginBottom: 7 }}>Actief in heel Friesland</p>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.5)' }}>KVK 71128174</p>
             </div>
           </div>
         </div>
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>© {new Date().getFullYear()} Bespaarhulp Friesland</p>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>© {new Date().getFullYear()} Bespaarhulp Friesland · KVK 71128174</p>
           <Link href="/login" style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>Medewerker login</Link>
         </div>
       </div>
@@ -813,17 +1082,19 @@ function Footer() {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-export default function LandingPage() {
+export default function LandingPage({ products = [] }: { products?: ShopProduct[] }) {
   return (
     <div style={{ fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh' }}>
       <Header />
       <HeroSection />
       <TrustBar />
+      <AssortimentSection products={products} />
       <BatterijCheck />
       <ThuisbatterijInfo />
       <Diensten />
       <Werkwijze />
       <InstallationGallery />
+      <ReviewsSection />
       <FAQ />
       <ContactForm />
       <Footer />

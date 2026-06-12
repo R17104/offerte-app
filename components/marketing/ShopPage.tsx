@@ -65,11 +65,20 @@ function ProductImage({ product }: { product: Product }) {
   )
 }
 
-export default function ShopPage({ products }: { products: Product[] }) {
+const SORT_OPTIONS = [
+  { key: 'default',    label: 'Aanbevolen' },
+  { key: 'price-asc',  label: 'Prijs: laag → hoog' },
+  { key: 'price-desc', label: 'Prijs: hoog → laag' },
+  { key: 'name',       label: 'Naam (A-Z)' },
+]
+
+export default function ShopPage({ products, initialCategory }: { products: Product[]; initialCategory?: string }) {
   const w = useWindowWidth()
   const isMobile = w < 768
-  const [tab, setTab] = useState('all')
+  const validCats = Object.keys(CAT)
+  const [tab, setTab] = useState(initialCategory && validCats.includes(initialCategory) ? initialCategory : 'all')
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState('default')
 
   const visible = products.filter(p => {
     if (!p.active) return false
@@ -79,6 +88,11 @@ export default function ShopPage({ products }: { products: Product[] }) {
       return p.name.toLowerCase().includes(q) || (p.description ?? '').toLowerCase().includes(q)
     }
     return true
+  }).sort((a, b) => {
+    if (sort === 'price-asc')  return a.unitPrice - b.unitPrice
+    if (sort === 'price-desc') return b.unitPrice - a.unitPrice
+    if (sort === 'name')       return a.name.localeCompare(b.name, 'nl')
+    return 0
   })
 
   return (
@@ -141,12 +155,33 @@ export default function ShopPage({ products }: { products: Product[] }) {
             <span>/</span>
             <span style={{ color: '#374151' }}>Producten</span>
           </div>
-          <h1 style={{ fontSize: 'clamp(22px,3vw,30px)', fontWeight: 900, color: '#111827', letterSpacing: '-0.02em' }}>
-            Productcatalogus
-          </h1>
-          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>
-            Professionele energieoplossingen voor uw woning · {visible.length} product{visible.length !== 1 ? 'en' : ''}
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h1 style={{ fontSize: 'clamp(22px,3vw,30px)', fontWeight: 900, color: '#111827', letterSpacing: '-0.02em' }}>
+                Productcatalogus
+              </h1>
+              <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>
+                Levering én installatie door heel Friesland · {visible.length} product{visible.length !== 1 ? 'en' : ''}
+              </p>
+            </div>
+            <select
+              value={sort}
+              onChange={e => setSort(e.target.value)}
+              style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', fontSize: 13, fontFamily: 'inherit', color: '#374151', cursor: 'pointer', outline: 'none' }}
+            >
+              {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+            </select>
+          </div>
+
+          {/* Merkenbalk */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
+            <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Wij leveren o.a.</span>
+            {['AlphaESS', 'Sigenergy', 'WeHeat'].map(brand => (
+              <span key={brand} style={{ fontSize: 13.5, fontWeight: 800, color: '#374151', padding: '4px 12px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 7 }}>
+                {brand}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Zoekbalk op mobiel */}
@@ -288,6 +323,13 @@ export default function ShopPage({ products }: { products: Product[] }) {
 
                       {/* Body */}
                       <div style={{ padding: '14px 14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        {/* Voorraad-indicator */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.isMaatwerk ? '#f59e0b' : '#16a34a', flexShrink: 0 }} />
+                          <span style={{ fontSize: 11.5, fontWeight: 600, color: p.isMaatwerk ? '#b45309' : '#15803d' }}>
+                            {p.isMaatwerk ? 'Op aanvraag · prijs na schouw' : 'Leverbaar · installatie in ±2 weken'}
+                          </span>
+                        </div>
                         <Link href={`/producten/${p.id}`} style={{ textDecoration: 'none' }}>
                           <h2 style={{ fontSize: 13.5, fontWeight: 700, color: '#111827', marginBottom: 6, lineHeight: 1.35 }}>
                             {p.name}
@@ -319,8 +361,11 @@ export default function ShopPage({ products }: { products: Product[] }) {
                               </>
                             ) : (
                               <>
-                                <div style={{ fontSize: 20, fontWeight: 900, color: '#111827', lineHeight: 1 }}>{fmt(inclPrice)}</div>
-                                <div style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 2 }}>{fmt(p.unitPrice)} excl. {p.vatRate}% btw</div>
+                                <div style={{ fontSize: 20, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
+                                  {fmt(p.unitPrice)}
+                                  <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9ca3af', marginLeft: 5 }}>excl. btw</span>
+                                </div>
+                                <div style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 2 }}>{fmt(inclPrice)} incl. {p.vatRate}% btw</div>
                               </>
                             )}
                           </div>
@@ -358,8 +403,12 @@ export default function ShopPage({ products }: { products: Product[] }) {
             <span style={{ color: '#fff' }}>Bespaar</span><span style={{ color: '#f5c442' }}>hulp</span>
             <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.12em', marginLeft: 7, textTransform: 'uppercase' }}>Friesland</span>
           </div>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} Bespaarhulp Friesland · Onafhankelijk energieadvies</p>
-          <Link href="/login" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Medewerker login</Link>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} Bespaarhulp Friesland · KVK 71128174</p>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <Link href="/privacy" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Privacy</Link>
+            <Link href="/voorwaarden" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Voorwaarden</Link>
+            <Link href="/login" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Medewerker login</Link>
+          </div>
         </div>
       </footer>
       <WhatsAppButton />

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
+import { calcBatterySavings, EMS_EXAMPLE_REVENUE_EUR } from '@/lib/battery-advice'
 
 type Product = {
   id: string
@@ -259,8 +260,7 @@ function fmt(n: number) {
 
 function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPrice: number }) {
   const [feedbackKwh, setFeedbackKwh] = useState(2000)
-  const absorbable = Math.min(capacityKwh * 365 * 0.9, feedbackKwh * 0.85)
-  const annualSavings = Math.round(absorbable * (0.28 - 0.07))
+  const { annualSavings } = calcBatterySavings(capacityKwh, feedbackKwh)
   const payback = annualSavings > 0 ? (inclPrice / annualSavings).toFixed(1) : '—'
   const tenYr = annualSavings * 10 - inclPrice
 
@@ -296,7 +296,9 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
         ))}
       </div>
       <p style={{ fontSize: 10.5, color: '#9ca3af', marginTop: 10, lineHeight: 1.5 }}>
-        Indicatieve berekening op basis van uw teruglevering, stroomtarief €0,28/kWh en teruglevertarief €0,07/kWh. Werkelijke besparing afhankelijk van situatie.
+        Indicatieve berekening op basis van uw teruglevering, stroomtarief €0,28/kWh en teruglevertarief €0,07/kWh.
+        De besparing geldt volledig vanaf het einde van de salderingsregeling (1 januari 2027); tot die tijd bespaart u vooral op terugleverkosten.
+        Werkelijke besparing afhankelijk van situatie.
       </p>
 
       {/* EMS / onbalansmarkt */}
@@ -312,7 +314,7 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
             <p style={{ fontSize: 11, color: '#0a5c35', fontWeight: 600, marginBottom: 2 }}>Gemiddelde extra opbrengst</p>
             <p style={{ fontSize: 10.5, color: '#6b7280' }}>3-jaarsgemiddelde · AlphaESS 9,3 kWh + 10kW omvormer</p>
           </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: '#0a5c35', whiteSpace: 'nowrap' }}>+ €1.314/jaar</div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: '#0a5c35', whiteSpace: 'nowrap' }}>+ €{EMS_EXAMPLE_REVENUE_EUR.toLocaleString('nl-NL')}/jaar</div>
         </div>
       </div>
     </div>
@@ -478,8 +480,15 @@ export default function ProductDetailPage({ product }: { product: Product }) {
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: 32, fontWeight: 900, color: '#111827', lineHeight: 1 }}>{fmt(inclPrice)}</div>
-                  <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{fmt(product.unitPrice)} excl. {product.vatRate}% btw</div>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
+                    {fmt(product.unitPrice)}
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#9ca3af', marginLeft: 7 }}>excl. btw</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{fmt(inclPrice)} incl. {product.vatRate}% btw</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#16a34a' }} />
+                    <span style={{ fontSize: 12.5, fontWeight: 600, color: '#15803d' }}>Leverbaar · installatie in ±2 weken</span>
+                  </div>
                 </>
               )}
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
