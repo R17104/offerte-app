@@ -177,12 +177,12 @@ function Header() {
   return (
     <header style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(16px)',
+      background: '#fff',
       borderBottom: '1px solid #f0f0f0',
     }}>
-      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(16px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(10px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 160 : 200} height={isMobile ? 40 : 50} priority style={{ display: 'block' }} />
+          <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 112 : 200} height={isMobile ? 28 : 50} priority style={{ display: 'block' }} />
         </Link>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -200,20 +200,18 @@ function Header() {
           )}
           {/* Producten als echte knop, zichtbaar op elk formaat */}
           <Link href="/producten" style={{
-            fontSize: 13.5, fontWeight: 700, color: '#0a5c35', textDecoration: 'none',
-            padding: isMobile ? '8px 12px' : '8px 16px', borderRadius: 8,
-            border: '1.5px solid #0a5c35', whiteSpace: 'nowrap', marginRight: 4,
+            fontSize: isMobile ? 12.5 : 13.5, fontWeight: 700, color: '#0a5c35', textDecoration: 'none',
+            padding: isMobile ? '7px 9px' : '8px 16px', borderRadius: 8,
+            border: '1.5px solid #0a5c35', whiteSpace: 'nowrap', marginRight: 4, flexShrink: 0,
           }}>
             Producten
           </Link>
-          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: isMobile ? '9px 12px' : '9px 18px', fontSize: 13.5, boxShadow: 'none', whiteSpace: 'nowrap' }}>
+          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: isMobile ? '8px 9px' : '9px 18px', fontSize: isMobile ? 12.5 : 13.5, boxShadow: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
             Gratis advies
           </a>
-          {!isMobile && (
-            <Link href="/login" style={{ fontSize: 12.5, color: '#9ca3af', textDecoration: 'none', padding: '8px 10px' }}>
-              Login
-            </Link>
-          )}
+          <Link href="/login" style={{ fontSize: isMobile ? 12 : 12.5, color: '#9ca3af', textDecoration: 'none', padding: isMobile ? '7px 4px' : '8px 10px', flexShrink: 0 }}>
+            Login
+          </Link>
         </nav>
       </div>
     </header>
@@ -737,13 +735,42 @@ function ThuisbatterijInfo() {
 // ── Diensten ──────────────────────────────────────────────────────────────────
 
 function Diensten() {
-  const list: { icon: React.ReactNode; title: string; featured?: boolean; desc: string; href: string; linkLabel?: string }[] = [
-    { icon: <Ic.Home />,    title: 'Woningadvies',      desc: 'Ontdek welke maatregelen uw woning energiezuiniger maken. Van isolatie tot ventilatie.', href: '#contact' },
-    { icon: <Ic.Sun />,     title: 'Zonnepanelen',      desc: 'Bereken of zonnepanelen rendabel zijn voor uw dak. Inclusief terugverdientijd en subsidies.', href: '/producten?cat=SOLAR', linkLabel: 'Bekijk producten →', featured: true },
-    { icon: <Ic.Battery />, title: 'Thuisbatterij',     desc: 'Sla zonnestroom op en gebruik het wanneer het nodig is. Bespaar tot €1.400 per jaar.', href: '/producten?cat=BATTERY', linkLabel: 'Bekijk producten →' },
-    { icon: <Ic.Flame />,   title: 'Warmtepomp',        desc: 'Alles over de overstap naar een warmtepomp. Kosten, subsidies en de juiste keuze.', href: '/producten?cat=HEAT_PUMP', linkLabel: 'Bekijk producten →' },
-    { icon: <Ic.Subsidy />, title: 'Subsidiecheck',     desc: 'Check welke landelijke en gemeentelijke subsidies beschikbaar zijn voor uw situatie.', href: '#contact' },
-    { icon: <Ic.Person />,  title: 'Persoonlijk advies', desc: 'Gratis en onafhankelijk advies van een energiecoach uit uw regio.', href: '#contact' },
+  const [openTitle, setOpenTitle] = useState<string | null>(null)
+
+  const list: { icon: React.ReactNode; title: string; featured?: boolean; desc: string; info: string; productHref?: string }[] = [
+    {
+      icon: <Ic.Home />, title: 'Woningadvies',
+      desc: 'Ontdek welke maatregelen uw woning energiezuiniger maken. Van isolatie tot ventilatie.',
+      info: 'Een goed geïsoleerde woning bespaart al snel honderden euro’s per jaar. Wij kijken naar isolatie, kierdichting, ventilatie en uw energielabel, en maken een stappenplan in de juiste volgorde: eerst besparen, dan opwekken. Zo voorkomt u dat u investeert in een warmtepomp terwijl de warmte nog door het dak verdwijnt.',
+    },
+    {
+      icon: <Ic.Sun />, title: 'Zonnepanelen', featured: true,
+      desc: 'Bereken of zonnepanelen rendabel zijn voor uw dak. Inclusief terugverdientijd en subsidies.',
+      info: 'Een set van 10–12 panelen levert zo’n 3.500–4.500 kWh per jaar. Ook na het einde van de saldering (2027) blijven panelen rendabel: stroom die u zelf direct verbruikt bespaart het volle tarief van ±€0,28/kWh. In combinatie met een thuisbatterij benut u nog meer van uw eigen opwek. De terugverdientijd ligt doorgaans tussen de 5 en 8 jaar.',
+      productHref: '/producten?cat=SOLAR',
+    },
+    {
+      icon: <Ic.Battery />, title: 'Thuisbatterij',
+      desc: 'Sla zonnestroom op en gebruik het wanneer het nodig is. Bespaar tot €1.400 per jaar.',
+      info: 'Een thuisbatterij slaat uw zonnestroom van overdag op voor ’s avonds. Dat wordt belangrijk: de salderingsregeling stopt per 2027, waarna terugleveren nog maar ±€0,07/kWh oplevert terwijl inkopen ±€0,28 kost. Met een slim energiemanagementsysteem (EMS) kan de batterij bovendien extra verdienen op de onbalansmarkt. Welke maat bij u past, ziet u in 2 minuten met onze gratis batterijcheck.',
+      productHref: '/producten?cat=BATTERY',
+    },
+    {
+      icon: <Ic.Flame />, title: 'Warmtepomp',
+      desc: 'Alles over de overstap naar een warmtepomp. Kosten, subsidies en de juiste keuze.',
+      info: 'Een (hybride) warmtepomp bespaart 60 tot 100% op uw gasverbruik. Via de ISDE-subsidie krijgt u al snel €2.000–€3.500 terug op de aanschaf. Wij adviseren welk type bij uw woning past — hybride naast de cv-ketel of volledig elektrisch — en nemen de subsidieaanvraag uit handen.',
+      productHref: '/producten?cat=HEAT_PUMP',
+    },
+    {
+      icon: <Ic.Subsidy />, title: 'Subsidiecheck',
+      desc: 'Check welke landelijke en gemeentelijke subsidies beschikbaar zijn voor uw situatie.',
+      info: 'Er bestaan landelijke regelingen zoals de ISDE-subsidie (warmtepompen en isolatie) en het Nationaal Warmtefonds, waarmee u tegen lage of zelfs 0% rente kunt lenen bij een inkomen tot €60.000. Daarnaast hebben sommige Friese gemeenten eigen regelingen. Wij zoeken gratis voor u uit waar u recht op heeft.',
+    },
+    {
+      icon: <Ic.Person />, title: 'Persoonlijk advies',
+      desc: 'Gratis en onafhankelijk advies van een energiecoach uit uw regio.',
+      info: 'Eén van onze adviseurs belt u of komt langs — gratis en vrijblijvend. We nemen uw energienota door, bekijken uw woning en rekenen door wat zinvol is en wat niet. U krijgt een eerlijk advies, ook als dat advies is om iets juist níet te doen.',
+    },
   ]
 
   return (
@@ -759,24 +786,47 @@ function Diensten() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-          {list.map(d => (
-            <div key={d.title} style={{
-              borderRadius: 14, padding: '28px 26px',
-              border: d.featured ? '1.5px solid #0a5c35' : '1px solid #e5e7eb',
-              background: d.featured ? '#f9fffe' : '#fff',
-              boxShadow: d.featured ? '0 4px 20px rgba(10,92,53,0.08)' : 'none',
-            }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: d.featured ? '#dcfce7' : '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, color: '#0a5c35' }}>
-                {d.icon}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'start' }}>
+          {list.map(d => {
+            const open = openTitle === d.title
+            return (
+              <div key={d.title} style={{
+                borderRadius: 14, padding: '28px 26px',
+                border: d.featured || open ? '1.5px solid #0a5c35' : '1px solid #e5e7eb',
+                background: d.featured ? '#f9fffe' : '#fff',
+                boxShadow: d.featured || open ? '0 4px 20px rgba(10,92,53,0.08)' : 'none',
+              }}>
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: d.featured ? '#dcfce7' : '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, color: '#0a5c35' }}>
+                  {d.icon}
+                </div>
+                <h3 style={{ fontSize: 16.5, fontWeight: 700, color: '#111827', marginBottom: 10 }}>{d.title}</h3>
+                <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.7, marginBottom: 18 }}>{d.desc}</p>
+
+                <button
+                  onClick={() => setOpenTitle(open ? null : d.title)}
+                  style={{ fontSize: 13.5, fontWeight: 600, color: '#0a5c35', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                >
+                  Meer informatie {open ? '▴' : '▾'}
+                </button>
+
+                {open && (
+                  <div style={{ marginTop: 14, borderTop: '1px solid #e5e7eb', paddingTop: 14 }}>
+                    <p style={{ fontSize: 13.5, color: '#374151', lineHeight: 1.75, marginBottom: 16 }}>{d.info}</p>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {d.productHref && (
+                        <Link href={d.productHref} style={{ padding: '8px 14px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+                          Bekijk producten →
+                        </Link>
+                      )}
+                      <a href="#contact" style={{ padding: '8px 14px', borderRadius: 8, border: '1.5px solid #0a5c35', color: '#0a5c35', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+                        Gratis advies →
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
-              <h3 style={{ fontSize: 16.5, fontWeight: 700, color: '#111827', marginBottom: 10 }}>{d.title}</h3>
-              <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.7, marginBottom: 18 }}>{d.desc}</p>
-              <a href={d.href} style={{ fontSize: 13.5, fontWeight: 600, color: '#0a5c35', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                {d.linkLabel ?? 'Meer informatie →'}
-              </a>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>

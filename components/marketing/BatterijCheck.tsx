@@ -235,7 +235,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
     <section style={{ background: '#fff', padding: 'clamp(48px,6vw,80px) clamp(16px,4vw,48px)', borderTop: '1px solid #f3f4f6' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto' }}>
         <div style={{ marginBottom: 32 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Gratis tool</span>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Gratis advies</span>
           <h2 style={{ fontSize: 'clamp(24px,3vw,36px)', fontWeight: 900, color: '#111827', marginTop: 8, letterSpacing: '-0.02em' }}>
             Welke batterijmaat past bij u?
           </h2>
