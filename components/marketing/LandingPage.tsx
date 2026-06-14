@@ -577,6 +577,7 @@ function AssortimentSection({ products }: { products: ShopProduct[] }) {
                       ) : (
                         <>
                           <div style={{ fontSize: 19, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginRight: 4 }}>vanaf</span>
                             {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(p.unitPrice)}
                             <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9ca3af', marginLeft: 5 }}>excl. btw</span>
                           </div>

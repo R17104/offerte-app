@@ -481,6 +481,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
               ) : (
                 <>
                   <div style={{ fontSize: 32, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#6b7280', marginRight: 6 }}>vanaf</span>
                     {fmt(product.unitPrice)}
                     <span style={{ fontSize: 14, fontWeight: 600, color: '#9ca3af', marginLeft: 7 }}>excl. btw</span>
                   </div>

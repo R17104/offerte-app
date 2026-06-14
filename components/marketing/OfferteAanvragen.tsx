@@ -164,7 +164,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '14px 18px', minWidth: 220, backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(245,196,66,0.85)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Geselecteerd product</p>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{product.name}</p>
-              <p style={{ fontSize: 20, fontWeight: 900, color: '#f5c442' }}>{fmt(inclBtw)} <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>incl. BTW</span></p>
+              <p style={{ fontSize: 20, fontWeight: 900, color: '#f5c442' }}><span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginRight: 4 }}>vanaf</span>{fmt(inclBtw)} <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>incl. BTW</span></p>
             </div>
           </div>
         </div>

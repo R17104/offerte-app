@@ -362,6 +362,7 @@ export default function ShopPage({ products, initialCategory }: { products: Prod
                             ) : (
                               <>
                                 <div style={{ fontSize: 20, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginRight: 4 }}>vanaf</span>
                                   {fmt(p.unitPrice)}
                                   <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9ca3af', marginLeft: 5 }}>excl. btw</span>
                                 </div>
