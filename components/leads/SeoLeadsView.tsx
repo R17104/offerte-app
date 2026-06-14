@@ -43,6 +43,7 @@ const SOURCE_META: Record<string, { label: string; color: string; bg: string }> 
   'Website':                    { label: 'Adviesaanvraag',    color: '#2563eb', bg: '#eff6ff' },
   'Website – offerte aanvraag': { label: 'Webshop bestelling', color: '#7c3aed', bg: '#f5f3ff' },
   'thuisbatterij':              { label: 'Batterijcheck',      color: '#0a5c35', bg: '#f0fdf4' },
+  'TikTok':                     { label: 'TikTok',             color: '#111827', bg: '#f3f4f6' },
 }
 
 function displayName(u: User) {
@@ -53,7 +54,7 @@ function formatDate(d: Date) {
   return new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export default function SeoLeadsView({ leads, users }: { leads: Lead[]; users: User[] }) {
+export default function SeoLeadsView({ leads, users, entityLabel = 'SEO leads' }: { leads: Lead[]; users: User[]; entityLabel?: string }) {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -138,7 +139,7 @@ export default function SeoLeadsView({ leads, users }: { leads: Lead[]; users: U
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
         {filtered.length === 0 ? (
           <p style={{ padding: '48px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 14 }}>
-            Geen SEO leads gevonden{search ? ` voor "${search}"` : ''}.
+            Geen {entityLabel} gevonden{search ? ` voor "${search}"` : ''}.
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>

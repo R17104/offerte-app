@@ -226,6 +226,62 @@ export async function createLeadFromLanding({
   revalidatePath('/dashboard')
 }
 
+export type WebhookLeadInput = {
+  firstName: string
+  lastName: string
+  email?: string
+  phone?: string
+  postalCode?: string
+  street?: string
+  houseNumber?: string
+  city?: string
+  message?: string
+  source: string
+}
+
+// Maakt een lead aan vanuit een externe bron (bv. TikTok via webhook).
+// Wordt aangeroepen door de webhook-route, die zelf de authenticatie regelt.
+export async function createLeadFromWebhook(data: WebhookLeadInput): Promise<{ success: boolean; leadId?: string; error?: string }> {
+  if (!data.firstName.trim() && !data.email && !data.phone) {
+    return { success: false, error: 'Geen bruikbare leadgegevens ontvangen' }
+  }
+
+  const systemUser = await prisma.user.findFirst({ where: { role: 'ADMIN' }, orderBy: { createdAt: 'asc' } })
+    ?? await prisma.user.findFirst({ orderBy: { createdAt: 'asc' } })
+  if (!systemUser) return { success: false, error: 'Geen systeemgebruiker gevonden' }
+
+  const lead = await prisma.lead.create({
+    data: {
+      firstName:   data.firstName.trim() || 'Onbekend',
+      lastName:    data.lastName.trim() || '-',
+      email:       data.email || null,
+      phone:       data.phone || null,
+      street:      data.street || null,
+      houseNumber: data.houseNumber || null,
+      postalCode:  data.postalCode || null,
+      city:        data.city || null,
+      source:      data.source,
+      status:      'NEW',
+      createdById: systemUser.id,
+    },
+  })
+
+  if (data.message?.trim()) {
+    await prisma.leadNote.create({
+      data: { leadId: lead.id, content: data.message.trim(), authorId: systemUser.id },
+    })
+  }
+
+  if (data.email && isValidEmail(data.email)) {
+    await sendConfirmationSafe(data.email, data.firstName.trim() || 'klant')
+  }
+
+  revalidatePath('/leads')
+  revalidatePath('/tiktok-leads')
+  revalidatePath('/dashboard')
+  return { success: true, leadId: lead.id }
+}
+
 export type IntakeFormData = {
   // Persoonlijk
   firstName: string

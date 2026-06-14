@@ -24,6 +24,7 @@ const nav = [
     label: 'Leads',
     items: [
       { href: '/seo-leads', label: 'SEO Leads', icon: IconGlobe },
+      { href: '/tiktok-leads', label: 'TikTok Leads', icon: IconTikTok },
       { href: '/leads', label: 'Alle leads', icon: IconLeads },
     ],
   },
@@ -243,6 +244,14 @@ function IconGlobe({ size = 16, color = 'currentColor' }) {
     <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
       <circle cx="8" cy="8" r="6.5" stroke={color} strokeWidth="1.3" />
       <path d="M8 1.5c-2 2-3 4-3 6.5s1 4.5 3 6.5M8 1.5c2 2 3 4 3 6.5s-1 4.5-3 6.5M1.5 8h13" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconTikTok({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <path d="M10 2c.2 1.4 1.1 2.5 2.5 2.8v1.7c-.9 0-1.8-.3-2.5-.8v3.8a3.4 3.4 0 11-3.4-3.4c.2 0 .3 0 .5.05v1.8a1.7 1.7 0 101.2 1.6V2H10z" stroke={color} strokeWidth="1.2" strokeLinejoin="round"/>
     </svg>
   )
 }
