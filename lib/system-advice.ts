@@ -57,9 +57,12 @@ export function calcSystemAdvice({ monthlyBill, hasSolar }: AdviceInput): Advice
     })
   }
 
-  // Thuisbatterij — voor wie panelen heeft (of erbij neemt). Voordeel groeit na
-  // het einde van de saldering (2027): zelf gebruiken i.p.v. goedkoop terugleveren.
-  const feedbackKwhEst = Math.round(estElecKwh * 0.45) // teruglevering ~45% van verbruik bij panelen
+  // Thuisbatterij — voordeel groeit na het einde van de saldering (2027): zelf
+  // gebruiken i.p.v. goedkoop terugleveren.
+  // Mét panelen is er nú al overschot om op te slaan (groter voordeel); zonder
+  // panelen is het overschot nog hypothetisch en kleiner, dus conservatiever.
+  const feedbackFraction = hasSolar ? 0.55 : 0.30
+  const feedbackKwhEst = Math.round(estElecKwh * feedbackFraction)
   const batterySaving = Math.round(feedbackKwhEst * 0.85 * (ELEC_TARIFF - FEEDBACK_TARIFF))
   if (batterySaving > 0) {
     items.push({
