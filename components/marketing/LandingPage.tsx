@@ -186,7 +186,7 @@ function Header() {
         </Link>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {!isMobile && !isTablet && [['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze']].map(([l, h]) => (
+          {!isMobile && !isTablet && [['Rekentools', '/rekentools'], ['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze']].map(([l, h]) => (
             <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 12px', borderRadius: 6, fontWeight: 500 }}>{l}</a>
           ))}
           {!isMobile && (
@@ -196,7 +196,7 @@ function Header() {
             </a>
           )}
           {isTablet && (
-            <a href="/welk-product" style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 500 }}>Welk product?</a>
+            <a href="/rekentools" style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 500 }}>Rekentools</a>
           )}
           {/* Producten als echte knop, zichtbaar op elk formaat */}
           <Link href="/producten" style={{
@@ -249,7 +249,7 @@ function HeroSection() {
 
   return (
     <section style={{
-      background: 'linear-gradient(160deg, #052e1a 0%, #0a5c35 55%, #0e7a48 100%)',
+      background: 'radial-gradient(130% 110% at 78% 0%, rgba(14,122,72,0.45) 0%, rgba(5,20,14,0) 55%), linear-gradient(165deg, #061611 0%, #07261a 45%, #0a3a24 100%)',
       paddingTop: 'clamp(88px, 12vw, 120px)',
       paddingBottom: 'clamp(48px, 8vw, 80px)',
       paddingLeft: 'clamp(16px, 4vw, 48px)',
@@ -606,6 +606,59 @@ function AssortimentSection({ products }: { products: ShopProduct[] }) {
             Niet zeker welk product bij uw situatie past?{' '}
             <a href="#contact" style={{ color: '#0a5c35', fontWeight: 700, textDecoration: 'none' }}>Plan een gratis adviesgesprek →</a>
           </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Rekentools-band (premium dark) ────────────────────────────────────────────
+
+function RekentoolsBand() {
+  const tools = [
+    { icon: '🧮', title: 'Besparingscalculator', desc: 'Vul uw maandbedrag in en zie wat verduurzamen u per jaar oplevert.', href: '/rekentools' },
+    { icon: '🔋', title: 'Backup-tijd calculator', desc: 'Bereken hoelang u doordraait bij stroomuitval met een thuisbatterij.', href: '/rekentools' },
+  ]
+  return (
+    <section style={{ background: 'radial-gradient(120% 120% at 50% 0%, rgba(14,122,72,0.4) 0%, #0a1410 60%)', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Gratis rekentools</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, letterSpacing: '-0.025em' }}>
+            Reken zelf uit wat u bespaart
+          </h2>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginTop: 12, maxWidth: 540, margin: '12px auto 0' }}>
+            Eerlijke berekeningen op basis van Nederlandse tarieven en regels. Geen verkooppraatjes.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 44 }}>
+          {tools.map(t => (
+            <Link key={t.title} href={t.href} style={{
+              display: 'block', padding: '26px 24px', borderRadius: 16, textDecoration: 'none',
+              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+            }}>
+              <span style={{ fontSize: 30 }}>{t.icon}</span>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 12, marginBottom: 6 }}>{t.title}</h3>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 14 }}>{t.desc}</p>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#f5c442' }}>Open de tool →</span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Stats — Anker-stijl */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'clamp(16px, 3vw, 40px)', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 36 }}>
+          {[
+            ['250+', 'installaties in Friesland'],
+            ['10 jaar', 'garantie op A-merk batterijen'],
+            ['±2 weken', 'van offerte tot installatie'],
+            ['KVK 71128174', 'geregistreerd & verzekerd'],
+          ].map(([v, l]) => (
+            <div key={l} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'clamp(20px, 3vw, 30px)', fontWeight: 900, color: '#f5c442', letterSpacing: '-0.02em' }}>{v}</div>
+              <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>{l}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -1112,7 +1165,7 @@ function Footer() {
             </div>
             <div>
               <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Informatie</p>
-              {[['Werkwijze', '#werkwijze'], ['Welk product past bij mij?', '/welk-product'], ['Contact', '#contact'], ['Privacyverklaring', '/privacy'], ['Algemene voorwaarden', '/voorwaarden']].map(([l, h]) => (
+              {[['Rekentools', '/rekentools'], ['Werkwijze', '#werkwijze'], ['Welk product past bij mij?', '/welk-product'], ['Contact', '#contact'], ['Privacyverklaring', '/privacy'], ['Algemene voorwaarden', '/voorwaarden']].map(([l, h]) => (
                 <a key={l} href={h} style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>{l}</a>
               ))}
             </div>
@@ -1143,6 +1196,7 @@ export default function LandingPage({ products = [] }: { products?: ShopProduct[
       <HeroSection />
       <TrustBar />
       <AssortimentSection products={products} />
+      <RekentoolsBand />
       <BatterijCheck />
       <ThuisbatterijInfo />
       <Diensten />
