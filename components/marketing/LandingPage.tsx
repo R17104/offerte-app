@@ -457,11 +457,12 @@ function TrustBar() {
 
 // ── Uitgelichte batterijen (2 producten, premium dark) ────────────────────────
 
-type Featured = { capacity: number; name: string; vanaf: number; badge: string; tagline: string }
+type Featured = { capacity: number; name: string; vanaf: number; badge?: string; tagline: string; image?: string }
 
 const FEATURED: Featured[] = [
-  { capacity: 9.3,  name: 'Alpha ESS 9,3 kWh thuisbatterij',  vanaf: 5000, badge: 'Meest gekozen',     tagline: 'De populairste keuze voor het gemiddelde huishouden.' },
-  { capacity: 18.6, name: 'Alpha ESS 18,6 kWh thuisbatterij', vanaf: 6950, badge: 'Voor groot verbruik', tagline: 'Maximale opslag voor woningen met hoog verbruik of een warmtepomp.' },
+  { capacity: 9.3,  name: 'Alpha ESS 9,3 kWh thuisbatterij',  vanaf: 5000, badge: 'Meest gekozen', tagline: 'De populairste keuze voor het gemiddelde huishouden.' },
+  // image: vul hier een afbeeldings-URL in voor de 18,6 (of upload 'm bij het product in het dashboard)
+  { capacity: 18.6, name: 'Alpha ESS 18,6 kWh thuisbatterij', vanaf: 6950, tagline: 'Maximale opslag voor woningen met hoog verbruik of een warmtepomp.' },
 ]
 
 function FeaturedImage({ src, alt }: { src: string | null; alt: string }) {
@@ -515,10 +516,12 @@ function FeaturedBatteries({ products }: { products: ShopProduct[] }) {
                 background: 'rgba(255,255,255,0.04)', border: `1px solid ${i === 0 ? 'rgba(245,196,66,0.4)' : 'rgba(255,255,255,0.12)'}`,
                 borderRadius: 20, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative',
               }}>
-                <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 2, padding: '5px 12px', borderRadius: 20, background: i === 0 ? gold : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', fontSize: 11.5, fontWeight: 800, color: i === 0 ? '#052e1a' : '#fff' }}>
-                  {i === 0 ? '★ ' : ''}{f.badge}
-                </div>
-                <FeaturedImage src={product?.imageUrl ?? null} alt={name} />
+                {(i === 0 || f.badge) && (
+                  <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 2, padding: '5px 12px', borderRadius: 20, background: i === 0 ? gold : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', fontSize: 11.5, fontWeight: 800, color: i === 0 ? '#052e1a' : '#fff' }}>
+                    {i === 0 ? `★ ${f.badge}` : f.badge}
+                  </div>
+                )}
+                <FeaturedImage src={f.image ?? product?.imageUrl ?? null} alt={name} />
                 <div style={{ padding: 'clamp(22px, 3vw, 32px)', flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <h3 style={{ fontSize: 'clamp(19px, 2.4vw, 23px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', marginBottom: 8 }}>{name}</h3>
                   <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 16 }}>{f.tagline}</p>
