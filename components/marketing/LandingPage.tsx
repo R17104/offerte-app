@@ -182,8 +182,8 @@ function Header() {
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(10px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
           {/* Logo op witte 'pill' zodat het premium oogt op de donkere balk */}
-          <span style={{ display: 'inline-flex', background: '#fff', borderRadius: 10, padding: isMobile ? '5px 8px' : '6px 12px', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
-            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 104 : 168} height={isMobile ? 26 : 42} priority style={{ display: 'block' }} />
+          <span style={{ display: 'inline-flex', background: '#fff', borderRadius: 10, padding: isMobile ? '4px 7px' : '6px 12px', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 88 : 168} height={isMobile ? 22 : 42} priority style={{ display: 'block' }} />
           </span>
         </Link>
 
@@ -208,12 +208,14 @@ function Header() {
           }}>
             Producten
           </Link>
-          <a href="#contact" style={{ ...btn('#f5c442', '#052e1a'), padding: isMobile ? '8px 9px' : '9px 18px', fontSize: isMobile ? 12.5 : 13.5, boxShadow: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <a href="#contact" style={{ ...btn('#f5c442', '#052e1a'), padding: isMobile ? '8px 11px' : '9px 18px', fontSize: isMobile ? 12.5 : 13.5, boxShadow: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
             Gratis advies
           </a>
-          <Link href="/login" style={{ fontSize: isMobile ? 12 : 12.5, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', padding: isMobile ? '7px 4px' : '8px 10px', flexShrink: 0 }}>
-            Login
-          </Link>
+          {!isMobile && (
+            <Link href="/login" style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', padding: '8px 10px', flexShrink: 0 }}>
+              Login
+            </Link>
+          )}
         </nav>
       </div>
     </header>
@@ -461,8 +463,7 @@ type Featured = { capacity: number; name: string; vanaf: number; badge?: string;
 
 const FEATURED: Featured[] = [
   { capacity: 9.3,  name: 'Alpha ESS 9,3 kWh thuisbatterij',  vanaf: 5000, badge: 'Meest gekozen', tagline: 'De populairste keuze voor het gemiddelde huishouden.' },
-  // image: vul hier een afbeeldings-URL in voor de 18,6 (of upload 'm bij het product in het dashboard)
-  { capacity: 18.6, name: 'Alpha ESS 18,6 kWh thuisbatterij', vanaf: 6950, tagline: 'Maximale opslag voor woningen met hoog verbruik of een warmtepomp.' },
+  { capacity: 18.6, name: 'Alpha ESS 18,6 kWh thuisbatterij', vanaf: 6950, tagline: 'Maximale opslag voor woningen met hoog verbruik of een warmtepomp.', image: 'https://thuisbatterijnederland.nl/wp-content/uploads/2024/07/ChatGPT-Image-8-mei-2026-13_55_35-3.png' },
 ]
 
 function FeaturedImage({ src, alt }: { src: string | null; alt: string }) {

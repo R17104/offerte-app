@@ -118,7 +118,7 @@ export default function BackupCalculator() {
       <div>
         <div style={{
           background: 'linear-gradient(160deg, rgba(245,196,66,0.12), rgba(245,196,66,0.04))',
-          border: '1px solid rgba(245,196,66,0.3)', borderRadius: 16, padding: '28px 26px', position: 'sticky', top: 90,
+          border: '1px solid rgba(245,196,66,0.3)', borderRadius: 16, padding: '28px 26px',
         }}>
           <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
             Uw woning blijft draaien
