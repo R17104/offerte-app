@@ -34,14 +34,41 @@ export default function BackupCalculator() {
         <p style={{ fontSize: 13, fontWeight: 700, color: gold, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>
           1 · Kies uw batterij
         </p>
+
+        {/* Eigen capaciteit: groot getal + invulveld */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
+          <input
+            type="number" min={1} max={65} step={0.1} value={capacity}
+            onChange={e => {
+              const v = parseFloat(e.target.value)
+              setCapacity(isNaN(v) ? 0 : Math.min(65, Math.max(0, v)))
+            }}
+            style={{
+              width: 96, padding: '6px 10px', borderRadius: 8, fontFamily: 'inherit',
+              fontSize: 24, fontWeight: 900, color: gold, textAlign: 'right',
+              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.18)', outline: 'none',
+            }}
+          />
+          <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>kWh</span>
+        </div>
+        <input
+          type="range" min={3} max={65} step={0.1} value={capacity}
+          onChange={e => setCapacity(+e.target.value)}
+          style={{ width: '100%', accentColor: gold, cursor: 'pointer' }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4, marginBottom: 14 }}>
+          <span>3 kWh</span><span>65 kWh</span>
+        </div>
+
+        {/* Snelkeuze veelgekozen maten */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 28 }}>
           {BATTERY_SIZES.map(s => (
             <button
               key={s}
               onClick={() => setCapacity(s)}
               style={{
-                padding: '10px 16px', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit',
-                fontSize: 14, fontWeight: 700,
+                padding: '8px 14px', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit',
+                fontSize: 13.5, fontWeight: 700,
                 border: `1.5px solid ${capacity === s ? gold : 'rgba(255,255,255,0.18)'}`,
                 background: capacity === s ? 'rgba(245,196,66,0.14)' : 'rgba(255,255,255,0.04)',
                 color: capacity === s ? gold : 'rgba(255,255,255,0.8)',
