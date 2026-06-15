@@ -9,7 +9,6 @@ import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 const InstallationGallery = dynamic(() => import('@/components/marketing/InstallationGallery'))
-const BatterijCheck = dynamic(() => import('@/components/marketing/BatterijCheck'))
 
 export type ShopProduct = {
   id: string
@@ -177,39 +176,42 @@ function Header() {
   return (
     <header style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      background: '#fff',
-      borderBottom: '1px solid #f0f0f0',
+      background: 'rgba(8,18,13,0.85)', backdropFilter: 'blur(14px)',
+      borderBottom: '1px solid rgba(255,255,255,0.08)',
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(10px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 112 : 200} height={isMobile ? 28 : 50} priority style={{ display: 'block' }} />
+        <Link href="/" style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+          {/* Logo op witte 'pill' zodat het premium oogt op de donkere balk */}
+          <span style={{ display: 'inline-flex', background: '#fff', borderRadius: 10, padding: isMobile ? '5px 8px' : '6px 12px', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 104 : 168} height={isMobile ? 26 : 42} priority style={{ display: 'block' }} />
+          </span>
         </Link>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {!isMobile && !isTablet && [['Rekentools', '/rekentools'], ['Welk product?', '/welk-product'], ['Werkwijze', '#werkwijze']].map(([l, h]) => (
-            <a key={l} href={h} style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 12px', borderRadius: 6, fontWeight: 500 }}>{l}</a>
+            <a key={l} href={h} style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', padding: '6px 12px', borderRadius: 6, fontWeight: 500 }}>{l}</a>
           ))}
           {!isMobile && (
-            <a href="https://wa.me/31638922513" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#374151', textDecoration: 'none', padding: '6px 12px', whiteSpace: 'nowrap' }}>
-              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M14 11.3c0 .4-.1.8-.3 1.2-.2.4-.5.7-.8 1-.6.4-1.2.6-1.9.5-1-.1-2-.4-2.9-.9a12 12 0 01-2.6-1.9A12 12 0 013.6 8.6c-.5-.9-.8-1.9-.9-2.9-.1-.7.1-1.3.5-1.9.3-.3.6-.6 1-.8.4-.2.8-.3 1.2-.3.2 0 .3.1.4.3l1 2.1c.1.2.1.3 0 .5l-.6.9c-.1.2-.1.3 0 .5.3.6.7 1.1 1.2 1.6s1 .9 1.6 1.2c.2.1.3.1.5 0l.9-.6c.2-.1.3-.1.5 0l2.1 1c.2.1.3.2.3.4z" fill="#0a5c35"/></svg>
+            <a href="https://wa.me/31638922513" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', padding: '6px 12px', whiteSpace: 'nowrap' }}>
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M14 11.3c0 .4-.1.8-.3 1.2-.2.4-.5.7-.8 1-.6.4-1.2.6-1.9.5-1-.1-2-.4-2.9-.9a12 12 0 01-2.6-1.9A12 12 0 013.6 8.6c-.5-.9-.8-1.9-.9-2.9-.1-.7.1-1.3.5-1.9.3-.3.6-.6 1-.8.4-.2.8-.3 1.2-.3.2 0 .3.1.4.3l1 2.1c.1.2.1.3 0 .5l-.6.9c-.1.2-.1.3 0 .5.3.6.7 1.1 1.2 1.6s1 .9 1.6 1.2c.2.1.3.1.5 0l.9-.6c.2-.1.3-.1.5 0l2.1 1c.2.1.3.2.3.4z" fill="#f5c442"/></svg>
               06 38 92 25 13
             </a>
           )}
           {isTablet && (
-            <a href="/rekentools" style={{ fontSize: 13.5, color: '#4b5563', textDecoration: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 500 }}>Rekentools</a>
+            <a href="/rekentools" style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 500 }}>Rekentools</a>
           )}
           {/* Producten als echte knop, zichtbaar op elk formaat */}
           <Link href="/producten" style={{
-            fontSize: isMobile ? 12.5 : 13.5, fontWeight: 700, color: '#0a5c35', textDecoration: 'none',
+            fontSize: isMobile ? 12.5 : 13.5, fontWeight: 700, color: '#f5c442', textDecoration: 'none',
             padding: isMobile ? '7px 9px' : '8px 16px', borderRadius: 8,
-            border: '1.5px solid #0a5c35', whiteSpace: 'nowrap', marginRight: 4, flexShrink: 0,
+            border: '1.5px solid rgba(245,196,66,0.5)', whiteSpace: 'nowrap', marginRight: 4, flexShrink: 0,
           }}>
             Producten
           </Link>
-          <a href="#contact" style={{ ...btn('#0a5c35', '#fff'), padding: isMobile ? '8px 9px' : '9px 18px', fontSize: isMobile ? 12.5 : 13.5, boxShadow: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <a href="#contact" style={{ ...btn('#f5c442', '#052e1a'), padding: isMobile ? '8px 9px' : '9px 18px', fontSize: isMobile ? 12.5 : 13.5, boxShadow: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
             Gratis advies
           </a>
-          <Link href="/login" style={{ fontSize: isMobile ? 12 : 12.5, color: '#9ca3af', textDecoration: 'none', padding: isMobile ? '7px 4px' : '8px 10px', flexShrink: 0 }}>
+          <Link href="/login" style={{ fontSize: isMobile ? 12 : 12.5, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', padding: isMobile ? '7px 4px' : '8px 10px', flexShrink: 0 }}>
             Login
           </Link>
         </nav>
@@ -440,12 +442,12 @@ function TrustBar() {
     { icon: <Ic.Check />, label: 'Geen verplichtingen' },
   ]
   return (
-    <div style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '16px clamp(16px, 4vw, 48px)' }}>
+    <div style={{ background: '#08120d', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '16px clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 'clamp(20px, 4vw, 56px)', flexWrap: 'wrap' }}>
         {items.map(item => (
-          <div key={String(item.label)} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#374151' }}>
-            <span style={{ color: '#0a5c35', flexShrink: 0, display: 'flex' }}>{item.icon}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{item.label}</span>
+          <div key={String(item.label)} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: '#f5c442', flexShrink: 0, display: 'flex' }}>{item.icon}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>{item.label}</span>
           </div>
         ))}
       </div>
@@ -453,146 +455,98 @@ function TrustBar() {
   )
 }
 
-// ── Assortiment ───────────────────────────────────────────────────────────────
+// ── Uitgelichte batterijen (2 producten, premium dark) ────────────────────────
 
-const ASSORTIMENT_CAT: Record<string, { label: string; icon: string }> = {
-  BATTERY:         { label: 'Thuisbatterijen', icon: '🔋' },
-  SOLAR:           { label: 'Zonnepanelen',    icon: '☀️' },
-  HEAT_PUMP:       { label: 'Warmtepompen',    icon: '🌡️' },
-  CHARGER:         { label: 'Laadpalen',       icon: '⚡' },
-  EMERGENCY_POWER: { label: 'Noodstroom',      icon: '🔌' },
-}
+type Featured = { capacity: number; name: string; vanaf: number; badge: string; tagline: string }
 
-function ProductCardImage({ product }: { product: ShopProduct }) {
+const FEATURED: Featured[] = [
+  { capacity: 9.3,  name: 'Alpha ESS 9,3 kWh thuisbatterij',  vanaf: 5000, badge: 'Meest gekozen',     tagline: 'De populairste keuze voor het gemiddelde huishouden.' },
+  { capacity: 18.6, name: 'Alpha ESS 18,6 kWh thuisbatterij', vanaf: 6950, badge: 'Voor groot verbruik', tagline: 'Maximale opslag voor woningen met hoog verbruik of een warmtepomp.' },
+]
+
+function FeaturedImage({ src, alt }: { src: string | null; alt: string }) {
   const [err, setErr] = useState(false)
-  if (product.imageUrl && !err) {
-    return (
-      <Image
-        src={product.imageUrl}
-        alt={product.name}
-        fill
-        unoptimized
-        onError={() => setErr(true)}
-        style={{ objectFit: 'contain', padding: 14, boxSizing: 'border-box' }}
-      />
-    )
-  }
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f6' }}>
-      {ASSORTIMENT_CAT[product.category ?? '']?.icon ?? '📦'}
+    <div style={{ position: 'relative', height: 280, background: 'radial-gradient(120% 90% at 50% 25%, #ffffff 0%, #eef2f5 70%, #dde4ea 100%)' }}>
+      {src && !err ? (
+        <Image src={src} alt={alt} fill unoptimized onError={() => setErr(true)} style={{ objectFit: 'contain', padding: 28, boxSizing: 'border-box' }} />
+      ) : (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64 }}>🔋</div>
+      )}
     </div>
   )
 }
 
-function AssortimentSection({ products }: { products: ShopProduct[] }) {
-  if (products.length === 0) return null
-
-  // Batterijen voorop (kernproduct), daarna de rest; max 6 kaarten
-  const featured = [
-    ...products.filter(p => p.category === 'BATTERY'),
-    ...products.filter(p => p.category !== 'BATTERY'),
-  ].slice(0, 6)
-
-  const categories = Object.entries(ASSORTIMENT_CAT)
-    .map(([key, meta]) => ({ key, ...meta, count: products.filter(p => p.category === key).length }))
-    .filter(c => c.count > 0)
+function FeaturedBatteries({ products }: { products: ShopProduct[] }) {
+  const gold = '#f5c442'
 
   return (
-    <section id="assortiment" style={{ background: '#f8faf9', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)', borderBottom: '1px solid #e5e7eb' }}>
-      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+    <section id="assortiment" style={{ background: 'radial-gradient(130% 110% at 50% 0%, rgba(14,122,72,0.4) 0%, #0a1410 58%)', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
-          <div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Ons assortiment</span>
-            <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
-              Leverbaar uit voorraad, inclusief installatie
-            </h2>
-            <p style={{ fontSize: 15, color: '#6b7280', marginTop: 10, maxWidth: 560 }}>
-              Wij leveren én installeren A-merken. Elke offerte begint met een persoonlijk advies, zodat u nooit te groot of te klein koopt.
-            </p>
-          </div>
-          <Link href="/producten" style={{ ...btn('#0a5c35', '#fff'), whiteSpace: 'nowrap' }}>
-            Volledig assortiment →
-          </Link>
+        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Onze bestsellers</span>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 42px)', fontWeight: 800, color: '#fff', marginTop: 10, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+            De thuisbatterijen die Friesland kiest
+          </h2>
+          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.6)', marginTop: 12, maxWidth: 560, margin: '12px auto 0' }}>
+            Geleverd én geïnstalleerd door eigen monteurs. A-merk Alpha ESS, 10 jaar garantie.
+          </p>
         </div>
 
         {/* Merkenbalk */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2vw, 22px)', flexWrap: 'wrap', marginBottom: 24 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Wij leveren o.a.</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(10px, 2vw, 20px)', flexWrap: 'wrap', margin: '24px 0 40px' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Wij leveren o.a.</span>
           {['AlphaESS', 'Sigenergy', 'WeHeat'].map(brand => (
-            <span key={brand} style={{ fontSize: 15, fontWeight: 800, color: '#374151', letterSpacing: '-0.01em', padding: '6px 14px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }}>
+            <span key={brand} style={{ fontSize: 14.5, fontWeight: 800, color: 'rgba(255,255,255,0.85)', padding: '6px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8 }}>
               {brand}
             </span>
           ))}
         </div>
 
-        {/* Categorie-tegels */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 28 }}>
-          {categories.map(c => (
-            <Link key={c.key} href={`/producten?cat=${c.key}`} style={{
-              display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px',
-              background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, textDecoration: 'none',
-              transition: 'border-color 0.15s, box-shadow 0.15s',
-            }}>
-              <span style={{ fontSize: 22 }}>{c.icon}</span>
-              <span>
-                <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: '#111827' }}>{c.label}</span>
-                <span style={{ display: 'block', fontSize: 11.5, color: '#9ca3af' }}>{c.count} product{c.count !== 1 ? 'en' : ''}</span>
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        {/* Productkaarten */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 16 }}>
-          {featured.map(p => {
-            const inclPrice = p.unitPrice * (1 + p.vatRate / 100)
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+          {FEATURED.map((f, i) => {
+            const product = products.find(p => p.category === 'BATTERY' && p.capacityKwh === f.capacity)
+            const name = product?.name ?? f.name
+            const offerHref = product ? `/offerte-aanvragen?product=${product.id}` : '/gratis-advies?product=' + encodeURIComponent(f.name)
+            const infoHref = product ? `/producten/${product.id}` : '/producten?cat=BATTERY'
             return (
-              <div key={p.id} style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <Link href={`/producten/${p.id}`} style={{ display: 'block', position: 'relative', height: 170, background: '#f9fafb', textDecoration: 'none' }}>
-                  <ProductCardImage product={p} />
-                </Link>
-                <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  {/* Voorraad-indicator */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.isMaatwerk ? '#f59e0b' : '#16a34a', flexShrink: 0 }} />
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: p.isMaatwerk ? '#b45309' : '#15803d' }}>
-                      {p.isMaatwerk ? 'Op aanvraag · prijs na schouw' : 'Leverbaar · installatie in ±2 weken'}
-                    </span>
+              <div key={f.capacity} style={{
+                background: 'rgba(255,255,255,0.04)', border: `1px solid ${i === 0 ? 'rgba(245,196,66,0.4)' : 'rgba(255,255,255,0.12)'}`,
+                borderRadius: 20, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative',
+              }}>
+                <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 2, padding: '5px 12px', borderRadius: 20, background: i === 0 ? gold : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', fontSize: 11.5, fontWeight: 800, color: i === 0 ? '#052e1a' : '#fff' }}>
+                  {i === 0 ? '★ ' : ''}{f.badge}
+                </div>
+                <FeaturedImage src={product?.imageUrl ?? null} alt={name} />
+                <div style={{ padding: 'clamp(22px, 3vw, 32px)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h3 style={{ fontSize: 'clamp(19px, 2.4vw, 23px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', marginBottom: 8 }}>{name}</h3>
+                  <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 16 }}>{f.tagline}</p>
+
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+                    {[`${f.capacity.toString().replace('.', ',')} kWh`, product?.powerKw != null ? `${product.powerKw} kW` : null, `${product?.warrantyYears ?? 10} jr garantie`].filter(Boolean).map(s => (
+                      <span key={s} style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.1)' }}>{s}</span>
+                    ))}
                   </div>
-                  <Link href={`/producten/${p.id}`} style={{ textDecoration: 'none' }}>
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.35, marginBottom: 6 }}>{p.name}</h3>
-                  </Link>
-                  {(p.capacityKwh || p.powerKw || p.warrantyYears) && (
-                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
-                      {p.capacityKwh != null && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#f3f4f6', color: '#374151' }}>{p.capacityKwh} kWh</span>}
-                      {p.powerKw != null && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#f3f4f6', color: '#374151' }}>{p.powerKw} kW</span>}
-                      {p.warrantyYears != null && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#f3f4f6', color: '#374151' }}>{p.warrantyYears} jr garantie</span>}
-                    </div>
-                  )}
+
                   <div style={{ marginTop: 'auto' }}>
-                    <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: 10, marginBottom: 12 }}>
-                      {p.isMaatwerk ? (
-                        <div style={{ fontSize: 19, fontWeight: 900, color: '#0a5c35' }}>Maatwerk</div>
-                      ) : (
-                        <>
-                          <div style={{ fontSize: 19, fontWeight: 900, color: '#111827', lineHeight: 1 }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginRight: 4 }}>vanaf</span>
-                            {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(p.unitPrice)}
-                            <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9ca3af', marginLeft: 5 }}>excl. btw</span>
-                          </div>
-                          <div style={{ fontSize: 11.5, color: '#9ca3af', marginTop: 3 }}>
-                            {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(inclPrice)} incl. {p.vatRate}% btw
-                          </div>
-                        </>
-                      )}
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 16, marginBottom: 16 }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>vanaf</span>
+                        <span style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 900, color: gold, letterSpacing: '-0.02em' }}>
+                          {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(f.vanaf)}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>compleet geïnstalleerd · exacte prijs na gratis advies</p>
                     </div>
-                    <Link href={`/offerte-aanvragen?product=${p.id}`} style={{
-                      display: 'block', textAlign: 'center', padding: '9px 12px', borderRadius: 8,
-                      background: '#0a5c35', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none',
-                    }}>
-                      Vraag offerte aan
-                    </Link>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Link href={offerHref} style={{ flex: 1, textAlign: 'center', padding: '12px', borderRadius: 10, background: gold, color: '#052e1a', fontSize: 14, fontWeight: 800, textDecoration: 'none' }}>
+                        Vraag offerte aan
+                      </Link>
+                      <Link href={infoHref} style={{ padding: '12px 16px', borderRadius: 10, border: '1.5px solid rgba(255,255,255,0.2)', color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                        Meer info
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -600,12 +554,10 @@ function AssortimentSection({ products }: { products: ShopProduct[] }) {
           })}
         </div>
 
-        {/* Advies-CTA onder de producten */}
-        <div style={{ marginTop: 24, textAlign: 'center' }}>
-          <p style={{ fontSize: 14, color: '#6b7280' }}>
-            Niet zeker welk product bij uw situatie past?{' '}
-            <a href="#contact" style={{ color: '#0a5c35', fontWeight: 700, textDecoration: 'none' }}>Plan een gratis adviesgesprek →</a>
-          </p>
+        <div style={{ marginTop: 28, textAlign: 'center' }}>
+          <Link href="/producten" style={{ fontSize: 14.5, fontWeight: 700, color: gold, textDecoration: 'none' }}>
+            Bekijk het volledige assortiment →
+          </Link>
         </div>
       </div>
     </section>
@@ -675,11 +627,11 @@ function Werkwijze() {
     { n: '04', icon: <Ic.Leaf />,     title: 'Besparen',      desc: 'Geniet van een lagere energierekening en meer comfort.' },
   ]
   return (
-    <section id="werkwijze" style={{ background: '#f9fafb', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+    <section id="werkwijze" style={{ background: '#08120d', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 52 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Zo werkt het</span>
-          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Zo werkt het</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, letterSpacing: '-0.025em' }}>
             Van aanvraag tot besparing
           </h2>
         </div>
@@ -688,14 +640,14 @@ function Werkwijze() {
           {steps.map((s, i) => (
             <div key={s.n} style={{ position: 'relative', padding: '0 24px', textAlign: 'center' }}>
               {i < steps.length - 1 && (
-                <div style={{ position: 'absolute', top: 36, right: -8, left: '50%', height: 1, background: '#d1fae5', zIndex: 0 }} />
+                <div style={{ position: 'absolute', top: 36, right: -8, left: '50%', height: 1, background: 'rgba(255,255,255,0.14)', zIndex: 0 }} />
               )}
-              <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff', border: '1.5px solid #d1fae5', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1, boxShadow: '0 2px 12px rgba(10,92,53,0.08)', color: '#0a5c35' }}>
+              <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(245,196,66,0.12)', border: '1.5px solid rgba(245,196,66,0.4)', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1, color: '#f5c442' }}>
                 {s.icon}
               </div>
-              <div style={{ fontSize: 10.5, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.1em', marginBottom: 6 }}>STAP {s.n}</div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 8 }}>{s.title}</h3>
-              <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.65 }}>{s.desc}</p>
+              <div style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em', marginBottom: 6 }}>STAP {s.n}</div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{s.title}</h3>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.65 }}>{s.desc}</p>
             </div>
           ))}
         </div>
@@ -722,60 +674,60 @@ function ThuisbatterijInfo() {
   ]
 
   return (
-    <section style={{ background: '#f9fafb', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+    <section style={{ background: '#0a1410', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 52 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Thuisbatterij</span>
-          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Thuisbatterij</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, letterSpacing: '-0.025em' }}>
             Slim besparen met een thuisbatterij
           </h2>
-          <p style={{ fontSize: 15.5, color: '#6b7280', marginTop: 12, maxWidth: 560, margin: '12px auto 0' }}>
+          <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.6)', marginTop: 12, maxWidth: 560, margin: '12px auto 0' }}>
             Ontdek hoe u meer van uw eigen stroom gebruikt en uw energiekosten verlaagt.
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 40, alignItems: 'start' }}>
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 20 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 20 }}>
               Waarom verandert uw energierekening?
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
               {reasons.map((r) => (
                 <div key={String(r.label)} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: '#fff', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#0a5c35', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#f5c442' }}>
                     {r.icon}
                   </div>
-                  <span style={{ fontSize: 14.5, color: '#374151', fontWeight: 500 }}>{r.label}</span>
+                  <span style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{r.label}</span>
                 </div>
               ))}
             </div>
 
-            <div style={{ background: '#fff', border: '1px solid #d1fae5', borderRadius: 10, padding: '16px 20px' }}>
-              <p style={{ fontSize: 14.5, color: '#111827', lineHeight: 1.6 }}>
+            <div style={{ background: 'rgba(245,196,66,0.1)', border: '1px solid rgba(245,196,66,0.3)', borderRadius: 10, padding: '16px 20px' }}>
+              <p style={{ fontSize: 14.5, color: '#fff', lineHeight: 1.6 }}>
                 <strong>Gemiddelde besparing met een thuisbatterij: €1.100 – €1.400 per jaar</strong>
               </p>
             </div>
           </div>
 
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 12 }}>
               Wat doet een thuisbatterij?
             </h3>
-            <p style={{ fontSize: 14.5, color: '#4b5563', lineHeight: 1.75, marginBottom: 20 }}>
+            <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75, marginBottom: 20 }}>
               Een thuisbatterij slaat energie op en gebruikt deze automatisch op het meest voordelige moment. Zo profiteert u optimaal van uw zonnepanelen én van lage stroomprijzen.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
               {benefits.map((b) => (
-                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#0a5c35' }}>
+                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f5c442' }}>
                   <div style={{ flexShrink: 0 }}><Ic.Check /></div>
-                  <span style={{ fontSize: 14, color: '#374151' }}>{b}</span>
+                  <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>{b}</span>
                 </div>
               ))}
             </div>
 
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 18px' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Nationaal Warmtefonds</p>
-              <p style={{ fontSize: 13.5, color: '#78350f', lineHeight: 1.6 }}>
+            <div style={{ background: 'rgba(245,196,66,0.1)', border: '1px solid rgba(245,196,66,0.3)', borderRadius: 10, padding: '14px 18px' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#f5c442', marginBottom: 4 }}>Nationaal Warmtefonds</p>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
                 Inkomen onder €60.000? Dan kunt u rentevrij lenen. Boetevrij aflossen is altijd mogelijk.
               </p>
             </div>
@@ -828,14 +780,14 @@ function Diensten() {
   ]
 
   return (
-    <section id="diensten" style={{ background: '#fff', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+    <section id="diensten" style={{ background: '#08120d', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Onze diensten</span>
-          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Onze diensten</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, letterSpacing: '-0.025em' }}>
             Uw weg naar een duurzamer huis
           </h2>
-          <p style={{ fontSize: 15, color: '#6b7280', marginTop: 12 }}>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginTop: 12 }}>
             Ontdek welke stappen u kunt zetten om energie te besparen en subsidies te benutten.
           </p>
         </div>
@@ -846,33 +798,32 @@ function Diensten() {
             return (
               <div key={d.title} style={{
                 borderRadius: 14, padding: '28px 26px',
-                border: d.featured || open ? '1.5px solid #0a5c35' : '1px solid #e5e7eb',
-                background: d.featured ? '#f9fffe' : '#fff',
-                boxShadow: d.featured || open ? '0 4px 20px rgba(10,92,53,0.08)' : 'none',
+                border: d.featured || open ? '1.5px solid rgba(245,196,66,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                background: d.featured ? 'rgba(245,196,66,0.06)' : 'rgba(255,255,255,0.03)',
               }}>
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: d.featured ? '#dcfce7' : '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, color: '#0a5c35' }}>
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(245,196,66,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, color: '#f5c442' }}>
                   {d.icon}
                 </div>
-                <h3 style={{ fontSize: 16.5, fontWeight: 700, color: '#111827', marginBottom: 10 }}>{d.title}</h3>
-                <p style={{ fontSize: 13.5, color: '#6b7280', lineHeight: 1.7, marginBottom: 18 }}>{d.desc}</p>
+                <h3 style={{ fontSize: 16.5, fontWeight: 700, color: '#fff', marginBottom: 10 }}>{d.title}</h3>
+                <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: 18 }}>{d.desc}</p>
 
                 <button
                   onClick={() => setOpenTitle(open ? null : d.title)}
-                  style={{ fontSize: 13.5, fontWeight: 600, color: '#0a5c35', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                  style={{ fontSize: 13.5, fontWeight: 600, color: '#f5c442', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 5 }}
                 >
                   Meer informatie {open ? '▴' : '▾'}
                 </button>
 
                 {open && (
-                  <div style={{ marginTop: 14, borderTop: '1px solid #e5e7eb', paddingTop: 14 }}>
-                    <p style={{ fontSize: 13.5, color: '#374151', lineHeight: 1.75, marginBottom: 16 }}>{d.info}</p>
+                  <div style={{ marginTop: 14, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 14 }}>
+                    <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, marginBottom: 16 }}>{d.info}</p>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {d.productHref && (
-                        <Link href={d.productHref} style={{ padding: '8px 14px', borderRadius: 8, background: '#0a5c35', color: '#fff', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+                        <Link href={d.productHref} style={{ padding: '8px 14px', borderRadius: 8, background: '#f5c442', color: '#052e1a', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
                           Bekijk producten →
                         </Link>
                       )}
-                      <a href="#contact" style={{ padding: '8px 14px', borderRadius: 8, border: '1.5px solid #0a5c35', color: '#0a5c35', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+                      <a href="#contact" style={{ padding: '8px 14px', borderRadius: 8, border: '1.5px solid rgba(245,196,66,0.5)', color: '#f5c442', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
                         Gratis advies →
                       </a>
                     </div>
@@ -961,11 +912,11 @@ function FAQ() {
   ]
 
   return (
-    <section id="veelgestelde-vragen" style={{ background: '#fff', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+    <section id="veelgestelde-vragen" style={{ background: '#0a1410', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 820, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Veelgestelde vragen</span>
-          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#111827', marginTop: 8, letterSpacing: '-0.025em' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Veelgestelde vragen</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, letterSpacing: '-0.025em' }}>
             Alles over thuisbatterijen in Friesland
           </h2>
         </div>
@@ -987,16 +938,16 @@ function FAQ() {
 function FAQItem({ question, answer, last }: { question: string; answer: string; last: boolean }) {
   const [open, setOpen] = useState(false)
   return (
-    <div style={{ borderTop: '1px solid #e5e7eb', ...(last ? { borderBottom: '1px solid #e5e7eb' } : {}) }}>
+    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', ...(last ? { borderBottom: '1px solid rgba(255,255,255,0.1)' } : {}) }}>
       <button
         onClick={() => setOpen(!open)}
         style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', gap: 16 }}
       >
-        <span style={{ fontSize: 15.5, fontWeight: 600, color: '#111827', lineHeight: 1.4 }}>{question}</span>
-        <span style={{ fontSize: 20, color: '#0a5c35', flexShrink: 0, lineHeight: 1, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s', fontWeight: 300 }}>+</span>
+        <span style={{ fontSize: 15.5, fontWeight: 600, color: '#fff', lineHeight: 1.4 }}>{question}</span>
+        <span style={{ fontSize: 20, color: '#f5c442', flexShrink: 0, lineHeight: 1, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s', fontWeight: 300 }}>+</span>
       </button>
       {open && (
-        <div style={{ padding: '0 0 20px', fontSize: 14.5, color: '#4b5563', lineHeight: 1.75 }}>
+        <div style={{ padding: '0 0 20px', fontSize: 14.5, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75 }}>
           {answer}
         </div>
       )}
@@ -1038,7 +989,7 @@ function ContactForm() {
   }
 
   return (
-    <section id="contact" style={{ background: 'linear-gradient(160deg, #052e1a 0%, #0a5c35 100%)', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+    <section id="contact" style={{ background: 'radial-gradient(120% 100% at 50% 0%, rgba(14,122,72,0.35) 0%, #07120d 60%), #07120d', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 48, alignItems: 'start' }}>
 
         <div>
@@ -1191,13 +1142,12 @@ function Footer() {
 
 export default function LandingPage({ products = [] }: { products?: ShopProduct[] }) {
   return (
-    <div style={{ fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh' }}>
+    <div style={{ fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: '#0a1410' }}>
       <Header />
       <HeroSection />
       <TrustBar />
-      <AssortimentSection products={products} />
+      <FeaturedBatteries products={products} />
       <RekentoolsBand />
-      <BatterijCheck />
       <ThuisbatterijInfo />
       <Diensten />
       <Werkwijze />

@@ -98,16 +98,16 @@ export default function InstallationGallery() {
   const slide = SLIDES[idx]
 
   return (
-    <section style={{ padding: 'clamp(56px,7vw,88px) clamp(16px,4vw,48px)', background: '#f9fafb' }}>
+    <section style={{ padding: 'clamp(56px,7vw,88px) clamp(16px,4vw,48px)', background: '#08120d' }}>
       <div style={{ maxWidth: 1140, margin: '0 auto' }}>
 
         {/* Heading */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0a5c35', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Klantenervaringen</span>
-          <h2 style={{ fontSize: 'clamp(24px,3vw,36px)', fontWeight: 900, color: '#111827', marginTop: 8, letterSpacing: '-0.02em' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#f5c442', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Klantenervaringen</span>
+          <h2 style={{ fontSize: 'clamp(24px,3vw,36px)', fontWeight: 900, color: '#fff', marginTop: 8, letterSpacing: '-0.02em' }}>
             Wat onze klanten zeggen
           </h2>
-          <p style={{ fontSize: 15, color: '#6b7280', marginTop: 8 }}>Echte installaties bij mensen thuis in Friesland</p>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginTop: 8 }}>Echte installaties bij mensen thuis in Friesland</p>
         </div>
 
         {/* Slider */}
@@ -167,7 +167,7 @@ export default function InstallationGallery() {
 
         {/* Bottom CTA */}
         <div style={{ textAlign: 'center', marginTop: 28 }}>
-          <Link href="/gratis-advies" style={{ fontSize: 14, fontWeight: 700, color: '#0a5c35', textDecoration: 'none' }}>
+          <Link href="/gratis-advies" style={{ fontSize: 14, fontWeight: 700, color: '#f5c442', textDecoration: 'none' }}>
             Word ook een tevreden klant → Vraag gratis advies aan
           </Link>
         </div>
