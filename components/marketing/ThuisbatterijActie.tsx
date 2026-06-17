@@ -75,7 +75,7 @@ function LeadForm({ compact }: { compact?: boolean }) {
         padding: '14px', borderRadius: 10, background: gold, color: '#052e1a', border: 'none',
         fontSize: 15.5, fontWeight: 800, cursor: pending ? 'not-allowed' : 'pointer', opacity: pending ? 0.7 : 1, fontFamily: 'inherit',
       }}>
-        {pending ? 'Versturen…' : 'Bel mij gratis terug →'}
+        {pending ? 'Versturen…' : 'Bel mij terug →'}
       </button>
       <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6 }}>
         Geen verkooppraatjes · u zit nergens aan vast · reactie binnen 1 werkdag<br />
@@ -271,7 +271,7 @@ export default function ThuisbatterijActie() {
           padding: '15px', fontSize: 15.5, fontWeight: 800,
           boxShadow: '0 -6px 24px rgba(0,0,0,0.4)',
         }}>
-          📞 Bel mij gratis terug
+          📞 Bel mij terug
         </a>
       )}
 
