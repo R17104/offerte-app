@@ -12,6 +12,7 @@ const dark = '#0a1410'
 function LeadForm({ compact }: { compact?: boolean }) {
   const [naam, setNaam] = useState('')
   const [telefoon, setTelefoon] = useState('')
+  const [email, setEmail] = useState('')
   const [website, setWebsite] = useState('') // honeypot
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -22,7 +23,7 @@ function LeadForm({ compact }: { compact?: boolean }) {
     setError('')
     startTransition(async () => {
       try {
-        await createLeadFromLanding({ naam, telefoon, herkomst: 'Thuisbatterij-actie', website })
+        await createLeadFromLanding({ naam, telefoon, email, herkomst: 'Thuisbatterij-actie', website })
         // Browser-side conversie-event (server-side gebeurt al in de actie)
         if (typeof window !== 'undefined' && window.ttq) window.ttq.track('SubmitForm')
         setSent(true)
@@ -33,9 +34,12 @@ function LeadForm({ compact }: { compact?: boolean }) {
   }
 
   const inp: React.CSSProperties = {
-    width: '100%', padding: '13px 15px', borderRadius: 10, border: '1.5px solid rgba(255,255,255,0.18)',
-    fontSize: 15, outline: 'none', background: 'rgba(255,255,255,0.05)', boxSizing: 'border-box',
+    width: '100%', padding: '13px 15px', borderRadius: 10, border: '1.5px solid rgba(255,255,255,0.25)',
+    fontSize: 15, outline: 'none', background: 'rgba(255,255,255,0.08)', boxSizing: 'border-box',
     fontFamily: 'inherit', color: '#fff',
+  }
+  const lbl: React.CSSProperties = {
+    display: 'block', fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: 6,
   }
 
   if (sent) {
@@ -53,8 +57,18 @@ function LeadForm({ compact }: { compact?: boolean }) {
       {!compact && <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 2 }}>Vraag gratis advies aan</h3>}
       {/* Honeypot */}
       <input type="text" name="website" value={website} onChange={e => setWebsite(e.target.value)} autoComplete="off" tabIndex={-1} aria-hidden="true" style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }} />
-      <input required value={naam} onChange={e => setNaam(e.target.value)} placeholder="Uw naam" style={inp} />
-      <input required type="tel" value={telefoon} onChange={e => setTelefoon(e.target.value)} placeholder="Uw telefoonnummer" style={inp} />
+      <div>
+        <label style={lbl}>Naam *</label>
+        <input required value={naam} onChange={e => setNaam(e.target.value)} placeholder="Bijv. Jan de Vries" style={inp} />
+      </div>
+      <div>
+        <label style={lbl}>Telefoonnummer *</label>
+        <input required type="tel" value={telefoon} onChange={e => setTelefoon(e.target.value)} placeholder="Bijv. 06 12 34 56 78" style={inp} />
+      </div>
+      <div>
+        <label style={lbl}>E-mailadres <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.45)' }}>(optioneel)</span></label>
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Bijv. jan@voorbeeld.nl" style={inp} />
+      </div>
       {error && <p style={{ fontSize: 13, color: '#fca5a5' }}>{error}</p>}
       <button type="submit" disabled={pending} style={{
         padding: '14px', borderRadius: 10, background: gold, color: '#052e1a', border: 'none',
