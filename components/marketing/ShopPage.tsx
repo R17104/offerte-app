@@ -102,7 +102,7 @@ export default function ShopPage({ products, initialCategory }: { products: Prod
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: '#fff', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 clamp(16px,4vw,48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 71 : 96} height={isMobile ? 40 : 54} priority style={{ display: 'block' }} />
+            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 78 : 103} height={isMobile ? 44 : 58} priority style={{ display: 'block' }} />
           </Link>
 
           {/* Search — verborgen op mobiel (staat hieronder) */}

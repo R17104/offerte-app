@@ -23,7 +23,7 @@ export default async function WelkProductPage() {
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 clamp(16px,4vw,48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={96} height={54} priority style={{ display: 'block' }} />
+            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={103} height={58} priority style={{ display: 'block' }} />
           </Link>
           <div style={{ display: 'flex', gap: 8 }}>
             <Link href="/producten" style={{ fontSize: 13.5, fontWeight: 600, color: '#374151', textDecoration: 'none', padding: '7px 14px' }}>Alle producten</Link>
