@@ -411,7 +411,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: '#fff', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 clamp(16px,4vw,48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 57 : 75} height={isMobile ? 32 : 42} priority style={{ display: 'block' }} />
+            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 68 : 89} height={isMobile ? 38 : 50} priority style={{ display: 'block' }} />
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
