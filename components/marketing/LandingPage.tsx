@@ -181,7 +181,7 @@ function Header() {
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(10px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-          <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={isMobile ? 59 : 80} height={isMobile ? 40 : 54} priority style={{ display: 'block' }} />
+          <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={isMobile ? 62 : 86} height={isMobile ? 42 : 58} priority style={{ display: 'block' }} />
         </Link>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>

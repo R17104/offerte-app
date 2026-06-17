@@ -94,7 +94,7 @@ export default function ThuisbatterijActie() {
       {/* Header — geen menu, alleen logo + telefoon */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(8,18,13,0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 clamp(16px,4vw,40px)', height: 62, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={77} height={52} priority style={{ display: 'block' }} />
+          <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={80} height={54} priority style={{ display: 'block' }} />
           <a href="https://wa.me/31638922513" style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 700, color: gold, textDecoration: 'none', whiteSpace: 'nowrap' }}>
             <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><path d="M14 11.3c0 .4-.1.8-.3 1.2-.2.4-.5.7-.8 1-.6.4-1.2.6-1.9.5-1-.1-2-.4-2.9-.9a12 12 0 01-2.6-1.9A12 12 0 013.6 8.6c-.5-.9-.8-1.9-.9-2.9-.1-.7.1-1.3.5-1.9.3-.3.6-.6 1-.8.4-.2.8-.3 1.2-.3.2 0 .3.1.4.3l1 2.1c.1.2.1.3 0 .5l-.6.9c-.1.2-.1.3 0 .5.3.6.7 1.1 1.2 1.6s1 .9 1.6 1.2c.2.1.3.1.5 0l.9-.6c.2-.1.3-.1.5 0l2.1 1c.2.1.3.2.3.4z" fill={gold}/></svg>
             06 38 92 25 13
