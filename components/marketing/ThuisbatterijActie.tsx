@@ -188,9 +188,9 @@ export default function ThuisbatterijActie() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
             {[
-              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png', name: 'Dhr. Dijkstra', city: 'Franeker', quote: 'Vlot geïnstalleerd en goed uitgelegd. Doe er nu geen omkijken meer naar.' },
-              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png', name: 'Familie Hoekstra', city: 'Leeuwarden', quote: 'De installatie ging vlotter dan verwacht en ik merk het nu terug op mijn rekening.' },
-              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png', name: 'Familie Visser', city: 'Heerenveen', quote: 'Werkt goed samen met onze zonnepanelen. We gebruiken ’s avonds nu onze eigen stroom.' },
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png', name: 'Dhr. Dijkstra', city: 'Franeker', stars: 5, quote: 'Vlot geïnstalleerd en goed uitgelegd. Doe er nu geen omkijken meer naar.' },
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png', name: 'Familie Hoekstra', city: 'Leeuwarden', stars: 5, quote: 'De installatie ging vlotter dan verwacht en ik merk het nu terug op mijn rekening.' },
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png', name: 'Dhr. de Jong', city: 'Drachten', stars: 4, quote: 'Een paar maanden terug onze Alpha ESS laten plaatsen — bleek achteraf net iets te klein. Inmiddels makkelijk een extra module laten bijzetten, fijn dat dat zo kan.' },
             ].map(r => (
               <div key={r.name} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'relative', height: 150, background: '#0e1a14' }}>
@@ -198,7 +198,10 @@ export default function ThuisbatterijActie() {
                   <img src={r.img} alt={`Installatie ${r.city}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                 </div>
                 <div style={{ padding: '16px 18px' }}>
-                  <span style={{ color: gold, fontSize: 13, letterSpacing: 1.5 }}>★★★★★</span>
+                  <span style={{ fontSize: 13, letterSpacing: 1.5 }}>
+                    <span style={{ color: gold }}>{'★'.repeat(r.stars)}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.25)' }}>{'★'.repeat(5 - r.stars)}</span>
+                  </span>
                   <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: '8px 0 10px', fontStyle: 'italic' }}>&ldquo;{r.quote}&rdquo;</p>
                   <p style={{ fontSize: 12.5, fontWeight: 700, color: '#fff' }}>{r.name} · <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.5)' }}>{r.city}</span></p>
                 </div>
