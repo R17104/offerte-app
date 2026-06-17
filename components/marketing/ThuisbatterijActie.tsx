@@ -150,7 +150,7 @@ export default function ThuisbatterijActie() {
       <section style={{ background: dark, padding: 'clamp(40px,6vw,72px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Betaalbaar</span>
-          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, marginBottom: 14, letterSpacing: '-0.02em' }}>Al vanaf €75 per maand</h2>
+          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, marginBottom: 14, letterSpacing: '-0.02em' }}>Al vanaf €35 per maand</h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>
             Via het <strong style={{ color: '#fff' }}>Nationaal Warmtefonds</strong> leent u rentevrij bij een inkomen tot €60.000 — en boetevrij aflossen mag altijd. Wij rekenen het in het gratis adviesgesprek precies voor u uit.
           </p>

@@ -674,7 +674,7 @@ function ThuisbatterijInfo() {
     'Minder terugleververlies',
     'Bescherming tegen stijgende prijzen',
     'Volledig automatisch systeem',
-    'Gespreid betalen mogelijk vanaf €75/mnd',
+    'Gespreid betalen mogelijk vanaf €35/mnd',
   ]
 
   return (
