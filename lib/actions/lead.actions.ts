@@ -201,7 +201,7 @@ export async function createLeadFromLanding({
   naam, email, telefoon, postcode, bericht, herkomst, website,
 }: {
   naam: string
-  email: string
+  email?: string
   telefoon?: string
   postcode?: string
   bericht?: string
@@ -214,7 +214,10 @@ export async function createLeadFromLanding({
     throw new Error(guard.error)
   }
   if (!naam.trim()) throw new Error('Vul je naam in')
-  if (!isValidEmail(email)) throw new Error('Vul een geldig e-mailadres in')
+  // E-mail óf telefoon volstaat (landingspagina vraagt vaak alleen telefoon)
+  const hasEmail = !!email && isValidEmail(email)
+  const hasPhone = !!telefoon && telefoon.replace(/\D/g, '').length >= 8
+  if (!hasEmail && !hasPhone) throw new Error('Vul een telefoonnummer of e-mailadres in')
 
   const parts = naam.trim().split(' ')
   const firstName = parts[0] ?? naam
@@ -244,7 +247,7 @@ export async function createLeadFromLanding({
     })
   }
 
-  await sendConfirmationSafe(email, firstName)
+  if (hasEmail) await sendConfirmationSafe(email!, firstName)
   await sendTikTokLeadSafe({ email, phone: telefoon })
 
   revalidatePath('/leads')
