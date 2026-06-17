@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
+import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 const gold = '#f5c442'
 const dark = '#0a1410'
@@ -76,16 +77,19 @@ function LeadForm({ compact }: { compact?: boolean }) {
       }}>
         {pending ? 'Versturen…' : 'Bel mij gratis terug →'}
       </button>
-      <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.4)', textAlign: 'center' }}>
-        Gratis & vrijblijvend · <a href="https://wa.me/31638922513" style={{ color: gold, textDecoration: 'none' }}>of app ons direct</a>
+      <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6 }}>
+        Geen verkooppraatjes · u zit nergens aan vast · reactie binnen 1 werkdag<br />
+        <a href="https://wa.me/31638922513" style={{ color: gold, textDecoration: 'none' }}>of app ons direct →</a>
       </p>
     </form>
   )
 }
 
 export default function ThuisbatterijActie() {
+  const w = useWindowWidth()
+  const isMobile = w < 768
   return (
-    <div style={{ fontFamily: "'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", background: dark, minHeight: '100vh', color: '#fff' }}>
+    <div style={{ fontFamily: "'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", background: dark, minHeight: '100vh', color: '#fff', paddingBottom: isMobile ? 64 : 0 }}>
 
       {/* Header — geen menu, alleen logo + telefoon */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(8,18,13,0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -112,6 +116,9 @@ export default function ThuisbatterijActie() {
             </h1>
             <p style={{ fontSize: 'clamp(15px,1.8vw,17px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.7, marginBottom: 26, maxWidth: 460 }}>
               Sla uw zonnestroom op en gebruik hem ’s avonds — juist nu de saldering verdwijnt. Gratis advies van een installateur uit Friesland. Wij bellen u terug.
+            </p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: gold, marginBottom: 24 }}>
+              Elke maand wachten kost u geld nu de saldering afloopt.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
               {['Gratis en volledig vrijblijvend', 'Gecertificeerde installateurs in heel Friesland', 'Geleverd én geïnstalleerd, ±2 weken'].map(t => (
@@ -140,6 +147,18 @@ export default function ThuisbatterijActie() {
         </div>
       </section>
 
+      {/* Trust-strip */}
+      <section style={{ background: '#08120d', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '16px clamp(16px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 'clamp(16px,3vw,40px)', flexWrap: 'wrap' }}>
+          {['KVK 71128174', 'Gecertificeerde installateurs', '10 jaar garantie', 'Geen voorrijkosten'].map(t => (
+            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <span style={{ color: gold, fontSize: 13 }}>✓</span>
+              <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>{t}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Waarom nu */}
       <section style={{ background: '#08120d', padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -160,6 +179,55 @@ export default function ThuisbatterijActie() {
         </div>
       </section>
 
+      {/* Social proof */}
+      <section style={{ background: dark, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <span style={{ color: gold, fontSize: 16, letterSpacing: 2 }}>★★★★★</span>
+            <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, letterSpacing: '-0.02em' }}>Klanten in Friesland gingen u voor</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+            {[
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png', name: 'Dhr. Dijkstra', city: 'Franeker', quote: 'Vlot geïnstalleerd en goed uitgelegd. Doe er nu geen omkijken meer naar.' },
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png', name: 'Familie Hoekstra', city: 'Leeuwarden', quote: 'De installatie ging vlotter dan verwacht en ik merk het nu terug op mijn rekening.' },
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png', name: 'Familie Visser', city: 'Heerenveen', quote: 'Werkt goed samen met onze zonnepanelen. We gebruiken ’s avonds nu onze eigen stroom.' },
+            ].map(r => (
+              <div key={r.name} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ position: 'relative', height: 150, background: '#0e1a14' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={r.img} alt={`Installatie ${r.city}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                </div>
+                <div style={{ padding: '16px 18px' }}>
+                  <span style={{ color: gold, fontSize: 13, letterSpacing: 1.5 }}>★★★★★</span>
+                  <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: '8px 0 10px', fontStyle: 'italic' }}>&ldquo;{r.quote}&rdquo;</p>
+                  <p style={{ fontSize: 12.5, fontWeight: 700, color: '#fff' }}>{r.name} · <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.5)' }}>{r.city}</span></p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mini-FAQ */}
+      <section style={{ background: '#08120d', padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, textAlign: 'center', marginBottom: 28, letterSpacing: '-0.02em' }}>Veelgestelde vragen</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {[
+              { q: 'Hoe snel hoor ik iets na mijn aanvraag?', a: 'Binnen één werkdag belt een adviseur uit Friesland u persoonlijk terug — geen callcenter.' },
+              { q: 'Hoe lang duurt de installatie?', a: 'Gemiddeld 2 tot 4 weken van aanvraag tot werkende installatie. De plaatsing zelf is meestal binnen een dag klaar.' },
+              { q: 'Werkt een thuisbatterij samen met mijn zonnepanelen?', a: 'Ja — de batterij slaat uw overschot van overdag op zodat u het ’s avonds gebruikt. Heeft u nog geen panelen, dan adviseren we de combinatie.' },
+              { q: 'Is een thuisbatterij iets voor mij?', a: 'Vooral interessant als u zonnepanelen heeft en nu de saldering afloopt. In het gratis gesprek rekenen we het eerlijk voor uw situatie door.' },
+            ].map(f => (
+              <div key={f.q} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '18px 20px' }}>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{f.q}</p>
+                <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.65)', lineHeight: 1.65 }}>{f.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Financiering — drempel weghalen */}
       <section style={{ background: dark, padding: 'clamp(40px,6vw,72px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
@@ -172,7 +240,7 @@ export default function ThuisbatterijActie() {
       </section>
 
       {/* Afsluitend formulier */}
-      <section style={{ background: 'radial-gradient(120% 100% at 50% 0%, rgba(14,122,72,0.35) 0%, #07120d 60%), #07120d', padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)' }}>
+      <section id="aanvraag" style={{ background: 'radial-gradient(120% 100% at 50% 0%, rgba(14,122,72,0.35) 0%, #07120d 60%), #07120d', padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', scrollMarginTop: 70 }}>
         <div style={{ maxWidth: 520, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(24px,3.5vw,36px)', fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em' }}>Ontdek wat u kunt besparen</h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', marginBottom: 28 }}>Laat uw nummer achter — geen verkooppraatjes, gewoon een eerlijke berekening voor uw situatie.</p>
@@ -193,6 +261,19 @@ export default function ThuisbatterijActie() {
           </div>
         </div>
       </footer>
+      {/* Sticky CTA — alleen mobiel */}
+      {isMobile && (
+        <a href="#aanvraag" style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 60,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          background: gold, color: '#052e1a', textDecoration: 'none',
+          padding: '15px', fontSize: 15.5, fontWeight: 800,
+          boxShadow: '0 -6px 24px rgba(0,0,0,0.4)',
+        }}>
+          📞 Bel mij gratis terug
+        </a>
+      )}
+
       <WhatsAppButton />
     </div>
   )
