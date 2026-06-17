@@ -183,7 +183,7 @@ function Header() {
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
           {/* Logo op witte 'pill' zodat het premium oogt op de donkere balk */}
           <span style={{ display: 'inline-flex', background: '#fff', borderRadius: 10, padding: isMobile ? '4px 7px' : '6px 12px', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
-            <Image src="/logo-bespaarhulp.jpg" alt="Bespaarhulp Friesland" width={isMobile ? 88 : 168} height={isMobile ? 22 : 42} priority style={{ display: 'block' }} />
+            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 43 : 61} height={isMobile ? 24 : 34} priority style={{ display: 'block' }} />
           </span>
         </Link>
 
