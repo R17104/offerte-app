@@ -6,6 +6,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
+import { trackWhatsAppClick } from '@/lib/track-contact'
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 const InstallationGallery = dynamic(() => import('@/components/marketing/InstallationGallery'))
@@ -189,7 +190,7 @@ function Header() {
             <a key={l} href={h} style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', padding: '6px 12px', borderRadius: 6, fontWeight: 500 }}>{l}</a>
           ))}
           {!isMobile && (
-            <a href="https://wa.me/31638922513" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', padding: '6px 12px', whiteSpace: 'nowrap' }}>
+            <a href="https://wa.me/31638922513" onClick={trackWhatsAppClick} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', padding: '6px 12px', whiteSpace: 'nowrap' }}>
               <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M14 11.3c0 .4-.1.8-.3 1.2-.2.4-.5.7-.8 1-.6.4-1.2.6-1.9.5-1-.1-2-.4-2.9-.9a12 12 0 01-2.6-1.9A12 12 0 013.6 8.6c-.5-.9-.8-1.9-.9-2.9-.1-.7.1-1.3.5-1.9.3-.3.6-.6 1-.8.4-.2.8-.3 1.2-.3.2 0 .3.1.4.3l1 2.1c.1.2.1.3 0 .5l-.6.9c-.1.2-.1.3 0 .5.3.6.7 1.1 1.2 1.6s1 .9 1.6 1.2c.2.1.3.1.5 0l.9-.6c.2-.1.3-.1.5 0l2.1 1c.2.1.3.2.3.4z" fill="#f5c442"/></svg>
               06 38 92 25 13
             </a>
@@ -1019,7 +1020,7 @@ function ContactForm() {
               <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 3 }}>U spreekt direct een adviseur</p>
               <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.55 }}>
                 Geen callcenter — één van onze eigen adviseurs uit Friesland belt u terug. Liever direct contact?{' '}
-                <a href="https://wa.me/31638922513" style={{ color: '#f5c442', fontWeight: 600, textDecoration: 'none' }}>App 06 38 92 25 13</a>
+                <a href="https://wa.me/31638922513" onClick={trackWhatsAppClick} style={{ color: '#f5c442', fontWeight: 600, textDecoration: 'none' }}>App 06 38 92 25 13</a>
               </p>
             </div>
           </div>
@@ -1123,7 +1124,7 @@ function Footer() {
             </div>
             <div>
               <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Contact</p>
-              <a href="https://wa.me/31638922513" style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>WhatsApp: 06 38 92 25 13</a>
+              <a href="https://wa.me/31638922513" onClick={trackWhatsAppClick} style={{ display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginBottom: 7 }}>WhatsApp: 06 38 92 25 13</a>
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.5)', marginBottom: 7 }}>Actief in heel Friesland</p>
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.5)' }}>KVK 71128174</p>
             </div>

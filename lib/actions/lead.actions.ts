@@ -14,14 +14,15 @@ import crypto from 'crypto'
 
 // Stuurt een TikTok Lead-event (Events API) — alleen met marketingtoestemming
 // en als de access token is ingesteld. Mag de aanvraag nooit laten falen.
-async function sendTikTokLeadSafe(opts: { email?: string | null; phone?: string | null }) {
+async function sendTikTokLeadSafe(opts: { email?: string | null; phone?: string | null; eventId?: string }) {
   try {
     if (!process.env.TIKTOK_ACCESS_TOKEN) return
     const c = await cookies()
     if (c.get('marketing_consent')?.value !== '1') return
     const h = await headers()
     await sendTikTokEvent({
-      eventId: crypto.randomUUID(),
+      // Hetzelfde event_id als de browser-pixel → TikTok dedupliceert de conversie.
+      eventId: opts.eventId || crypto.randomUUID(),
       email: opts.email ?? undefined,
       phone: opts.phone ?? undefined,
       ip: h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || undefined,
@@ -198,7 +199,7 @@ export async function createLead(data: LeadImportRow) {
 }
 
 export async function createLeadFromLanding({
-  naam, email, telefoon, postcode, bericht, herkomst, website,
+  naam, email, telefoon, postcode, bericht, herkomst, website, eventId,
 }: {
   naam: string
   email?: string
@@ -207,6 +208,7 @@ export async function createLeadFromLanding({
   bericht?: string
   herkomst?: string
   website?: string // honeypot — hoort leeg te blijven
+  eventId?: string // gedeeld met browser-pixel voor deduplicatie
 }) {
   const guard = await checkPublicForm(website)
   if (!guard.allowed) {
@@ -248,7 +250,7 @@ export async function createLeadFromLanding({
   }
 
   if (hasEmail) await sendConfirmationSafe(email!, firstName)
-  await sendTikTokLeadSafe({ email, phone: telefoon })
+  await sendTikTokLeadSafe({ email, phone: telefoon, eventId })
 
   revalidatePath('/leads')
   revalidatePath('/dashboard')

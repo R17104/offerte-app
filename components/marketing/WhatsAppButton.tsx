@@ -1,5 +1,7 @@
 'use client'
 
+import { trackWhatsAppClick } from '@/lib/track-contact'
+
 const WA_URL = 'https://wa.me/31638922513?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20van%20uw%20producten.'
 
 export default function WhatsAppButton() {
@@ -18,6 +20,7 @@ export default function WhatsAppButton() {
         href={WA_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={trackWhatsAppClick}
         className="wa-btn"
         aria-label="Stuur ons een WhatsApp bericht"
         style={{

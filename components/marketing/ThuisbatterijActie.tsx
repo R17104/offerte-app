@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createLeadFromLanding } from '@/lib/actions/lead.actions'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
+import { trackWhatsAppClick } from '@/lib/track-contact'
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth'
 
 const gold = '#f5c442'
@@ -22,11 +23,14 @@ function LeadForm({ compact }: { compact?: boolean }) {
   function submit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    // Eén gedeeld event_id voor browser- én server-event, zodat TikTok ze
+    // dedupliceert en de conversie niet dubbel telt.
+    const eventId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())
     startTransition(async () => {
       try {
-        await createLeadFromLanding({ naam, telefoon, email, herkomst: 'Thuisbatterij-actie', website })
-        // Browser-side conversie-event (server-side gebeurt al in de actie)
-        if (typeof window !== 'undefined' && window.ttq) window.ttq.track('SubmitForm')
+        await createLeadFromLanding({ naam, telefoon, email, herkomst: 'Thuisbatterij-actie', website, eventId })
+        // Browser-side conversie-event (server-side gebeurt al in de actie, met hetzelfde event_id)
+        if (typeof window !== 'undefined' && window.ttq) window.ttq.track('SubmitForm', {}, { event_id: eventId })
         setSent(true)
       } catch (err) {
         setError(err instanceof Error && err.message ? err.message : 'Er ging iets mis. Probeer het opnieuw.')
@@ -79,7 +83,7 @@ function LeadForm({ compact }: { compact?: boolean }) {
       </button>
       <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6 }}>
         Geen verkooppraatjes · u zit nergens aan vast · reactie binnen 1 werkdag<br />
-        <a href="https://wa.me/31638922513" style={{ color: gold, textDecoration: 'none' }}>of app ons direct →</a>
+        <a href="https://wa.me/31638922513" onClick={trackWhatsAppClick} style={{ color: gold, textDecoration: 'none' }}>of app ons direct →</a>
       </p>
     </form>
   )
@@ -95,7 +99,7 @@ export default function ThuisbatterijActie() {
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(8,18,13,0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 clamp(16px,4vw,40px)', height: 62, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={120} height={36} priority style={{ display: 'block' }} />
-          <a href="https://wa.me/31638922513" style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 700, color: gold, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          <a href="https://wa.me/31638922513" onClick={trackWhatsAppClick} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 700, color: gold, textDecoration: 'none', whiteSpace: 'nowrap' }}>
             <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><path d="M14 11.3c0 .4-.1.8-.3 1.2-.2.4-.5.7-.8 1-.6.4-1.2.6-1.9.5-1-.1-2-.4-2.9-.9a12 12 0 01-2.6-1.9A12 12 0 013.6 8.6c-.5-.9-.8-1.9-.9-2.9-.1-.7.1-1.3.5-1.9.3-.3.6-.6 1-.8.4-.2.8-.3 1.2-.3.2 0 .3.1.4.3l1 2.1c.1.2.1.3 0 .5l-.6.9c-.1.2-.1.3 0 .5.3.6.7 1.1 1.2 1.6s1 .9 1.6 1.2c.2.1.3.1.5 0l.9-.6c.2-.1.3-.1.5 0l2.1 1c.2.1.3.2.3.4z" fill={gold}/></svg>
             06 38 92 25 13
           </a>
@@ -166,7 +170,7 @@ export default function ThuisbatterijActie() {
             {[
               { t: 'Saldering verdwijnt (2027)', d: 'Straks krijgt u nog maar ±€0,07 per teruggeleverde kWh, terwijl inkopen ±€0,28 kost. Met een batterij gebruikt u uw stroom zelf.' },
               { t: 'Terugleverkosten stijgen', d: 'Steeds meer leveranciers rekenen kosten voor teruglevering. Sla op in plaats van terugleveren en vermijd die kosten.' },
-              { t: 'Slim verdienen met EMS', d: 'Met een energiemanagementsysteem handelt uw batterij automatisch op de onbalansmarkt — extra opbrengst bovenop uw besparing.' },
+              { t: 'Slim sturen met EMS', d: 'Met een slim energiemanagementsysteem kan uw batterij meebewegen met de stroomprijs. Afhankelijk van de markt kan dat extra opbrengst opleveren, bovenop uw besparing.' },
             ].map(c => (
               <div key={c.t} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '22px 22px' }}>
                 <h3 style={{ fontSize: 16.5, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{c.t}</h3>
