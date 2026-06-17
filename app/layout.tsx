@@ -45,10 +45,15 @@ export const metadata: Metadata = {
   },
 }
 
+import ConsentBanner from '@/components/marketing/ConsentBanner'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nl" className={`${dmSans.variable} ${dmMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ConsentBanner />
+      </body>
     </html>
   )
 }

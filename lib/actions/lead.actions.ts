@@ -8,6 +8,30 @@ import { LeadStatus, HouseType } from '@prisma/client'
 import { calculateQuoteTotals } from '@/lib/utils'
 import { withQuoteNumber } from '@/lib/quote-number'
 import { checkPublicForm, isValidEmail } from '@/lib/public-form-guard'
+import { sendTikTokEvent } from '@/lib/tiktok-capi'
+import { headers, cookies } from 'next/headers'
+import crypto from 'crypto'
+
+// Stuurt een TikTok Lead-event (Events API) — alleen met marketingtoestemming
+// en als de access token is ingesteld. Mag de aanvraag nooit laten falen.
+async function sendTikTokLeadSafe(opts: { email?: string | null; phone?: string | null }) {
+  try {
+    if (!process.env.TIKTOK_ACCESS_TOKEN) return
+    const c = await cookies()
+    if (c.get('marketing_consent')?.value !== '1') return
+    const h = await headers()
+    await sendTikTokEvent({
+      eventId: crypto.randomUUID(),
+      email: opts.email ?? undefined,
+      phone: opts.phone ?? undefined,
+      ip: h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || undefined,
+      userAgent: h.get('user-agent') || undefined,
+      url: h.get('referer') || undefined,
+    })
+  } catch (e) {
+    console.error('TikTok lead-event mislukt:', e)
+  }
+}
 
 // Bevestiging naar de aanvrager; mag de aanvraag zelf nooit laten falen.
 async function sendConfirmationSafe(to: string, name: string, quoteNumber?: string) {
@@ -221,6 +245,7 @@ export async function createLeadFromLanding({
   }
 
   await sendConfirmationSafe(email, firstName)
+  await sendTikTokLeadSafe({ email, phone: telefoon })
 
   revalidatePath('/leads')
   revalidatePath('/dashboard')
@@ -441,6 +466,7 @@ export async function createLeadWithQuote(data: IntakeFormData): Promise<{ succe
   })
 
   await sendConfirmationSafe(data.email, data.firstName, quote.quoteNumber)
+  await sendTikTokLeadSafe({ email: data.email, phone: data.phone })
 
   revalidatePath('/leads')
   revalidatePath('/dashboard')
