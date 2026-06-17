@@ -181,10 +181,7 @@ function Header() {
     }}>
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 clamp(10px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-          {/* Logo op witte 'pill' zodat het premium oogt op de donkere balk */}
-          <span style={{ display: 'inline-flex', background: '#fff', borderRadius: 10, padding: isMobile ? '4px 7px' : '6px 12px', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
-            <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 43 : 61} height={isMobile ? 24 : 34} priority style={{ display: 'block' }} />
-          </span>
+          <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={isMobile ? 53 : 71} height={isMobile ? 36 : 48} priority style={{ display: 'block' }} />
         </Link>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
