@@ -12,7 +12,12 @@ export default async function TikTokLeadsPage() {
     prisma.lead.findMany({
       where: {
         archivedAt: null,
-        source: { startsWith: 'TikTok' },
+        OR: [
+          // Webhook-leads (TikTok Instant Forms via Make)
+          { source: { startsWith: 'TikTok' } },
+          // Leads van de TikTok-advertentielandingspagina (formulier op /thuisbatterij-actie)
+          { source: { contains: 'Thuisbatterij-actie' } },
+        ],
       },
       include: {
         assignedTo: { select: { id: true, name: true, email: true } },
