@@ -154,6 +154,102 @@ export async function sendLeadConfirmationEmail({
   })
 }
 
+// ── Bevestiging naar de klant ná ondertekenen ─────────────────────────────────
+
+export async function sendSignedQuoteEmail({
+  to,
+  customerName,
+  quoteTitle,
+  quoteNumber,
+  quoteTotal,
+  quoteUrl,
+  missingPhotos,
+}: {
+  to: string
+  customerName: string
+  quoteTitle: string
+  quoteNumber: string
+  quoteTotal: string
+  quoteUrl: string
+  missingPhotos: string[] // bv. ['een foto van de meterkast']
+}) {
+  const transporter = await createTransporter()
+  const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
+
+  const safeName = escapeHtml(customerName)
+  const safeTitle = escapeHtml(quoteTitle)
+  const safeNumber = escapeHtml(quoteNumber)
+  const safeTotal = escapeHtml(quoteTotal)
+
+  const photoBlock = missingPhotos.length
+    ? `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 4px;">
+            <tr><td style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:16px 18px;">
+              <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#92400e;">📷 Nog even dit: foto's voor de schouw</p>
+              <p style="margin:0 0 12px;font-size:13.5px;color:#78350f;line-height:1.6;">
+                We hebben nog ${escapeHtml(missingPhotos.join(' en '))} nodig. Met deze foto('s) kunnen wij de installatie goed voorbereiden. U kunt ze eenvoudig toevoegen via dezelfde pagina als uw offerte (ook met uw telefoon).
+              </p>
+              <a href="${quoteUrl}" style="display:inline-block;padding:10px 20px;background:#b45309;border-radius:8px;font-size:13.5px;font-weight:600;color:#ffffff;text-decoration:none;">
+                Foto's toevoegen →
+              </a>
+            </td></tr>
+          </table>`
+    : ''
+
+  const html = `
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:'DM Sans',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <tr><td style="background:#0a5c35;padding:28px 36px;">
+          <p style="margin:0;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">Bespaarhulp Friesland</p>
+          <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.7);">Bevestiging van uw ondertekende offerte</p>
+        </td></tr>
+        <tr><td style="padding:36px 36px 28px;">
+          <p style="margin:0 0 8px;font-size:16px;color:#111827;">Beste ${safeName},</p>
+          <p style="margin:0 0 20px;font-size:14px;color:#4b5563;line-height:1.7;">
+            Bedankt voor het ondertekenen van uw offerte! Hieronder vindt u uw getekende offerte. Wij nemen <strong>binnen één werkdag</strong> contact met u op om de vervolgstappen te bespreken.
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;">
+            <tr><td style="padding:14px 18px;">
+              <p style="margin:0;font-size:13px;color:#166534;">Offerte: <strong style="color:#111827;">${safeTitle}</strong> (${safeNumber})</p>
+              <p style="margin:6px 0 0;font-size:13px;color:#166534;">Totaalbedrag: <strong style="color:#111827;">${safeTotal}</strong></p>
+            </td></tr>
+          </table>
+          <table cellpadding="0" cellspacing="0" style="margin:24px 0;">
+            <tr><td style="background:#0a5c35;border-radius:8px;">
+              <a href="${quoteUrl}" style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">
+                Getekende offerte bekijken →
+              </a>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 4px;font-size:13px;color:#9ca3af;line-height:1.6;">
+            Op die pagina kunt u uw offerte ook downloaden of printen.
+          </p>
+          ${photoBlock}
+        </td></tr>
+        <tr><td style="background:#f9fafb;padding:20px 36px;border-top:1px solid #e5e7eb;">
+          <p style="margin:0;font-size:12px;color:#9ca3af;">
+            Bespaarhulp Friesland · KVK 71128174 · Vragen? App ons via WhatsApp 06 38 92 25 13
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject: `Uw getekende offerte (${safeNumber}) · Bespaarhulp Friesland`,
+    html,
+  })
+}
+
 // ── Interne notificatie bij acceptatie/afwijzing ──────────────────────────────
 
 export async function sendQuoteStatusNotification({

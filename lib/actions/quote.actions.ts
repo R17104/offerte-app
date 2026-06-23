@@ -107,6 +107,44 @@ async function notifyQuoteOutcome(quoteId: string, outcome: 'accepted' | 'reject
   }
 }
 
+// Stuurt de klant een bevestiging met de getekende offerte; vraagt om foto's
+// als die nog ontbreken. Mag de acceptatie nooit laten falen.
+async function notifyCustomerAccepted(quoteId: string, token: string) {
+  try {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return
+    const quote = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      select: {
+        title: true,
+        quoteNumber: true,
+        total: true,
+        meterkastPhotoUrl: true,
+        batterijLocatiePhotoUrl: true,
+        customer: { select: { firstName: true, lastName: true, email: true } },
+      },
+    })
+    if (!quote?.customer.email) return
+
+    const missingPhotos: string[] = []
+    if (!quote.meterkastPhotoUrl) missingPhotos.push('een foto van de meterkast')
+    if (!quote.batterijLocatiePhotoUrl) missingPhotos.push('een foto van de batterijlocatie')
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
+    const { sendSignedQuoteEmail } = await import('@/lib/email')
+    await sendSignedQuoteEmail({
+      to: quote.customer.email,
+      customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
+      quoteTitle: quote.title,
+      quoteNumber: quote.quoteNumber,
+      quoteTotal: new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(quote.total),
+      quoteUrl: `${baseUrl}/offerte/${token}`,
+      missingPhotos,
+    })
+  } catch (e) {
+    console.error('Klant-bevestigingsmail versturen mislukt:', e)
+  }
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 export async function createQuote(input: CreateQuoteInput): Promise<{ id: string }> {
@@ -287,6 +325,7 @@ export async function acceptQuoteByToken(token: string, input: AcceptQuoteInput)
   ])
 
   await notifyQuoteOutcome(quote.id, 'accepted')
+  await notifyCustomerAccepted(quote.id, token)
 
   redirect(`/offerte/${token}/bevestiging?type=accepted`)
 }
