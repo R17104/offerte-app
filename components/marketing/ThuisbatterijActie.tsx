@@ -193,7 +193,7 @@ export default function ThuisbatterijActie() {
           </div>
           <div style={{ flex: '1 1 320px', minWidth: 280 }}>
             <div style={{ position: 'relative', width: '100%', aspectRatio: '3 / 2', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)', background: '#0e1a14' }}>
-              <Image src="/voorlichting-adviseur.jpg" alt="Thijmen Veeman geeft voorlichting over thuisbatterijen bij een energiecollectief in Friesland" fill sizes="(max-width: 768px) 100vw, 480px" style={{ objectFit: 'cover' }} />
+              <Image src="/voorlichting-zaal.jpg" alt="Thijmen Veeman geeft voorlichting over thuisbatterijen bij een energiecollectief in Friesland" fill sizes="(max-width: 768px) 100vw, 480px" style={{ objectFit: 'cover' }} />
               <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '36px 16px 14px', background: 'linear-gradient(to top, rgba(3,16,10,0.85), transparent)' }}>
                 <p style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.92)', margin: 0 }}>Voorlichting bij een energiecollectief in Friesland</p>
               </div>

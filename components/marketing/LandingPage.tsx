@@ -1162,24 +1162,17 @@ function Voorlichting() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Hoofdbeeld */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14 }}>
           <div style={frame}>
-            <Image src="/voorlichting-adviseur.jpg" alt="Thijmen Veeman geeft voorlichting over thuisbatterijen bij een energiecollectief in Friesland" fill sizes="(max-width: 1140px) 100vw, 1140px" style={{ objectFit: 'cover' }} />
+            <Image src="/voorlichting-adviseur.jpg" alt="Thijmen Veeman geeft voorlichting over thuisbatterijen bij een energiecollectief in Friesland" fill sizes="(max-width: 1140px) 100vw, 560px" style={{ objectFit: 'cover' }} />
             <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '40px 20px 16px', background: 'linear-gradient(to top, rgba(3,16,10,0.85), transparent)' }}>
               <p style={{ fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,0.92)', margin: 0 }}>
                 Thijmen Veeman geeft voorlichting bij een energiecollectief in Friesland
               </p>
             </div>
           </div>
-          {/* Twee kleinere beelden */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
-            <div style={frame}>
-              <Image src="/voorlichting-lachend.jpg" alt="Thijmen Veeman tijdens een presentatie over thuisbatterijen" fill sizes="(max-width: 1140px) 100vw, 560px" style={{ objectFit: 'cover' }} />
-            </div>
-            <div style={frame}>
-              <Image src="/voorlichting-zaal.jpg" alt="Bezoekers van het energiecollectief tijdens de voorlichting over thuisbatterijen" fill sizes="(max-width: 1140px) 100vw, 560px" style={{ objectFit: 'cover' }} />
-            </div>
+          <div style={frame}>
+            <Image src="/voorlichting-lachend.jpg" alt="Thijmen Veeman tijdens een presentatie over thuisbatterijen" fill sizes="(max-width: 1140px) 100vw, 560px" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </div>
