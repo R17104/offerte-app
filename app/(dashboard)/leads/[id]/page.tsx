@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
-import { verifySession, leadAccessFilter } from '@/lib/dal'
+import Link from 'next/link'
+import { verifySession, leadAccessFilter, isPlanner } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
 import LeadDetailClient from '@/components/leads/LeadDetailClient'
 
@@ -30,6 +31,7 @@ export default async function LeadDetailPage({ params }: Props) {
 
   if (!lead) notFound()
 
+  const planner = await isPlanner(session)
   const users = role === 'ADMIN'
     ? await prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } })
     : []
@@ -39,6 +41,15 @@ export default async function LeadDetailPage({ params }: Props) {
       <PageHeader
         title={`${lead.firstName} ${lead.lastName}`}
         back={{ href: '/leads', label: 'Leads' }}
+        action={planner ? (
+          <Link href={`/afspraken?lead=${lead.id}`} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '7px 14px', borderRadius: 8, background: 'var(--accent)', color: '#fff',
+            fontSize: 13.5, fontWeight: 500, textDecoration: 'none',
+          }}>
+            📅 Afspraak inplannen
+          </Link>
+        ) : undefined}
       />
       <LeadDetailClient lead={lead} users={users} isAdmin={role === 'ADMIN'} />
     </PageContainer>

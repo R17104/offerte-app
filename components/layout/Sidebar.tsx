@@ -11,6 +11,7 @@ const nav: { label: string; items: NavItem[] }[] = [
     label: 'Algemeen',
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: IconGrid },
+      { href: '/afspraken', label: 'Afspraken', icon: IconCalendar },
     ],
   },
   {
@@ -261,6 +262,15 @@ function IconTikTok({ size = 16, color = 'currentColor' }) {
   return (
     <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
       <path d="M10 2c.2 1.4 1.1 2.5 2.5 2.8v1.7c-.9 0-1.8-.3-2.5-.8v3.8a3.4 3.4 0 11-3.4-3.4c.2 0 .3 0 .5.05v1.8a1.7 1.7 0 101.2 1.6V2H10z" stroke={color} strokeWidth="1.2" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+function IconCalendar({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <rect x="2" y="3" width="12" height="11" rx="2" stroke={color} strokeWidth="1.3" />
+      <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
     </svg>
   )
 }

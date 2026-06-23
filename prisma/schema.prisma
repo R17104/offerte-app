@@ -68,6 +68,12 @@ enum LeadStatus {
   LOST
 }
 
+enum AppointmentStatus {
+  PLANNED
+  COMPLETED
+  CANCELLED
+}
+
 // ── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -76,6 +82,7 @@ model User {
   password  String?
   name      String?
   role      UserRole @default(SALES)
+  canPlan   Boolean  @default(false) // mag afspraken inplannen en verdelen over salers
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -88,6 +95,9 @@ model User {
   assignedQuotes      Quote[] @relation("QuoteAssignee")
   assignedLeads       Lead[]  @relation("LeadAssignee")
   appointmentsPlanned Lead[]  @relation("AppointmentPlanner")
+
+  plannedAppointments  Appointment[] @relation("ApptPlanner")
+  assignedAppointments Appointment[] @relation("ApptAssignee")
 
   salesTodos     SalesTodo[]
   assignedTodos  SalesTodo[] @relation("TodoAssignee")
@@ -298,7 +308,29 @@ model Lead {
   appointmentPlannedById String?
   appointmentPlannedBy   User?   @relation("AppointmentPlanner", fields: [appointmentPlannedById], references: [id])
 
-  notes LeadNote[]
+  notes        LeadNote[]
+  appointments Appointment[]
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  scheduledAt DateTime
+  notes       String?
+  status      AppointmentStatus @default(PLANNED)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Lead waar de afspraak voor is (optioneel)
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  // Wie de afspraak heeft ingepland
+  plannedById String
+  plannedBy   User   @relation("ApptPlanner", fields: [plannedById], references: [id])
+
+  // Toegewezen saler (leeg = open, voor iedereen zichtbaar)
+  assignedToId String?
+  assignedTo   User?   @relation("ApptAssignee", fields: [assignedToId], references: [id])
 }
 
 model Setting {

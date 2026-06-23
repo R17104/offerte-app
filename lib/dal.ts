@@ -2,6 +2,7 @@ import { cache } from 'react'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/session'
 import { Prisma } from '@prisma/client'
+import { prisma } from '@/lib/db'
 
 export type SessionInfo = { userId: string; email: string; role: string }
 
@@ -38,4 +39,18 @@ export function quoteAccessFilter(s: SessionInfo): Prisma.QuoteWhereInput {
 export function customerAccessFilter(s: SessionInfo): Prisma.CustomerWhereInput {
   if (s.role === 'ADMIN') return {}
   return { userId: s.userId }
+}
+
+// Afspraken: admin ziet alles; anderen zien afspraken die ze inplanden, die aan
+// hen zijn toegewezen, of die nog niet zijn toegewezen (open = voor iedereen).
+export function appointmentAccessFilter(s: SessionInfo): Prisma.AppointmentWhereInput {
+  if (s.role === 'ADMIN') return {}
+  return { OR: [{ plannedById: s.userId }, { assignedToId: s.userId }, { assignedToId: null }] }
+}
+
+// Mag deze gebruiker afspraken inplannen/verdelen? Admin altijd; sales alleen met canPlan.
+export async function isPlanner(s: SessionInfo): Promise<boolean> {
+  if (s.role === 'ADMIN') return true
+  const u = await prisma.user.findUnique({ where: { id: s.userId }, select: { canPlan: true } })
+  return !!u?.canPlan
 }
