@@ -70,11 +70,13 @@ export async function importLeads(rows: LeadImportRow[], source: string) {
       postalCode:  r.postalCode  || null,
       city:        r.city        || null,
       source:      r.source || source,
-      createdById: userId,
+      createdById:  userId,
+      assignedToId: userId, // geïmporteerde leads blijven op het account dat ze importeerde
     })),
     skipDuplicates: false,
   })
   revalidatePath('/leads')
+  revalidatePath('/dashboard')
 }
 
 export async function updateLeadStatus(leadId: string, status: LeadStatus) {
