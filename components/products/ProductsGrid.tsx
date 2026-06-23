@@ -27,10 +27,12 @@ const CATEGORIES: Record<string, { label: string; icon: string; gradient: string
   HEAT_PUMP:      { label: 'Warmtepomp',    icon: '🌡️', gradient: 'linear-gradient(145deg, #052e16 0%, #065f46 50%, #059669 100%)', iconBg: '#047857' },
   CHARGER:        { label: 'Laadpaal',      icon: '⚡',  gradient: 'linear-gradient(145deg, #1e1b4b 0%, #312e81 50%, #6366f1 100%)', iconBg: '#4f46e5' },
   EMERGENCY_POWER:{ label: 'Noodstroom',   icon: '🔌',  gradient: 'linear-gradient(145deg, #1c0a00 0%, #7c2d12 50%, #dc2626 100%)', iconBg: '#b91c1c' },
+  FULL_INSTALLATION:{ label: 'Volledige installatie', icon: '🏠', gradient: 'linear-gradient(145deg, #052e16 0%, #0a5c35 50%, #16a34a 100%)', iconBg: '#0a5c35' },
 }
 
 const FILTER_TABS = [
   { key: 'all', label: 'Alle producten' },
+  { key: 'FULL_INSTALLATION', label: 'Volledige installaties' },
   { key: 'BATTERY',         label: 'Thuisbatterij' },
   { key: 'SOLAR',           label: 'Zonnepanelen' },
   { key: 'HEAT_PUMP',       label: 'Warmtepomp' },

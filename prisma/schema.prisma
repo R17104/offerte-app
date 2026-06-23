@@ -28,6 +28,7 @@ enum ProductCategory {
   HEAT_PUMP
   CHARGER
   EMERGENCY_POWER
+  FULL_INSTALLATION
 }
 
 enum QuoteType {

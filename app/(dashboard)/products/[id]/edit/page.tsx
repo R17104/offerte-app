@@ -19,6 +19,7 @@ const CATEGORIES = [
   { value: 'HEAT_PUMP',    label: '♨️ Warmtepomp' },
   { value: 'CHARGER',      label: '⚡ Laadpaal' },
   { value: 'EMERGENCY_POWER', label: '🔌 Noodstroom box' },
+  { value: 'FULL_INSTALLATION', label: '🏠 Volledige installatie' },
 ]
 
 export default async function EditProductPage({ params }: Props) {
