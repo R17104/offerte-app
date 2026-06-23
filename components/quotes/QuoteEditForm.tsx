@@ -278,7 +278,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
               <span>
                 Reservatieoptie inschakelen{' '}
                 <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>
-                  — klant ziet optie &quot;Reserveer onder voorbehoud van financiering (€250)&quot;
+                 , klant ziet optie &quot;Reserveer onder voorbehoud van financiering (€250)&quot;
                 </span>
               </span>
             </label>
@@ -437,7 +437,7 @@ export default function QuoteEditForm({ quoteId, initialData, products }: Props)
         <div style={{ ...s.card, width: 320 }}>
           {[
             { label: 'Subtotaal', value: formatCurrency(subtotal) },
-            { label: 'Korting',   value: discountAmount > 0 ? `- ${formatCurrency(discountAmount)}` : '—' },
+            { label: 'Korting',   value: discountAmount > 0 ? `- ${formatCurrency(discountAmount)}` : '-' },
             { label: 'BTW',       value: formatCurrency(vatTotal) },
           ].map(({ label, value }) => (
             <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: 13, color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)' }}>

@@ -254,7 +254,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
             onChange={(e) => onChange({ energyLabel: e.target.value })}
             style={{ ...s.input, width: 140, appearance: 'none' }}
           >
-            <option value="">— Onbekend —</option>
+            <option value="">- Onbekend -</option>
             {['A++++','A+++','A++','A+','A','B','C','D','E','F','G'].map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}
@@ -316,7 +316,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                 <select value={state.houseType}
                   onChange={(e) => onChange({ houseType: e.target.value })}
                   style={{ ...s.input, appearance: 'none' }}>
-                  <option value="">— Kies —</option>
+                  <option value="">- Kies -</option>
                   <option value="APARTMENT">Appartement</option>
                   <option value="TERRACED">Tussenwoning</option>
                   <option value="CORNER">Hoekwoning</option>
@@ -352,7 +352,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {/* Huidig termijnbedrag — altijd zichtbaar, auto-berekend */}
+            {/* Huidig termijnbedrag, altijd zichtbaar, auto-berekend */}
             <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ ...s.label, fontSize: 13.5, fontWeight: 700, margin: 0 }}>
@@ -372,7 +372,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                 style={{ ...s.input }} />
               <p style={s.hint}>
                 {billManuallyEdited
-                  ? 'Handmatig ingevuld — klik "↺ auto" om terug te gaan naar automatische berekening.'
+                  ? 'Handmatig ingevuld, klik "↺ auto" om terug te gaan naar automatische berekening.'
                   : 'Automatisch berekend op basis van verbruik en tarieven. Klik het veld om handmatig aan te passen.'}
               </p>
             </div>
@@ -451,7 +451,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
       <div style={s.card}>
         <p style={s.cardTitle}>Energietarieven</p>
         <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 14, marginTop: -8 }}>
-          Standaardwaarden — pas aan per klant indien nodig
+          Standaardwaarden, pas aan per klant indien nodig
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={s.row3}>
@@ -493,7 +493,7 @@ export default function EnergyProfileSection({ state, onChange }: Props) {
                 value={state.emsAnnualRevenueEur}
                 onChange={(e) => onChange({ emsAnnualRevenueEur: e.target.value })}
                 style={s.input} />
-              <p style={s.hint}>Alpha ESS EMS handelt automatisch — schat in op basis van batterijgrootte</p>
+              <p style={s.hint}>Alpha ESS EMS handelt automatisch, schat in op basis van batterijgrootte</p>
             </div>
           </div>
         </div>

@@ -96,7 +96,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
             Uw situatie
           </p>
           <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.55 }}>
-            Vul uw gegevens in — de aanbeveling wordt direct berekend.
+            Vul uw gegevens in, de aanbeveling wordt direct berekend.
           </p>
         </div>
 
@@ -240,7 +240,7 @@ export default function BatterijCheck({ products, variant = 'section' }: {
             Welke batterijmaat past bij u?
           </h2>
           <p style={{ fontSize: 15, color: '#6b7280', marginTop: 6 }}>
-            Gebaseerd op uw teruglevering — dezelfde berekening die wij in onze offertes gebruiken.
+            Gebaseerd op uw teruglevering, dezelfde berekening die wij in onze offertes gebruiken.
           </p>
         </div>
         {inner}

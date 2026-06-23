@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Algemene voorwaarden — Bespaarhulp Friesland',
+  title: 'Algemene voorwaarden | Bespaarhulp Friesland',
   description: 'De algemene voorwaarden van Bespaarhulp Friesland.',
   alternates: { canonical: '/voorwaarden' },
 }

@@ -1,6 +1,6 @@
 // Vuurt een TikTok 'Contact'-event bij een WhatsApp-/belklik.
 // Werkt alleen als de bezoeker marketingcookies heeft geaccepteerd (dan bestaat
-// window.ttq). Zonder toestemming gebeurt er niets — AVG-proof.
+// window.ttq). Zonder toestemming gebeurt er niets, AVG-proof.
 export function trackWhatsAppClick() {
   try {
     if (typeof window !== 'undefined' && window.ttq) {

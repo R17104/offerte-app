@@ -179,7 +179,7 @@ export default function OfferteAanvragen({ product }: { product: Product }) {
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', fontSize: 38 }}>✓</div>
             <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 900, color: '#111827', marginBottom: 12 }}>Aanvraag ontvangen!</h2>
             <p style={{ fontSize: 15, color: '#6b7280', lineHeight: 1.7, maxWidth: 480, margin: '0 auto 12px' }}>
-              Uw offerte <strong style={{ color: '#111827' }}>{done}</strong> is aangemaakt. Een adviseur belt u zo spoedig mogelijk — uiterlijk de volgende werkdag.
+              Uw offerte <strong style={{ color: '#111827' }}>{done}</strong> is aangemaakt. Een adviseur belt u zo spoedig mogelijk, uiterlijk de volgende werkdag.
             </p>
             <p style={{ fontSize: 13.5, color: '#9ca3af', marginBottom: 32 }}>Controleer ook uw e-mail voor een bevestiging.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>

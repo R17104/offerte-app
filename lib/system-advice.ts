@@ -44,7 +44,7 @@ export function calcSystemAdvice({ monthlyBill, hasSolar }: AdviceInput): Advice
 
   const items: AdviceItem[] = []
 
-  // Zonnepanelen — alleen zinvol als de klant ze nog niet heeft
+  // Zonnepanelen, alleen zinvol als de klant ze nog niet heeft
   if (!hasSolar) {
     // Panelen dekken doorgaans 70-80% van het stroomverbruik; ~65% wordt direct
     // zelf gebruikt tegen het volle inkooptarief.
@@ -57,7 +57,7 @@ export function calcSystemAdvice({ monthlyBill, hasSolar }: AdviceInput): Advice
     })
   }
 
-  // Thuisbatterij — voordeel groeit na het einde van de saldering (2027): zelf
+  // Thuisbatterij, voordeel groeit na het einde van de saldering (2027): zelf
   // gebruiken i.p.v. goedkoop terugleveren.
   // Mét panelen is er nú al overschot om op te slaan (groter voordeel); zonder
   // panelen is het overschot nog hypothetisch en kleiner, dus conservatiever.
@@ -69,13 +69,13 @@ export function calcSystemAdvice({ monthlyBill, hasSolar }: AdviceInput): Advice
       key: 'BATTERY',
       title: 'Thuisbatterij',
       reason: hasSolar
-        ? 'U heeft al zonnepanelen — na het einde van de saldering (2027) houdt een batterij uw zonnestroom waardevol.'
+        ? 'U heeft al zonnepanelen, na het einde van de saldering (2027) houdt een batterij uw zonnestroom waardevol.'
         : 'In combinatie met zonnepanelen: sla overschot op en gebruik het ’s avonds, juist als de saldering verdwijnt.',
       yearlySaving: batterySaving,
     })
   }
 
-  // Warmtepomp — zinvol bij een serieus gasverbruik. Hybride bespaart ~60% gas.
+  // Warmtepomp, zinvol bij een serieus gasverbruik. Hybride bespaart ~60% gas.
   if (estGasM3 > 800) {
     const gasSaving = Math.round(estGasM3 * 0.6 * GAS_TARIFF)
     items.push({

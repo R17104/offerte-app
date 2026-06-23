@@ -13,7 +13,7 @@ import { verifyAdmin } from '@/lib/dal'
 type Props = { params: Promise<{ id: string }> }
 
 const CATEGORIES = [
-  { value: '',              label: '— Geen categorie —' },
+  { value: '',              label: 'Geen categorie' },
   { value: 'BATTERY',      label: '🔋 Thuisbatterij' },
   { value: 'SOLAR',        label: '☀️ Zonnepanelen' },
   { value: 'HEAT_PUMP',    label: '♨️ Warmtepomp' },
@@ -59,7 +59,7 @@ export default async function EditProductPage({ params }: Props) {
               <FormGroup label="Omschrijving">
                 <Textarea name="description" defaultValue={product.description ?? ''} rows={3} />
               </FormGroup>
-              <FormGroup label="Notities" hint="Intern — niet zichtbaar voor klant">
+              <FormGroup label="Notities" hint="Intern, niet zichtbaar voor klant">
                 <Textarea name="notes" defaultValue={product.notes ?? ''} rows={2} />
               </FormGroup>
             </div>

@@ -141,7 +141,7 @@ export default async function QuoteDetailPage({ params }: Props) {
               <div style={{ width: 260 }}>
                 {[
                   { label: 'Subtotaal',  value: formatCurrency(quote.subtotal) },
-                  { label: 'Korting',    value: quote.discountAmount > 0 ? `- ${formatCurrency(quote.discountAmount)}` : '—' },
+                  { label: 'Korting',    value: quote.discountAmount > 0 ? `- ${formatCurrency(quote.discountAmount)}` : '-' },
                   { label: 'BTW',        value: formatCurrency(quote.vatTotal) },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13, color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)' }}>
@@ -201,9 +201,9 @@ export default async function QuoteDetailPage({ params }: Props) {
                 {[
                   { label: 'Naam',           value: `${quote.acceptance.firstName} ${quote.acceptance.lastName}` },
                   { label: 'Geboortedatum',  value: formatDate(quote.acceptance.dateOfBirth) },
-                  { label: 'IBAN',           value: quote.acceptance.iban || '—' },
+                  { label: 'IBAN',           value: quote.acceptance.iban || '-' },
                   { label: 'Geaccepteerd op', value: formatDate(quote.acceptance.acceptedAt) },
-                  { label: 'IP-adres',       value: quote.acceptance.ipAddress || '—' },
+                  { label: 'IP-adres',       value: quote.acceptance.ipAddress || '-' },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ display: 'flex', gap: 10, fontSize: 13 }}>
                     <span style={{ color: 'var(--text-tertiary)', width: 140, flexShrink: 0 }}>{label}</span>

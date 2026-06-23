@@ -165,9 +165,9 @@ export default function CustomersList({ customers: initialCustomers, showArchive
                 <td style={{ padding: '10px 14px' }}>
                   <Link href={`/customers/${c.id}`} style={{ fontWeight: 500, textDecoration: 'none', color: 'var(--text-primary)', fontSize: 13.5 }}>{c.firstName} {c.lastName}</Link>
                 </td>
-                <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{c.email || '—'}</td>
-                <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{c.phone || '—'}</td>
-                <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{addr ? `${addr.postalCode} ${addr.city}` : '—'}</td>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{c.email || '-'}</td>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{c.phone || '-'}</td>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{addr ? `${addr.postalCode} ${addr.city}` : '-'}</td>
                 <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)', textAlign: 'right' }}>{c._count.quotes}</td>
                 <td style={{ padding: '10px 14px', fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{formatDate(showArchived ? c.archivedAt : c.createdAt)}</td>
                 <td style={{ padding: '10px 14px' }}>

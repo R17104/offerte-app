@@ -66,7 +66,7 @@ export default async function GetekendeOffertesPage() {
                     {q.customer.firstName} {q.customer.lastName}
                   </Td>
                   <Td>
-                    {q.acceptance ? `${q.acceptance.firstName} ${q.acceptance.lastName}` : '—'}
+                    {q.acceptance ? `${q.acceptance.firstName} ${q.acceptance.lastName}` : '-'}
                   </Td>
                   <Td>{formatDate(q.acceptedAt)}</Td>
                   <Td>
@@ -93,7 +93,7 @@ export default async function GetekendeOffertesPage() {
                         Bekijk & download PDF
                       </a>
                     ) : (
-                      <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>—</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>-</span>
                     )}
                   </Td>
                 </Tr>
@@ -139,7 +139,7 @@ function SignedQuotePreview({ q }: { q: QuoteWithAcceptance }) {
     >
       <div style={{ flex: 1, minWidth: 200 }}>
         <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', marginBottom: 2 }}>
-          {q.quoteNumber} — {q.customer.firstName} {q.customer.lastName}
+          {q.quoteNumber}, {q.customer.firstName} {q.customer.lastName}
         </p>
         <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
           Ondertekend door {q.acceptance.firstName} {q.acceptance.lastName} op {formatDate(q.acceptedAt)}

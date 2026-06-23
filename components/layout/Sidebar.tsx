@@ -90,10 +90,10 @@ export default function Sidebar() {
           <path d="M0 15L18 2L36 15H0Z" fill="#f5c442"/>
           {/* House body */}
           <rect x="2" y="15" width="32" height="19" rx="1.5" fill="#0a5c35"/>
-          {/* Windows — left column */}
+          {/* Windows, left column */}
           <rect x="5" y="18" width="7" height="5.5" rx="0.5" fill="white" fillOpacity="0.22"/>
           <rect x="5" y="25.5" width="7" height="6" rx="0.5" fill="white" fillOpacity="0.22"/>
-          {/* Windows — middle column */}
+          {/* Windows, middle column */}
           <rect x="14" y="18" width="7" height="5.5" rx="0.5" fill="white" fillOpacity="0.22"/>
           <rect x="14" y="25.5" width="7" height="6" rx="0.5" fill="white" fillOpacity="0.22"/>
           {/* Crescent / sun on right */}
@@ -192,7 +192,7 @@ export default function Sidebar() {
             </Link>
           )
         })}
-        <p style={{ fontSize: 10, color: 'var(--text-tertiary)', padding: '6px 8px 2px' }}>v0.1.0 — beta</p>
+        <p style={{ fontSize: 10, color: 'var(--text-tertiary)', padding: '6px 8px 2px' }}>v0.1.0, beta</p>
       </div>
     </aside>
     </>

@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 
 // Eenvoudige in-memory rate limiter per IP. Op Vercel leeft dit per serverless
-// instance — geen waterdichte garantie, maar het stopt simpele spam-bots.
+// instance, geen waterdichte garantie, maar het stopt simpele spam-bots.
 const WINDOW_MS = 60 * 60 * 1000 // 1 uur
 const MAX_PER_WINDOW = 5
 
@@ -13,7 +13,7 @@ export function isValidEmail(email: string): boolean {
 
 export type PublicFormCheck =
   | { allowed: true }
-  // silent: honeypot-hit — doe alsof het gelukt is zodat bots niets leren
+  // silent: honeypot-hit, doe alsof het gelukt is zodat bots niets leren
   | { allowed: false; silent: true }
   | { allowed: false; silent: false; error: string }
 

@@ -129,7 +129,7 @@ export default async function CustomerDetailPage({ params }: Props) {
                   {label}
                 </span>
                 <span style={{ fontSize: 13, color: value ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
-                  {value || '—'}
+                  {value || '-'}
                 </span>
               </div>
             ))}

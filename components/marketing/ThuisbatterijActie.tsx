@@ -95,7 +95,7 @@ export default function ThuisbatterijActie() {
   return (
     <div style={{ fontFamily: "'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", background: dark, minHeight: '100vh', color: '#fff', paddingBottom: isMobile ? 64 : 0 }}>
 
-      {/* Header — geen menu, alleen logo + telefoon */}
+      {/* Header, geen menu, alleen logo + telefoon */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(8,18,13,0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 clamp(16px,4vw,40px)', height: 62, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Image src="/logo-bespaarhulp-wit.png" alt="Bespaarhulp Friesland" width={120} height={36} priority style={{ display: 'block' }} />
@@ -106,7 +106,7 @@ export default function ThuisbatterijActie() {
         </div>
       </header>
 
-      {/* Hero — boven de vouw: hook + formulier */}
+      {/* Hero, boven de vouw: hook + formulier */}
       <section style={{ background: 'radial-gradient(130% 110% at 80% 0%, rgba(14,122,72,0.45) 0%, rgba(5,20,14,0) 55%), linear-gradient(165deg, #061611 0%, #07261a 45%, #0a3a24 100%)', padding: 'clamp(36px,6vw,72px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 'clamp(28px,5vw,64px)', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 360px', minWidth: 300 }}>
@@ -117,7 +117,7 @@ export default function ThuisbatterijActie() {
               Bespaar tot <span style={{ color: gold }}>€1.400 per jaar</span> met een thuisbatterij
             </h1>
             <p style={{ fontSize: 'clamp(15px,1.8vw,17px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.7, marginBottom: 26, maxWidth: 460 }}>
-              Sla uw zonnestroom op en gebruik hem ’s avonds — juist nu de saldering verdwijnt. Gratis advies van een installateur uit Friesland. Wij bellen u terug.
+              Sla uw zonnestroom op en gebruik hem ’s avonds, juist nu de saldering verdwijnt. Gratis advies van een installateur uit Friesland. Wij bellen u terug.
             </p>
             <p style={{ fontSize: 14, fontWeight: 700, color: gold, marginBottom: 24 }}>
               Elke maand wachten kost u geld nu de saldering afloopt.
@@ -186,7 +186,7 @@ export default function ThuisbatterijActie() {
         <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', gap: 'clamp(24px,4vw,48px)', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 280px', minWidth: 260 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Echte specialisten</span>
-            <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, marginBottom: 14, letterSpacing: '-0.02em' }}>Geen verkopers — maar adviseurs</h2>
+            <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, marginBottom: 14, letterSpacing: '-0.02em' }}>Geen verkopers, maar adviseurs</h2>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.68)', lineHeight: 1.7 }}>
               Onze adviseur <strong style={{ color: '#fff' }}>Thijmen Veeman</strong> wordt regelmatig gevraagd om voorlichting te geven bij energiecollectieven in Friesland. Bij ons krijgt u dus geen verkooppraatje, maar eerlijk en onafhankelijk advies van iemand die de materie écht kent.
             </p>
@@ -213,7 +213,7 @@ export default function ThuisbatterijActie() {
             {[
               { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-003_1.png', name: 'Dhr. Dijkstra', city: 'Franeker', stars: 5, quote: 'Vlot geïnstalleerd en goed uitgelegd. Doe er nu geen omkijken meer naar.' },
               { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-002.png', name: 'Familie Hoekstra', city: 'Leeuwarden', stars: 5, quote: 'De installatie ging vlotter dan verwacht en ik merk het nu terug op mijn rekening.' },
-              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png', name: 'Dhr. de Jong', city: 'Drachten', stars: 4, quote: 'Een paar maanden terug onze Alpha ESS laten plaatsen — bleek achteraf net iets te klein. Inmiddels makkelijk een extra module laten bijzetten, fijn dat dat zo kan.' },
+              { img: 'https://www.vekto.nl/media/catalog/product/a/l/alphaess_sfeer-005.png', name: 'Dhr. de Jong', city: 'Drachten', stars: 4, quote: 'Een paar maanden terug onze Alpha ESS laten plaatsen, bleek achteraf net iets te klein. Inmiddels makkelijk een extra module laten bijzetten, fijn dat dat zo kan.' },
             ].map(r => (
               <div key={r.name} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'relative', height: 150, background: '#0e1a14' }}>
@@ -240,9 +240,9 @@ export default function ThuisbatterijActie() {
           <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, textAlign: 'center', marginBottom: 28, letterSpacing: '-0.02em' }}>Veelgestelde vragen</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { q: 'Hoe snel hoor ik iets na mijn aanvraag?', a: 'Binnen één werkdag belt een adviseur uit Friesland u persoonlijk terug — geen callcenter.' },
+              { q: 'Hoe snel hoor ik iets na mijn aanvraag?', a: 'Binnen één werkdag belt een adviseur uit Friesland u persoonlijk terug, geen callcenter.' },
               { q: 'Hoe lang duurt de installatie?', a: 'Gemiddeld 2 tot 4 weken van aanvraag tot werkende installatie. De plaatsing zelf is meestal binnen een dag klaar.' },
-              { q: 'Werkt een thuisbatterij samen met mijn zonnepanelen?', a: 'Ja — de batterij slaat uw overschot van overdag op zodat u het ’s avonds gebruikt. Heeft u nog geen panelen, dan adviseren we de combinatie.' },
+              { q: 'Werkt een thuisbatterij samen met mijn zonnepanelen?', a: 'Ja, de batterij slaat uw overschot van overdag op zodat u het ’s avonds gebruikt. Heeft u nog geen panelen, dan adviseren we de combinatie.' },
               { q: 'Is een thuisbatterij iets voor mij?', a: 'Vooral interessant als u zonnepanelen heeft en nu de saldering afloopt. In het gratis gesprek rekenen we het eerlijk voor uw situatie door.' },
             ].map(f => (
               <div key={f.q} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '18px 20px' }}>
@@ -254,13 +254,13 @@ export default function ThuisbatterijActie() {
         </div>
       </section>
 
-      {/* Financiering — drempel weghalen */}
+      {/* Financiering, drempel weghalen */}
       <section style={{ background: dark, padding: 'clamp(40px,6vw,72px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Betaalbaar</span>
           <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, marginBottom: 14, letterSpacing: '-0.02em' }}>Al vanaf €35 per maand</h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>
-            Via het <strong style={{ color: '#fff' }}>Nationaal Warmtefonds</strong> leent u rentevrij bij een inkomen tot €60.000 — en boetevrij aflossen mag altijd. Wij rekenen het in het gratis adviesgesprek precies voor u uit.
+            Via het <strong style={{ color: '#fff' }}>Nationaal Warmtefonds</strong> leent u rentevrij bij een inkomen tot €60.000, en boetevrij aflossen mag altijd. Wij rekenen het in het gratis adviesgesprek precies voor u uit.
           </p>
         </div>
       </section>
@@ -269,14 +269,14 @@ export default function ThuisbatterijActie() {
       <section id="aanvraag" style={{ background: 'radial-gradient(120% 100% at 50% 0%, rgba(14,122,72,0.35) 0%, #07120d 60%), #07120d', padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', scrollMarginTop: 70 }}>
         <div style={{ maxWidth: 520, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(24px,3.5vw,36px)', fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em' }}>Ontdek wat u kunt besparen</h2>
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', marginBottom: 28 }}>Laat uw nummer achter — geen verkooppraatjes, gewoon een eerlijke berekening voor uw situatie.</p>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', marginBottom: 28 }}>Laat uw nummer achter, geen verkooppraatjes, gewoon een eerlijke berekening voor uw situatie.</p>
           <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${gold}`, borderRadius: 18, padding: 'clamp(22px,3vw,30px)', textAlign: 'left' }}>
             <LeadForm compact />
           </div>
         </div>
       </section>
 
-      {/* Footer — verkenning bewust subtiel/verstopt */}
+      {/* Footer, verkenning bewust subtiel/verstopt */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '22px clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} Bespaarhulp Friesland · KVK 71128174</p>
@@ -287,7 +287,7 @@ export default function ThuisbatterijActie() {
           </div>
         </div>
       </footer>
-      {/* Sticky CTA — alleen mobiel */}
+      {/* Sticky CTA, alleen mobiel */}
       {isMobile && (
         <a href="#aanvraag" style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 60,

@@ -105,7 +105,7 @@ export default function ShopPage({ products, initialCategory }: { products: Prod
             <Image src="/logo-bespaarhulp.png" alt="Bespaarhulp Friesland" width={isMobile ? 78 : 103} height={isMobile ? 44 : 58} priority style={{ display: 'block' }} />
           </Link>
 
-          {/* Search — verborgen op mobiel (staat hieronder) */}
+          {/* Search, verborgen op mobiel (staat hieronder) */}
           {!isMobile && (
             <div style={{ position: 'relative', flex: 1, maxWidth: 480 }}>
               <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} width="15" height="15" fill="none" viewBox="0 0 16 16">
@@ -229,7 +229,7 @@ export default function ShopPage({ products, initialCategory }: { products: Prod
 
         <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
 
-          {/* Sidebar filters — alleen op desktop */}
+          {/* Sidebar filters, alleen op desktop */}
           <aside style={{ width: isMobile ? 0 : 220, flexShrink: 0, display: isMobile ? 'none' : 'block' }}>
             <p style={{ fontSize: 11.5, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>Categorie</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

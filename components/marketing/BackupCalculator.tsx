@@ -138,7 +138,7 @@ export default function BackupCalculator() {
           {result.exceedsSinglePhase && (
             <div style={{ marginTop: 16, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(248,113,113,0.4)', borderRadius: 10, padding: '12px 14px' }}>
               <p style={{ fontSize: 12.5, color: '#fca5a5', lineHeight: 1.55 }}>
-                ⚠ Boven {(SINGLE_PHASE_MAX_W / 1000)} kW is doorgaans een <strong>3-fase backup-set</strong> nodig. Niet alle zware apparaten draaien meestal tegelijk — wij kijken in het advies wat bij u past.
+                ⚠ Boven {(SINGLE_PHASE_MAX_W / 1000)} kW is doorgaans een <strong>3-fase backup-set</strong> nodig. Niet alle zware apparaten draaien meestal tegelijk, wij kijken in het advies wat bij u past.
               </p>
             </div>
           )}
@@ -153,9 +153,9 @@ export default function BackupCalculator() {
 
         {/* NL-regel uitleg */}
         <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px' }}>
-          <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>Let op — zo werkt backup in Nederland</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>Let op, zo werkt backup in Nederland</p>
           <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
-            Een gewone thuisbatterij schakelt bij netuitval uit (veiligheidseis). Backup-stroom werkt alleen met een <strong style={{ color: 'rgba(255,255,255,0.8)' }}>backup-box met automatische omschakeling</strong>. Die leveren én installeren wij — vraag ernaar in het advies.
+            Een gewone thuisbatterij schakelt bij netuitval uit (veiligheidseis). Backup-stroom werkt alleen met een <strong style={{ color: 'rgba(255,255,255,0.8)' }}>backup-box met automatische omschakeling</strong>. Die leveren én installeren wij, vraag ernaar in het advies.
           </p>
         </div>
       </div>

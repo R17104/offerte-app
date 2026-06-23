@@ -367,7 +367,7 @@ function HeroSection() {
                     <span>{HOUSE_TYPES.find(h => h.key === houseType)?.label ?? 'Woning'} · {hasSolar ? 'Zonnepanelen aanwezig' : 'Geen zonnepanelen'}</span>
                   </div>
 
-                  <p style={{ fontSize: 12.5, color: '#6b7280', marginBottom: 14 }}>We hebben gemiddelden ingevuld — aanpassen mag.</p>
+                  <p style={{ fontSize: 12.5, color: '#6b7280', marginBottom: 14 }}>We hebben gemiddelden ingevuld, aanpassen mag.</p>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 18 }}>
                     <div>
@@ -600,7 +600,7 @@ function RekentoolsBand() {
           ))}
         </div>
 
-        {/* Stats — Anker-stijl */}
+        {/* Stats, Anker-stijl */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'clamp(16px, 3vw, 40px)', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 36 }}>
           {[
             ['250+', 'installaties in Friesland'],
@@ -766,7 +766,7 @@ function Diensten() {
     {
       icon: <Ic.Flame />, title: 'Warmtepomp',
       desc: 'Alles over de overstap naar een warmtepomp. Kosten, subsidies en de juiste keuze.',
-      info: 'Een (hybride) warmtepomp bespaart 60 tot 100% op uw gasverbruik. Via de ISDE-subsidie krijgt u al snel €2.000–€3.500 terug op de aanschaf. Wij adviseren welk type bij uw woning past — hybride naast de cv-ketel of volledig elektrisch — en nemen de subsidieaanvraag uit handen.',
+      info: 'Een (hybride) warmtepomp bespaart 60 tot 100% op uw gasverbruik. Via de ISDE-subsidie krijgt u al snel €2.000–€3.500 terug op de aanschaf. Wij adviseren welk type bij uw woning past, hybride naast de cv-ketel of volledig elektrisch, en nemen de subsidieaanvraag uit handen.',
       productHref: '/producten?cat=HEAT_PUMP',
     },
     {
@@ -777,7 +777,7 @@ function Diensten() {
     {
       icon: <Ic.Person />, title: 'Persoonlijk advies',
       desc: 'Gratis en onafhankelijk advies van een energiecoach uit uw regio.',
-      info: 'Eén van onze adviseurs belt u of komt langs — gratis en vrijblijvend. We nemen uw energienota door, bekijken uw woning en rekenen door wat zinvol is en wat niet. U krijgt een eerlijk advies, ook als dat advies is om iets juist níet te doen.',
+      info: 'Eén van onze adviseurs belt u of komt langs, gratis en vrijblijvend. We nemen uw energienota door, bekijken uw woning en rekenen door wat zinvol is en wat niet. U krijgt een eerlijk advies, ook als dat advies is om iets juist níet te doen.',
     },
   ]
 
@@ -1011,7 +1011,7 @@ function ContactForm() {
             ))}
           </div>
 
-          {/* Persoonlijk contact — geen callcenter */}
+          {/* Persoonlijk contact, geen callcenter */}
           <div style={{ marginTop: 28, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 14, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center', maxWidth: 420 }}>
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(245,196,66,0.15)', border: '1.5px solid rgba(245,196,66,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#f5c442' }}>
               <Ic.Person />
@@ -1019,7 +1019,7 @@ function ContactForm() {
             <div>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 3 }}>U spreekt direct een adviseur</p>
               <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.55 }}>
-                Geen callcenter — één van onze eigen adviseurs uit Friesland belt u terug. Liever direct contact?{' '}
+                Geen callcenter, één van onze eigen adviseurs uit Friesland belt u terug. Liever direct contact?{' '}
                 <a href="https://wa.me/31638922513" onClick={trackWhatsAppClick} style={{ color: '#f5c442', fontWeight: 600, textDecoration: 'none' }}>App 06 38 92 25 13</a>
               </p>
             </div>
@@ -1082,7 +1082,7 @@ function ContactForm() {
                 {isPending ? 'Verzenden…' : 'Stuur aanvraag'}
               </button>
               <p style={{ fontSize: 11.5, color: '#9ca3af', textAlign: 'center' }}>
-                Uw gegevens worden vertrouwelijk behandeld — zie onze <Link href="/privacy" style={{ color: '#0a5c35', fontWeight: 600 }}>privacyverklaring</Link>
+                Uw gegevens worden vertrouwelijk behandeld, zie onze <Link href="/privacy" style={{ color: '#0a5c35', fontWeight: 600 }}>privacyverklaring</Link>
               </p>
             </form>
           )}
@@ -1155,10 +1155,10 @@ function Voorlichting() {
         <div style={{ textAlign: 'center', marginBottom: 44, maxWidth: 680, marginInline: 'auto' }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Echte specialisten</span>
           <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, marginBottom: 14, letterSpacing: '-0.025em' }}>
-            Geen verkopers — maar adviseurs
+            Geen verkopers, maar adviseurs
           </h2>
           <p style={{ fontSize: 'clamp(15px, 1.8vw, 17px)', color: 'rgba(255,255,255,0.66)', lineHeight: 1.7 }}>
-            Onze adviseur <strong style={{ color: '#fff' }}>Thijmen Veeman</strong> wordt regelmatig gevraagd om voorlichting te geven bij energiecollectieven in Friesland. Geen verkooppraatjes — gewoon eerlijke, onafhankelijke kennis over thuisbatterijen en besparen.
+            Onze adviseur <strong style={{ color: '#fff' }}>Thijmen Veeman</strong> wordt regelmatig gevraagd om voorlichting te geven bij energiecollectieven in Friesland. Geen verkooppraatjes, gewoon eerlijke, onafhankelijke kennis over thuisbatterijen en besparen.
           </p>
         </div>
 

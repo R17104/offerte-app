@@ -44,7 +44,7 @@ export default function AssignSalesperson({ entityType, entityId, currentId, use
         fontFamily: 'var(--font-sans)',
       }}
     >
-      <option value="">— Niet toegewezen —</option>
+      <option value="">- Niet toegewezen -</option>
       {users.map((u) => (
         <option key={u.id} value={u.id}>
           {u.name ?? u.email}

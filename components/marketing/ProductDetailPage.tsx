@@ -24,7 +24,7 @@ type Product = {
   isMaatwerk?: boolean
 }
 
-// Galerij per product — key = hoofdafbeelding URL
+// Galerij per product, key = hoofdafbeelding URL
 const GALLERIES: Record<string, string[]> = {
   // AlphaESS batterij 3.8kWh
   'https://www.vekto.nl/media/catalog/product/2/4/242247_label_2_1.png': [
@@ -261,7 +261,7 @@ function fmt(n: number) {
 function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPrice: number }) {
   const [feedbackKwh, setFeedbackKwh] = useState(2000)
   const { annualSavings } = calcBatterySavings(capacityKwh, feedbackKwh)
-  const payback = annualSavings > 0 ? (inclPrice / annualSavings).toFixed(1) : '—'
+  const payback = annualSavings > 0 ? (inclPrice / annualSavings).toFixed(1) : '-'
   const tenYr = annualSavings * 10 - inclPrice
 
   return (
@@ -307,7 +307,7 @@ function SavingsCalc({ capacityKwh, inclPrice }: { capacityKwh: number; inclPric
           Extra opbrengst met EMS (Energie Management Systeem)
         </p>
         <p style={{ fontSize: 12.5, color: '#374151', lineHeight: 1.6, marginBottom: 8 }}>
-          Met een EMS kan uw thuisbatterij slim handelen op de <strong>onbalansmarkt</strong> — het netbeheerder-netwerk waar energieprijzen per kwartier variëren. De batterij laadt op bij lage prijzen en levert terug bij hoge prijzen, los van uw zonnepanelen.
+          Met een EMS kan uw thuisbatterij slim handelen op de <strong>onbalansmarkt</strong>, het netbeheerder-netwerk waar energieprijzen per kwartier variëren. De batterij laadt op bij lage prijzen en levert terug bij hoge prijzen, los van uw zonnepanelen.
         </p>
         <div style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div>
@@ -476,7 +476,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
               {product.isMaatwerk ? (
                 <>
                   <div style={{ fontSize: 32, fontWeight: 900, color: '#0a5c35', lineHeight: 1 }}>Maatwerk</div>
-                  <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Prijs wordt bepaald na de schouw — geen verrassingen achteraf</div>
+                  <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Prijs wordt bepaald na de schouw, geen verrassingen achteraf</div>
                 </>
               ) : (
                 <>
@@ -547,7 +547,7 @@ export default function ProductDetailPage({ product }: { product: Product }) {
               </div>
             )}
 
-            {/* Savings calculator — only for batteries with capacity */}
+            {/* Savings calculator, only for batteries with capacity */}
             {product.category === 'BATTERY' && product.capacityKwh != null && (
               <SavingsCalc capacityKwh={product.capacityKwh} inclPrice={inclPrice} />
             )}

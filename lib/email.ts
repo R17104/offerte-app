@@ -41,7 +41,7 @@ export async function sendQuoteEmail({
   const transporter = await createTransporter()
   const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
 
-  const subject = `Uw offerte van Bespaarhulp Friesland — ${quoteTitle}`
+  const subject = `Uw offerte van Bespaarhulp Friesland, ${quoteTitle}`
 
   customerName = escapeHtml(customerName)
   senderName = escapeHtml(senderName)
@@ -128,7 +128,7 @@ export async function sendLeadConfirmationEmail({
         <tr><td style="padding:36px 36px 28px;">
           <p style="margin:0 0 8px;font-size:16px;color:#111827;">Beste ${safeName},</p>
           <p style="margin:0 0 18px;font-size:14px;color:#4b5563;line-height:1.7;">
-            Bedankt voor uw aanvraag! Eén van onze adviseurs neemt <strong>binnen één werkdag</strong> persoonlijk contact met u op — geen callcenter, gewoon iemand uit Friesland die uw situatie doorneemt.
+            Bedankt voor uw aanvraag! Eén van onze adviseurs neemt <strong>binnen één werkdag</strong> persoonlijk contact met u op, geen callcenter, gewoon iemand uit Friesland die uw situatie doorneemt.
           </p>
           ${quoteNumber ? `<p style="margin:0 0 18px;font-size:13px;color:#6b7280;">Uw offerte wordt voorbereid onder nummer <strong style="color:#111827;">${escapeHtml(quoteNumber)}</strong>.</p>` : ''}
           <p style="margin:0 0 8px;font-size:14px;color:#4b5563;line-height:1.7;">
@@ -149,7 +149,7 @@ export async function sendLeadConfirmationEmail({
   await transporter.sendMail({
     from,
     to,
-    subject: 'Aanvraag ontvangen — wij bellen u binnen één werkdag',
+    subject: 'Aanvraag ontvangen, wij bellen u binnen één werkdag',
     html,
   })
 }

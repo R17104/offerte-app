@@ -48,7 +48,7 @@ export default function ConsentBanner() {
 
   function choose(accepted: boolean) {
     localStorage.setItem(STORAGE_KEY, accepted ? 'accepted' : 'declined')
-    // cookie zodat de server (Events API) de keuze kent — 6 maanden
+    // cookie zodat de server (Events API) de keuze kent, 6 maanden
     document.cookie = `marketing_consent=${accepted ? '1' : '0'}; path=/; max-age=${60 * 60 * 24 * 180}; SameSite=Lax`
     if (accepted) loadTikTokPixel()
     setDecided(true)

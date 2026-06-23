@@ -40,7 +40,7 @@ export default async function WelkProductPage() {
             Welke batterijmaat past bij u?
           </h1>
           <p style={{ fontSize: 'clamp(13px,1.5vw,16px)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.7 }}>
-            Dezelfde berekening die wij in onze offertes gebruiken — op basis van uw teruglevering en paneelvermogen.
+            Dezelfde berekening die wij in onze offertes gebruiken, op basis van uw teruglevering en paneelvermogen.
           </p>
         </div>
       </div>

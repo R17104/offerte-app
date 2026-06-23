@@ -7,11 +7,11 @@ import LandingPage from '@/components/marketing/LandingPage'
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
 
 export const metadata: Metadata = {
-  title: 'Thuisbatterij & Zonnepanelen Friesland — Gratis Energieadvies',
+  title: 'Thuisbatterij & Zonnepanelen Friesland | Gratis Energieadvies',
   description: 'Gratis onafhankelijk advies over thuisbatterijen, zonnepanelen en warmtepompen in Friesland. Bespaar tot €3.000/jaar. Meer dan 2.400 Friese huishoudens geholpen.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Thuisbatterij & Zonnepanelen Friesland — Gratis Energieadvies',
+    title: 'Thuisbatterij & Zonnepanelen Friesland | Gratis Energieadvies',
     description: 'Gratis onafhankelijk advies over thuisbatterijen, zonnepanelen en warmtepompen in Friesland. Bespaar tot €3.000 per jaar.',
     url: '/',
     type: 'website',

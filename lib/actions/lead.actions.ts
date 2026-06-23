@@ -12,7 +12,7 @@ import { sendTikTokEvent } from '@/lib/tiktok-capi'
 import { headers, cookies } from 'next/headers'
 import crypto from 'crypto'
 
-// Stuurt een TikTok Lead-event (Events API) — alleen met marketingtoestemming
+// Stuurt een TikTok Lead-event (Events API), alleen met marketingtoestemming
 // en als de access token is ingesteld. Mag de aanvraag nooit laten falen.
 async function sendTikTokLeadSafe(opts: { email?: string | null; phone?: string | null; eventId?: string }) {
   try {
@@ -207,7 +207,7 @@ export async function createLeadFromLanding({
   postcode?: string
   bericht?: string
   herkomst?: string
-  website?: string // honeypot — hoort leeg te blijven
+  website?: string // honeypot, hoort leeg te blijven
   eventId?: string // gedeeld met browser-pixel voor deduplicatie
 }) {
   const guard = await checkPublicForm(website)
@@ -338,7 +338,7 @@ export type IntakeFormData = {
   productId: string
   includeInstallation: boolean
   opmerkingen?: string
-  website?: string // honeypot — hoort leeg te blijven
+  website?: string // honeypot, hoort leeg te blijven
 }
 
 export async function createLeadWithQuote(data: IntakeFormData): Promise<{ success: boolean; quoteNumber?: string; error?: string }> {
@@ -509,7 +509,7 @@ export async function convertLeadToQuote(leadId: string): Promise<{ quoteId: str
   const lead = await prisma.lead.findFirst({ where: { id: leadId, ...leadAccessFilter(session) } })
   if (!lead) throw new Error('Lead niet gevonden of geen toegang')
 
-  // Already linked — return existing quote
+  // Already linked, return existing quote
   if (lead.quoteId) return { quoteId: lead.quoteId }
 
   // Find or create customer

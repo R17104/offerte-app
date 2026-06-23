@@ -282,7 +282,7 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
                 fontFamily: 'var(--font-sans)', boxSizing: 'border-box' as const,
               }}
             >
-              <option value="">— Niet ingesteld —</option>
+              <option value="">- Niet ingesteld -</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>{u.name ?? u.email}</option>
               ))}

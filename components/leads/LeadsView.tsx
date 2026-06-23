@@ -248,18 +248,18 @@ function ListView({ leads, setLeads }: { leads: LeadRow[]; setLeads: (fn: (prev:
                     <span style={{ fontWeight: 500, fontSize: 13.5 }}>{lead.firstName} {lead.lastName}</span>
                     {lead.postalCode && <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-tertiary)' }}>{lead.postalCode}</span>}
                   </td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead.phone ?? '—'}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead.email ?? '—'}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead.city ?? '—'}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead.phone ?? '-'}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead.email ?? '-'}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead.city ?? '-'}</td>
                   <td style={{ padding: '10px 14px' }}>
                     <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 500, color: s.color, background: s.bg }}>{s.label}</span>
                   </td>
                   <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
                     {lead.followUpAt ? (
                       <span style={{ fontSize: 12.5, fontWeight: overdue ? 600 : 400, color: overdue ? '#dc2626' : 'var(--text-secondary)' }}>{overdue && '! '}{fmtDate(lead.followUpAt)}</span>
-                    ) : <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>—</span>}
+                    ) : <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>-</span>}
                   </td>
-                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead._count.notes > 0 ? lead._count.notes : '—'}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)' }}>{lead._count.notes > 0 ? lead._count.notes : '-'}</td>
                   <td style={{ padding: '10px 14px', fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{new Date(lead.createdAt).toLocaleDateString('nl-NL')}</td>
                 </tr>
               )

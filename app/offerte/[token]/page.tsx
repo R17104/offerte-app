@@ -217,7 +217,7 @@ export default async function PublicQuotePage({ params }: Props) {
       <div style={{ paddingTop: 32, paddingBottom: 60, paddingLeft: 16, paddingRight: 16 }}>
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 1 — BEGELEIDENDE BRIEF
+            PAGINA 1, BEGELEIDENDE BRIEF
         ══════════════════════════════════════════════════════════════════ */}
         {(() => { const p = nextPage(); return (
         <div className="doc-page" style={PAGE}>
@@ -253,7 +253,7 @@ export default async function PublicQuotePage({ params }: Props) {
           {/* Letter body */}
           <div className="li" style={{ padding: '52px 64px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
-            {/* Date + reference — right aligned */}
+            {/* Date + reference, right aligned */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 44 }}>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: 13.5, color: '#374151' }}>
@@ -332,7 +332,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 2 — SALDERINGSREGELING
+            PAGINA 2, SALDERINGSREGELING
         ══════════════════════════════════════════════════════════════════ */}
         {showSalderingPage && (() => { const p = nextPage(); return (
         <div className="doc-page" style={PAGE}>
@@ -497,7 +497,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 2B — PERSOONLIJK BATTERIJADVIES
+            PAGINA 2B, PERSOONLIJK BATTERIJADVIES
         ══════════════════════════════════════════════════════════════════ */}
         {showBatteryAdvicePage && (() => { const p = nextPage(); return (
         <div className="doc-page" style={PAGE}>
@@ -527,7 +527,7 @@ export default async function PublicQuotePage({ params }: Props) {
                   <span style={{ fontSize: 28, fontWeight: 600, color: '#6b7280', marginLeft: 6 }}>kWh</span>
                 </div>
                 <p style={{ fontSize: 14, color: '#374151', marginTop: 10 }}>
-                  Alpha ESS thuisbatterij — specifiek gekozen op basis van uw dagelijks overschot en verbruikspatroon.
+                  Alpha ESS thuisbatterij, specifiek gekozen op basis van uw dagelijks overschot en verbruikspatroon.
                 </p>
                 <div style={{ marginTop: 16, display: 'flex', gap: 16 }}>
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 16px', textAlign: 'center', flex: 1 }}>
@@ -636,7 +636,7 @@ export default async function PublicQuotePage({ params }: Props) {
                     Door {advSelfUseKwh.toLocaleString('nl-NL')} kWh/jaar zelf te gebruiken in plaats van terug te leveren,
                     ontvangt u €{(quote.electricityTariff - quote.feedbackTariff).toFixed(2).replace('.', ',')} meer per kWh.
                     Dat levert u circa <strong>€{advAnnualSavings.toLocaleString('nl-NL')}/jaar</strong> op.
-                    Stroom die toch wordt teruggeleverd wordt via de EMS automatisch verhandeld op de onbalansmarkt — gemiddeld voor <strong>€0,15 tot €0,40/kWh</strong>.
+                    Stroom die toch wordt teruggeleverd wordt via de EMS automatisch verhandeld op de onbalansmarkt, gemiddeld voor <strong>€0,15 tot €0,40/kWh</strong>.
                   </p>
                 </div>
               </div>
@@ -653,7 +653,7 @@ export default async function PublicQuotePage({ params }: Props) {
                 {
                   icon: '⚡',
                   title: 'Salderingsverlies',
-                  body: `Na 2027 vervalt de salderingsregeling. De batterij slaat uw overschot op zodat u het zelf gebruikt — voor €${quote.electricityTariff.toFixed(2).replace('.', ',')} i.p.v. het terug te leveren voor €${quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh.`,
+                  body: `Na 2027 vervalt de salderingsregeling. De batterij slaat uw overschot op zodat u het zelf gebruikt, voor €${quote.electricityTariff.toFixed(2).replace('.', ',')} i.p.v. het terug te leveren voor €${quote.feedbackTariff.toFixed(2).replace('.', ',')}/kWh.`,
                   color: '#dc2626', bg: '#fef2f2', border: '#fca5a5',
                 },
                 {
@@ -686,7 +686,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 3 — SITUATIE-ANALYSE
+            PAGINA 3, SITUATIE-ANALYSE
         ══════════════════════════════════════════════════════════════════ */}
         {showBespaarplan && (() => { const p = nextPage(); return (
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
@@ -704,7 +704,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </p>
           </div>
 
-          {/* S1 — Saldering */}
+          {/* S1, Saldering */}
           {quote.hasSolarPanels && feedbackKwh > 0 && (
             <div className="sec" style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
               <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
@@ -790,7 +790,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </div>
           )}
 
-          {/* S2 — Terugleverkosten */}
+          {/* S2, Terugleverkosten */}
           {quote.hasSolarPanels && feedInYearlyCost > 0 && (
             <div className="sec" style={{ padding: '44px 52px', background: '#f8f9fa', borderBottom: '1px solid #e5e7eb' }}>
               <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
@@ -828,7 +828,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </div>
           )}
 
-          {/* S3 — Netcongestie & EMS */}
+          {/* S3, Netcongestie & EMS */}
           <div className="sec" style={{ padding: '44px 52px', borderBottom: '1px solid #e5e7eb' }}>
             <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
@@ -869,7 +869,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </div>
           </div>
 
-          {/* S4 — Woningwaarde */}
+          {/* S4, Woningwaarde */}
           <div className="sec" style={{ padding: '44px 52px', background: '#f8f9fa' }}>
             <div style={{ borderTop: '2px solid #2563eb', paddingTop: 24 }}>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
@@ -921,7 +921,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 3 — HET ANTWOORD
+            PAGINA 3, HET ANTWOORD
         ══════════════════════════════════════════════════════════════════ */}
         {showBespaarplan && (() => { const p = nextPage(); return (
         <div className="doc-page" style={PAGE}>
@@ -1020,7 +1020,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 4 — UW INSTALLATIE
+            PAGINA 4, UW INSTALLATIE
         ══════════════════════════════════════════════════════════════════ */}
         {(() => { const p = nextPage(); return (
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>
@@ -1104,7 +1104,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 5 — INVESTERING
+            PAGINA 5, INVESTERING
         ══════════════════════════════════════════════════════════════════ */}
         {(() => { const p = nextPage(); return (
         <div className="doc-page" style={PAGE}>
@@ -1173,7 +1173,7 @@ export default async function PublicQuotePage({ params }: Props) {
               <div style={{ background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#b45309' }}>Deze offerte is verlopen</p>
                 <p style={{ fontSize: 13, color: '#92400e', marginTop: 4 }}>
-                  De geldigheidsdatum {quote.validUntil ? `(${formatDate(quote.validUntil)}) ` : ''}is verstreken. Neem contact met ons op voor een nieuwe offerte — de actuele prijzen kunnen afwijken.
+                  De geldigheidsdatum {quote.validUntil ? `(${formatDate(quote.validUntil)}) ` : ''}is verstreken. Neem contact met ons op voor een nieuwe offerte, de actuele prijzen kunnen afwijken.
                 </p>
               </div>
             )}
@@ -1199,7 +1199,7 @@ export default async function PublicQuotePage({ params }: Props) {
             </div>
           </div>
 
-          {/* Acceptatie — 3 knoppen + formulier */}
+          {/* Acceptatie, 3 knoppen + formulier */}
           {canInteract && (
             <div className="sec" style={{ padding: '36px 52px', borderTop: '1px solid #e5e7eb' }}>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Wat wilt u doen?</p>
@@ -1226,7 +1226,7 @@ export default async function PublicQuotePage({ params }: Props) {
         )})()}
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAGINA 6 — VOORWAARDEN & HANDTEKENING
+            PAGINA 6, VOORWAARDEN & HANDTEKENING
         ══════════════════════════════════════════════════════════════════ */}
         {(() => { const p = nextPage(); return (
         <div className="doc-page" style={{ ...PAGE, minHeight: 0 }}>

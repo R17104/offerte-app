@@ -7,7 +7,7 @@ import ImageUpload from '@/components/ui/ImageUpload'
 import { verifyAdmin } from '@/lib/dal'
 
 const CATEGORIES = [
-  { value: '',              label: '— Geen categorie —' },
+  { value: '',              label: 'Geen categorie' },
   { value: 'BATTERY',      label: '🔋 Thuisbatterij' },
   { value: 'SOLAR',        label: '☀️ Zonnepanelen' },
   { value: 'HEAT_PUMP',    label: '♨️ Warmtepomp' },
@@ -47,7 +47,7 @@ export default async function NewProductPage() {
               <FormGroup label="Omschrijving">
                 <Textarea name="description" placeholder="Korte omschrijving zichtbaar in de offerte" rows={3} />
               </FormGroup>
-              <FormGroup label="Notities" hint="Intern — niet zichtbaar voor klant">
+              <FormGroup label="Notities" hint="Intern, niet zichtbaar voor klant">
                 <Textarea name="notes" placeholder="Interne notities" rows={2} />
               </FormGroup>
             </div>

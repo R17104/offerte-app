@@ -158,7 +158,7 @@ export default function ProductQuiz({ products }: { products: Product[] }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <OptionBtn icon="💰" label="Energierekening verlagen" desc="Meer zelfverbruik, minder teruglevering" selected={answers.doel === 'besparen'} onClick={() => set('doel', 'besparen')} />
                   <OptionBtn icon="🔌" label="Noodstroom bij stroomuitval" desc="Kritische apparaten altijd van stroom voorzien" selected={answers.doel === 'noodstroom'} onClick={() => set('doel', 'noodstroom')} />
-                  <OptionBtn icon="⚡" label="Beide — besparen én noodstroom" desc="Complete energieonafhankelijkheid" selected={answers.doel === 'beiden'} onClick={() => set('doel', 'beiden')} />
+                  <OptionBtn icon="⚡" label="Beide, besparen én noodstroom" desc="Complete energieonafhankelijkheid" selected={answers.doel === 'beiden'} onClick={() => set('doel', 'beiden')} />
                 </div>
               </div>
             )}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Privacyverklaring — Bespaarhulp Friesland',
+  title: 'Privacyverklaring | Bespaarhulp Friesland',
   description: 'Hoe Bespaarhulp Friesland omgaat met uw persoonsgegevens.',
   alternates: { canonical: '/privacy' },
 }

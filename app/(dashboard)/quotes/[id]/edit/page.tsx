@@ -16,7 +16,7 @@ const STATUS_WARNINGS: Record<string, { text: string; color: string; bg: string;
     border: 'rgba(59,130,246,0.2)',
   },
   ACCEPTED: {
-    text: '⚠️ Deze offerte is geaccepteerd en ondertekend door de klant. Bewerk alleen als je zeker weet wat je doet — wijzigingen zijn direct zichtbaar op de publieke offertepagina.',
+    text: '⚠️ Deze offerte is geaccepteerd en ondertekend door de klant. Bewerk alleen als je zeker weet wat je doet, wijzigingen zijn direct zichtbaar op de publieke offertepagina.',
     color: '#f59e0b',
     bg: 'rgba(245,158,11,0.08)',
     border: 'rgba(245,158,11,0.25)',

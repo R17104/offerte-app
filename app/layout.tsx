@@ -20,7 +20,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesla
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Bespaarhulp Friesland — Gratis energieadvies',
+    default: 'Bespaarhulp Friesland | Gratis energieadvies',
     template: '%s | Bespaarhulp Friesland',
   },
   description: 'Gratis en onafhankelijk advies voor zonnepanelen, thuisbatterijen en warmtepompen in heel Friesland. Bespaar tot €3.000 per jaar op uw energierekening.',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Bespaarhulp Friesland — Gratis energieadvies',
+    title: 'Bespaarhulp Friesland | Gratis energieadvies',
     description: 'Gratis en onafhankelijk advies voor zonnepanelen, thuisbatterijen en warmtepompen in Friesland.',
   },
   robots: {

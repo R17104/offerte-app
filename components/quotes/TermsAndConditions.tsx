@@ -1,4 +1,4 @@
-// Standaard voorwaardentekst — elke sectie gescheiden door lege regel.
+// Standaard voorwaardentekst, elke sectie gescheiden door lege regel.
 // Eerste regel van elke sectie = titel, overige regels = inhoud.
 export const DEFAULT_TERMS_TEXT = `Aanbetaling en eindfactuur
 Wanneer u akkoord gaat met de offerte, wordt na de technische schouw een aanbetaling in rekening gebracht. Het resterende bedrag wordt op de dag van installatie in twee delen gefactureerd. Deze facturen dienen uiterlijk binnen 2 dagen na oplevering te worden voldaan.

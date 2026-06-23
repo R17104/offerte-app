@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : product.category === 'EMERGENCY_POWER' ? 'Noodstroom'
     : 'Energieproduct'
 
-  const title = `${product.name} — ${categoryLabel} kopen in Friesland`
+  const title = `${product.name}, ${categoryLabel} kopen in Friesland`
   const description = product.description
     ? `${product.description.slice(0, 140)}… Gratis advies en installatie in heel Friesland.`
     : `${product.name} kopen? Gratis installatieadvies in heel Friesland. Bekijk prijs en specificaties.`

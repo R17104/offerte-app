@@ -7,7 +7,7 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: Date | string | null | undefined): string {
-  if (!date) return '—'
+  if (!date) return '-'
   return new Date(date).toLocaleDateString('nl-NL', {
     day: '2-digit',
     month: '2-digit',

@@ -1,7 +1,7 @@
 // ── Backup-stroom calculator (Nederlandse situatie) ───────────────────────────
 //
 // BELANGRIJK (NL-regel): een net-gekoppelde thuisbatterij schakelt bij een
-// stroomstoring standaard UIT (anti-eilandbedrijf — veiligheidseis uit de
+// stroomstoring standaard UIT (anti-eilandbedrijf, veiligheidseis uit de
 // netcode, zodat monteurs niet op een 'dode' kabel onder spanning komen).
 // Backup-stroom werkt daarom ALLEEN met een backup-box + automatische
 // omschakeling (ATS). Zonder die voorziening levert de batterij bij netuitval
@@ -13,7 +13,7 @@ export type Appliance = {
   label: string
   watts: number       // gemiddeld opgenomen vermogen tijdens gebruik (W)
   essential?: boolean // standaard aangevinkt (essentieel bij stroomuitval)
-  heavy?: boolean      // grootverbruiker — kan omvormervermogen overschrijden
+  heavy?: boolean      // grootverbruiker, kan omvormervermogen overschrijden
 }
 
 // Realistische Nederlandse waarden (gemiddeld draaivermogen).
@@ -58,7 +58,7 @@ export function calcBackup(capacityKwh: number, selectedWatts: number): BackupRe
 
   let runtimeLabel: string
   if (runtimeHours <= 0) {
-    runtimeLabel = '—'
+    runtimeLabel = '-'
   } else if (runtimeHours < 1) {
     runtimeLabel = `${Math.round(runtimeHours * 60)} minuten`
   } else if (runtimeHours < 24) {

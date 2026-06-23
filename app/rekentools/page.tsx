@@ -6,7 +6,7 @@ import BillAdviceCalculator from '@/components/marketing/BillAdviceCalculator'
 import WhatsAppButton from '@/components/marketing/WhatsAppButton'
 
 export const metadata: Metadata = {
-  title: 'Rekentools — Bespaarhulp Friesland',
+  title: 'Rekentools | Bespaarhulp Friesland',
   description: 'Bereken gratis hoeveel u kunt besparen met zonnepanelen, een thuisbatterij of warmtepomp, en hoe lang u doordraait bij stroomuitval. Nederlandse tarieven en regels.',
   alternates: { canonical: '/rekentools' },
 }
@@ -39,12 +39,12 @@ export default function RekentoolsPage() {
             Reken zelf uit wat u <span style={{ color: gold }}>bespaart</span>
           </h1>
           <p style={{ fontSize: 'clamp(15px,1.8vw,17px)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, maxWidth: 560, margin: '0 auto' }}>
-            Op basis van Nederlandse tarieven en regels. Geen verkooppraatjes — wij rekenen het eerlijk voor en u beslist.
+            Op basis van Nederlandse tarieven en regels. Geen verkooppraatjes, wij rekenen het eerlijk voor en u beslist.
           </p>
         </div>
       </section>
 
-      {/* Tool 1 — Besparing uit maandbedrag */}
+      {/* Tool 1, Besparing uit maandbedrag */}
       <section style={{ padding: '0 clamp(16px,4vw,48px) clamp(40px,6vw,72px)' }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 20, padding: 'clamp(24px,4vw,44px)' }}>
           <div style={{ marginBottom: 28 }}>
@@ -58,7 +58,7 @@ export default function RekentoolsPage() {
         </div>
       </section>
 
-      {/* Tool 2 — Backup-tijd */}
+      {/* Tool 2, Backup-tijd */}
       <section style={{ padding: '0 clamp(16px,4vw,48px) clamp(56px,8vw,96px)' }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 20, padding: 'clamp(24px,4vw,44px)' }}>
           <div style={{ marginBottom: 28 }}>

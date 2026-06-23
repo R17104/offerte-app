@@ -39,7 +39,7 @@ export async function adminDeleteUser(userId: string) {
   if (userId === callerId) throw new Error('Je kunt jezelf niet verwijderen')
 
   // Verplichte relaties (offertes, leads, notities, todo's) blokkeren een delete
-  // op databaseniveau — geef daarom vooraf een duidelijke melding.
+  // op databaseniveau, geef daarom vooraf een duidelijke melding.
   const [quotes, leads, notes, todos] = await Promise.all([
     prisma.quote.count({ where: { createdById: userId } }),
     prisma.lead.count({ where: { createdById: userId } }),

@@ -64,7 +64,7 @@ export type BatteryAdvice = {
 /**
  * Adviesmaat voor een thuisbatterij. Gedimensioneerd op het ZOMERSE
  * dagoverschot (niet het jaargemiddelde): dan vangt de batterij ook op
- * zonnige dagen het volledige overschot op — wat de offerte ook belooft.
+ * zonnige dagen het volledige overschot op, wat de offerte ook belooft.
  */
 export function calcBatteryAdvice(input: BatteryAdviceInput): BatteryAdvice | null {
   const feedbackKwh = input.feedbackKwh
