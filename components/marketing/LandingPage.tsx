@@ -1142,6 +1142,51 @@ function Footer() {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+// ── Voorlichting / autoriteit ─────────────────────────────────────────────────
+
+function Voorlichting() {
+  const frame: React.CSSProperties = {
+    position: 'relative', width: '100%', aspectRatio: '3 / 2', borderRadius: 16, overflow: 'hidden',
+    border: '1px solid rgba(255,255,255,0.1)', background: '#0e1a14',
+  }
+  return (
+    <section style={{ background: '#08120d', padding: 'clamp(56px, 8vw, 96px) clamp(16px, 4vw, 48px)' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 44, maxWidth: 680, marginInline: 'auto' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c442', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Echte specialisten</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 800, color: '#fff', marginTop: 8, marginBottom: 14, letterSpacing: '-0.025em' }}>
+            Geen verkopers — maar adviseurs
+          </h2>
+          <p style={{ fontSize: 'clamp(15px, 1.8vw, 17px)', color: 'rgba(255,255,255,0.66)', lineHeight: 1.7 }}>
+            Onze adviseur <strong style={{ color: '#fff' }}>Thijmen Veeman</strong> wordt regelmatig gevraagd om voorlichting te geven bij energiecollectieven in Friesland. Geen verkooppraatjes — gewoon eerlijke, onafhankelijke kennis over thuisbatterijen en besparen.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Hoofdbeeld */}
+          <div style={frame}>
+            <Image src="/voorlichting-adviseur.jpg" alt="Thijmen Veeman geeft voorlichting over thuisbatterijen bij een energiecollectief in Friesland" fill sizes="(max-width: 1140px) 100vw, 1140px" style={{ objectFit: 'cover' }} />
+            <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '40px 20px 16px', background: 'linear-gradient(to top, rgba(3,16,10,0.85), transparent)' }}>
+              <p style={{ fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,0.92)', margin: 0 }}>
+                Thijmen Veeman geeft voorlichting bij een energiecollectief in Friesland
+              </p>
+            </div>
+          </div>
+          {/* Twee kleinere beelden */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
+            <div style={frame}>
+              <Image src="/voorlichting-lachend.jpg" alt="Thijmen Veeman tijdens een presentatie over thuisbatterijen" fill sizes="(max-width: 1140px) 100vw, 560px" style={{ objectFit: 'cover' }} />
+            </div>
+            <div style={frame}>
+              <Image src="/voorlichting-zaal.jpg" alt="Bezoekers van het energiecollectief tijdens de voorlichting over thuisbatterijen" fill sizes="(max-width: 1140px) 100vw, 560px" style={{ objectFit: 'cover' }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function LandingPage({ products = [] }: { products?: ShopProduct[] }) {
   return (
     <div style={{ fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: '#0a1410' }}>
@@ -1154,6 +1199,7 @@ export default function LandingPage({ products = [] }: { products?: ShopProduct[
       <Diensten />
       <Werkwijze />
       <InstallationGallery />
+      <Voorlichting />
       {SHOW_REVIEWS && <ReviewsSection />}
       <FAQ />
       <ContactForm />

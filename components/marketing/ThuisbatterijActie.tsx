@@ -181,6 +181,27 @@ export default function ThuisbatterijActie() {
         </div>
       </section>
 
+      {/* Voorlichting / autoriteit */}
+      <section style={{ background: dark, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', gap: 'clamp(24px,4vw,48px)', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 280px', minWidth: 260 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Echte specialisten</span>
+            <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, marginTop: 8, marginBottom: 14, letterSpacing: '-0.02em' }}>Geen verkopers — maar adviseurs</h2>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.68)', lineHeight: 1.7 }}>
+              Onze adviseur <strong style={{ color: '#fff' }}>Thijmen Veeman</strong> wordt regelmatig gevraagd om voorlichting te geven bij energiecollectieven in Friesland. Bij ons krijgt u dus geen verkooppraatje, maar eerlijk en onafhankelijk advies van iemand die de materie écht kent.
+            </p>
+          </div>
+          <div style={{ flex: '1 1 320px', minWidth: 280 }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '3 / 2', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)', background: '#0e1a14' }}>
+              <Image src="/voorlichting-adviseur.jpg" alt="Thijmen Veeman geeft voorlichting over thuisbatterijen bij een energiecollectief in Friesland" fill sizes="(max-width: 768px) 100vw, 480px" style={{ objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '36px 16px 14px', background: 'linear-gradient(to top, rgba(3,16,10,0.85), transparent)' }}>
+                <p style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.92)', margin: 0 }}>Voorlichting bij een energiecollectief in Friesland</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Social proof */}
       <section style={{ background: dark, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
