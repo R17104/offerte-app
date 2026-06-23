@@ -223,6 +223,33 @@ export default async function QuoteDetailPage({ params }: Props) {
               </div>
             </Card>
           )}
+
+          {/* Schouw-foto's van de klant */}
+          <Card>
+            <CardHeader title="Schouw-foto's" />
+            {quote.meterkastPhotoUrl || quote.batterijLocatiePhotoUrl ? (
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                {[
+                  { label: 'Meterkast', url: quote.meterkastPhotoUrl },
+                  { label: 'Batterijlocatie', url: quote.batterijLocatiePhotoUrl },
+                ].map(({ label, url }) => (
+                  <div key={label} style={{ flex: '1 1 200px', minWidth: 180 }}>
+                    <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 6 }}>{label}</p>
+                    {url ? (
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={label} style={{ width: '100%', borderRadius: 8, border: '1px solid var(--border)', display: 'block' }} />
+                      </a>
+                    ) : (
+                      <p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Nog niet geüpload</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>De klant heeft nog geen foto&apos;s geüpload.</p>
+            )}
+          </Card>
         </div>
 
         {/* Sidebar */}

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import QuoteAcceptanceForm from '@/components/quotes/QuoteAcceptanceForm'
+import SchouwPhotoUpload from '@/components/quotes/SchouwPhotoUpload'
 import { calcBatteryAdvice, EMS_EXAMPLE_REVENUE_EUR } from '@/lib/battery-advice'
 import PrintButton from '@/components/quotes/PrintButton'
 import TermsAndConditions from '@/components/quotes/TermsAndConditions'
@@ -1207,6 +1208,10 @@ export default async function PublicQuotePage({ params }: Props) {
                 Kies een optie en onderteken digitaal. Na ondertekening nemen wij binnen 24 uur contact op.
               </p>
               <QuoteAcceptanceForm token={token} customerName={customerName} reservationOptionEnabled={quote.reservationOptionEnabled} />
+
+              <div style={{ marginTop: 28, paddingTop: 28, borderTop: '1px solid #e5e7eb' }}>
+                <SchouwPhotoUpload token={token} meterkast={quote.meterkastPhotoUrl} batterij={quote.batterijLocatiePhotoUrl} />
+              </div>
             </div>
           )}
 
@@ -1215,9 +1220,10 @@ export default async function PublicQuotePage({ params }: Props) {
               <p style={{ fontSize: 14, fontWeight: 700, color: '#15803d', marginBottom: 4 }}>
                 Geaccepteerd op {formatDate(quote.acceptedAt)}
               </p>
-              <p style={{ fontSize: 13, color: '#166534' }}>
+              <p style={{ fontSize: 13, color: '#166534', marginBottom: 20 }}>
                 Ondertekend door {quote.acceptance.firstName} {quote.acceptance.lastName}
               </p>
+              <SchouwPhotoUpload token={token} meterkast={quote.meterkastPhotoUrl} batterij={quote.batterijLocatiePhotoUrl} />
             </div>
           )}
 

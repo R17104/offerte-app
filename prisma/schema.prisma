@@ -200,6 +200,10 @@ model Quote {
   termsText   String?
   reservationOptionEnabled Boolean @default(false)
 
+  // Schouw-foto's die de klant uploadt (optioneel, bij of na ondertekenen)
+  meterkastPhotoUrl        String?
+  batterijLocatiePhotoUrl  String?
+
   sentAt     DateTime?
   acceptedAt DateTime?
   rejectedAt DateTime?
