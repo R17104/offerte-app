@@ -1,22 +1,28 @@
 export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
-import { verifySession } from '@/lib/dal'
+import { verifySession, leadAccessFilter } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
 import SeoLeadsView from '@/components/leads/SeoLeadsView'
 
 export default async function TikTokLeadsPage() {
-  await verifySession()
+  const session = await verifySession()
 
   const [leads, users] = await Promise.all([
     prisma.lead.findMany({
       where: {
         archivedAt: null,
-        OR: [
-          // Webhook-leads (TikTok Instant Forms via Make)
-          { source: { startsWith: 'TikTok' } },
-          // Leads van de TikTok-advertentielandingspagina (formulier op /thuisbatterij-actie)
-          { source: { contains: 'Thuisbatterij-actie' } },
+        AND: [
+          {
+            OR: [
+              // Webhook-leads (TikTok Instant Forms via Make)
+              { source: { startsWith: 'TikTok' } },
+              // Leads van de TikTok-advertentielandingspagina (formulier op /thuisbatterij-actie)
+              { source: { contains: 'Thuisbatterij-actie' } },
+            ],
+          },
+          // Admin ziet alles; sales alleen eigen/toegewezen
+          leadAccessFilter(session),
         ],
       },
       include: {

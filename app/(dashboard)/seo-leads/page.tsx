@@ -1,20 +1,21 @@
 export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
-import { verifySession } from '@/lib/dal'
+import { verifySession, leadAccessFilter } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
 import SeoLeadsView from '@/components/leads/SeoLeadsView'
 
 const SEO_SOURCES = ['Website', 'Website – offerte aanvraag']
 
 export default async function SeoLeadsPage() {
-  await verifySession()
+  const session = await verifySession()
 
   const [leads, users] = await Promise.all([
     prisma.lead.findMany({
       where: {
         archivedAt: null,
         source: { in: SEO_SOURCES },
+        ...leadAccessFilter(session),
       },
       include: {
         assignedTo: { select: { id: true, name: true, email: true } },

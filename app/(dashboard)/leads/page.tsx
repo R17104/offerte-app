@@ -1,17 +1,18 @@
 export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
-import { verifySession } from '@/lib/dal'
+import { verifySession, leadAccessFilter } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
 import LeadImportButton from '@/components/leads/LeadImportButton'
 import LeadsView from '@/components/leads/LeadsView'
 import Link from 'next/link'
 
 export default async function LeadsPage() {
-  const { userId } = await verifySession()
+  const session = await verifySession()
 
+  // Admin ziet alle leads; sales alleen eigen aangemaakte of aan hen toegewezen.
   const leads = await prisma.lead.findMany({
-    where: { createdById: userId, archivedAt: null },
+    where: { ...leadAccessFilter(session), archivedAt: null },
     include: { _count: { select: { notes: true } } },
     orderBy: { createdAt: 'desc' },
   })

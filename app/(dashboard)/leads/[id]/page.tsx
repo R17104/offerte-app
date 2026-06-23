@@ -2,18 +2,20 @@ export const dynamic = 'force-dynamic'
 
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
-import { verifySession } from '@/lib/dal'
+import { verifySession, leadAccessFilter } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
 import LeadDetailClient from '@/components/leads/LeadDetailClient'
 
 type Props = { params: Promise<{ id: string }> }
 
 export default async function LeadDetailPage({ params }: Props) {
-  const { userId, role } = await verifySession()
+  const session = await verifySession()
+  const { role } = session
   const { id } = await params
 
-  const lead = await prisma.lead.findUnique({
-    where: role === 'ADMIN' ? { id } : { id, createdById: userId },
+  // Admin mag elke lead openen; sales alleen eigen aangemaakte of aan hen toegewezen.
+  const lead = await prisma.lead.findFirst({
+    where: { id, ...leadAccessFilter(session) },
     include: {
       notes: {
         include: { author: { select: { name: true } } },

@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
-const nav = [
+type NavItem = { href: string; label: string; icon: (p: { size?: number; color?: string }) => React.ReactNode; adminOnly?: boolean }
+
+const nav: { label: string; items: NavItem[] }[] = [
   {
     label: 'Algemeen',
     items: [
@@ -23,16 +25,23 @@ const nav = [
   {
     label: 'Leads',
     items: [
-      { href: '/seo-leads', label: 'SEO Leads', icon: IconGlobe },
-      { href: '/tiktok-leads', label: 'TikTok Leads', icon: IconTikTok },
+      // SEO- en TikTok-leads komen alleen bij admin binnen
+      { href: '/seo-leads', label: 'SEO Leads', icon: IconGlobe, adminOnly: true },
+      { href: '/tiktok-leads', label: 'TikTok Leads', icon: IconTikTok, adminOnly: true },
       { href: '/leads', label: 'Alle leads', icon: IconLeads },
     ],
   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ role }: { role?: string }) {
   const path = usePathname()
   const [open, setOpen] = useState(false)
+  const isAdmin = role === 'ADMIN'
+
+  // Verberg admin-only items voor niet-admins; laat lege groepen weg.
+  const visibleNav = nav
+    .map((group) => ({ ...group, items: group.items.filter((i) => isAdmin || !i.adminOnly) }))
+    .filter((group) => group.items.length > 0)
 
   return (
     <>
@@ -113,7 +122,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '10px 8px', overflowY: 'auto' }}>
-        {nav.map((group) => (
+        {visibleNav.map((group) => (
           <div key={group.label} style={{ marginBottom: 20 }}>
             <p
               style={{

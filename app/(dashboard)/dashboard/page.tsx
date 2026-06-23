@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 import { PageContainer, PageHeader, Card, CardHeader, Badge, Divider } from '@/components/ui'
 import { formatCurrency, STATUS_META } from '@/lib/utils'
 import Link from 'next/link'
-import { verifySession } from '@/lib/dal'
+import { verifySession, leadAccessFilter } from '@/lib/dal'
 import SalesTodoPanel from '@/components/dashboard/SalesTodoPanel'
 
 function StatCard({ label, value, sub, color, href }: { label: string; value: string | number; sub?: string; color?: string; href?: string }) {
@@ -23,7 +23,8 @@ function StatCard({ label, value, sub, color, href }: { label: string; value: st
 }
 
 export default async function DashboardPage() {
-  await verifySession()
+  const session = await verifySession()
+  const leadFilter = leadAccessFilter(session)
 
   const now = new Date()
   const todayStart  = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -43,13 +44,13 @@ export default async function DashboardPage() {
       take: 5, orderBy: { createdAt: 'desc' }, where: { archivedAt: null },
       include: { customer: true, assignedTo: { select: { name: true } } },
     }),
-    prisma.lead.groupBy({ by: ['status'], _count: true, where: { archivedAt: null } }),
+    prisma.lead.groupBy({ by: ['status'], _count: true, where: { archivedAt: null, ...leadFilter } }),
     prisma.lead.findMany({
-      where: { archivedAt: null, followUpAt: { gte: todayStart, lt: todayEnd } },
+      where: { archivedAt: null, followUpAt: { gte: todayStart, lt: todayEnd }, ...leadFilter },
       orderBy: { followUpAt: 'asc' },
       select: { id: true, firstName: true, lastName: true, followUpAt: true, status: true, assignedTo: { select: { name: true } } },
     }),
-    prisma.lead.count({ where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo } } }),
+    prisma.lead.count({ where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo }, ...leadFilter } }),
     // offertes verstuurd afgelopen 10 dagen
     prisma.quote.aggregate({
       _sum: { total: true }, _count: true,
