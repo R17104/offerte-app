@@ -192,7 +192,8 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
         </select>
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <table style={{ width: '100%', minWidth: 680, borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border)' }}>
             <th style={{ padding: '10px 14px', width: 44 }}>
@@ -252,6 +253,7 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
           })}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

@@ -142,7 +142,8 @@ export default function SeoLeadsView({ leads, users, entityLabel = 'SEO leads' }
             Geen {entityLabel} gevonden{search ? ` voor "${search}"` : ''}.
           </p>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>
                 {['Naam & contact', 'Bron', 'Interesse', 'Status', 'Toegewezen aan', 'Datum', ''].map((h) => (
@@ -239,6 +240,7 @@ export default function SeoLeadsView({ leads, users, entityLabel = 'SEO leads' }
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

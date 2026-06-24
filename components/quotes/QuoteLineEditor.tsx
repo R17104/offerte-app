@@ -257,7 +257,7 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
       {/* Quote meta */}
       <div style={s.card}>
         <p style={s.cardTitle}>Offertegegevens</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className="r-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div style={{ ...s.field, gridColumn: '1 / -1' }}>
             <label style={s.label}>Klant <span style={{ color: 'var(--danger)' }}>*</span></label>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -299,7 +299,7 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
                     {customerError}
                   </div>
                 )}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div className="r-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
                     <label style={s.label}>Voornaam <span style={{ color: 'var(--danger)' }}>*</span></label>
                     <input value={newCustomer.firstName} onChange={(e) => setNewCustomer((p) => ({ ...p, firstName: e.target.value }))} placeholder="Jan" style={s.input} />
@@ -440,7 +440,9 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
           </button>
         </div>
 
-        {/* Header */}
+        {/* Regels — horizontaal scrollbaar op mobiel */}
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ minWidth: 700 }}>
         <div style={s.lineHeader}>
           <span style={{ flex: '0 0 200px' }}>Product</span>
           <span style={{ flex: 1 }}>Omschrijving</span>
@@ -540,6 +542,8 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
             </div>
           )
         })}
+        </div>
+        </div>
       </div>
 
       {/* Totals */}

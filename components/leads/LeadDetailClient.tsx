@@ -106,7 +106,7 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
+    <div className="r-grid-detail" style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
 
       {/* Links: info + notities */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
