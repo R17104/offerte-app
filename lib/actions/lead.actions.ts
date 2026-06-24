@@ -139,6 +139,20 @@ export async function addLeadNote(leadId: string, content: string) {
   revalidatePath(`/leads/${leadId}`)
 }
 
+// Logt dat er een WhatsApp-bericht naar de lead is gestuurd (vanuit de knop).
+export async function logWhatsAppContact(leadId: string) {
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
+    data: {}, // alleen toegang controleren
+  })
+  if (result.count === 0) return
+  await prisma.leadNote.create({
+    data: { content: '📱 WhatsApp-bericht gestuurd', leadId, authorId: session.userId },
+  })
+  revalidatePath(`/leads/${leadId}`)
+}
+
 export async function deleteLeadNote(noteId: string, leadId: string) {
   const session = await verifySession()
   // Auteur mag eigen notities verwijderen; admin mag alle notities verwijderen.
