@@ -72,6 +72,7 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
   const [period, setPeriod] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [isPending, startTransition] = useTransition()
 
   // Sync met nieuwe server-data tijdens render (officieel React-patroon),
@@ -95,6 +96,7 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
   })()
 
   const filtered = quotes.filter((q) => {
+    if (statusFilter !== 'all' && q.status !== statusFilter) return false
     if (search.trim()) {
       const s = search.toLowerCase()
       const matchesSearch = q.quoteNumber.toLowerCase().includes(s)
@@ -168,6 +170,18 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
           style={{ flex: 1, minWidth: 200, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }}
         />
         <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ padding: '7px 10px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}
+        >
+          <option value="all">Alle statussen</option>
+          <option value="DRAFT">Concept</option>
+          <option value="SENT">Verstuurd</option>
+          <option value="ACCEPTED">Geaccepteerd</option>
+          <option value="REJECTED">Afgewezen</option>
+          <option value="EXPIRED">Verlopen</option>
+        </select>
+        <select
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
           style={{ padding: '7px 10px', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: 13, background: 'var(--bg-elevated)', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}
@@ -191,7 +205,7 @@ export default function QuotesList({ quotes: initialQuotes, showArchived }: { qu
         </thead>
         <tbody>
           {filtered.length === 0 && (
-            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen resultaten voor &quot;{search}&quot;</td></tr>
+            <tr><td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13.5 }}>Geen offertes gevonden met deze filters.</td></tr>
           )}
           {filtered.map((q) => {
             const meta = STATUS_META[q.status] ?? STATUS_META.DRAFT

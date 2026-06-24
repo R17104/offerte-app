@@ -45,6 +45,59 @@ const DEFAULT_INCLUDED_ITEMS = `Dit aanbod is inclusief:
 let keyCounter = 0
 function newKey() { return String(++keyCounter) }
 
+// Zoekbare productkiezer voor een offerteregel
+function ProductPicker({ products, value, onPick }: { products: Product[]; value: string; onPick: (id: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ] = useState('')
+  const selected = products.find((p) => p.id === value)
+  const ql = q.trim().toLowerCase()
+  const filtered = ql ? products.filter((p) => p.name.toLowerCase().includes(ql)) : products
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        value={open ? q : (selected ? selected.name : '')}
+        onChange={(e) => { setQ(e.target.value); setOpen(true) }}
+        onFocus={() => { setOpen(true); setQ('') }}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder="Zoek product…"
+        style={{
+          background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', borderRadius: 8,
+          padding: '6px 8px', color: 'var(--text-primary)', fontSize: 12.5, outline: 'none',
+          width: '100%', fontFamily: 'var(--font-sans)', boxSizing: 'border-box',
+        }}
+      />
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 30, marginTop: 2,
+          background: 'var(--bg-surface)', border: '1px solid var(--border-strong)', borderRadius: 8,
+          boxShadow: '0 8px 28px rgba(0,0,0,0.18)', maxHeight: 240, overflowY: 'auto',
+        }}>
+          <div
+            onMouseDown={() => { onPick(''); setOpen(false) }}
+            style={{ padding: '7px 10px', fontSize: 12.5, color: 'var(--text-secondary)', cursor: 'pointer', borderBottom: '1px solid var(--border)' }}
+          >
+            ✎ Handmatig invullen
+          </div>
+          {filtered.slice(0, 60).map((p) => (
+            <div
+              key={p.id}
+              onMouseDown={() => { onPick(p.id); setOpen(false) }}
+              style={{ padding: '7px 10px', fontSize: 12.5, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 8, background: p.id === value ? 'var(--accent-muted)' : 'transparent' }}
+            >
+              <span style={{ color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+              <span style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}>{formatCurrency(p.unitPrice)}</span>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div style={{ padding: '8px 10px', fontSize: 12.5, color: 'var(--text-tertiary)' }}>Geen product gevonden</div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function emptyLine(): Line {
   return {
     key: newKey(),
@@ -402,18 +455,9 @@ export default function QuoteLineEditor({ customerId: defaultCustomerId, custome
           const lineTotal = line.quantity * line.unitPrice * (1 + line.vatRate / 100)
           return (
             <div key={line.key} style={s.lineRow}>
-              {/* Product picker */}
+              {/* Product picker (zoekbaar) */}
               <div style={{ flex: '0 0 200px' }}>
-                <select
-                  value={line.productId}
-                  onChange={(e) => pickProduct(line.key, e.target.value)}
-                  style={{ ...s.input, padding: '6px 8px', fontSize: 12.5 }}
-                >
-                  <option value="">Handmatig</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
+                <ProductPicker products={products} value={line.productId} onPick={(id) => pickProduct(line.key, id)} />
               </div>
 
               {/* Name / description */}

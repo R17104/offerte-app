@@ -204,6 +204,10 @@ model Quote {
   meterkastPhotoUrl        String?
   batterijLocatiePhotoUrl  String?
 
+  // Automatische herinnering: stuur na X dagen (vanaf verzenddatum) als nog niet getekend
+  reminderDays   Int?
+  reminderSentAt DateTime?
+
   sentAt     DateTime?
   acceptedAt DateTime?
   rejectedAt DateTime?

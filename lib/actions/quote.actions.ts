@@ -477,3 +477,120 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
     return { ok: false, error: e instanceof Error ? e.message : 'Versturen mislukt' }
   }
 }
+
+// ── Dupliceren ─────────────────────────────────────────────────────────────────
+
+export async function duplicateQuote(quoteId: string) {
+  const session = await verifySession()
+  const orig = await prisma.quote.findFirst({
+    where: { id: quoteId, ...quoteAccessFilter(session) },
+    include: { lines: { orderBy: { sortOrder: 'asc' } } },
+  })
+  if (!orig) throw new Error('Offerte niet gevonden of geen toegang')
+
+  const validUntil = new Date()
+  validUntil.setDate(validUntil.getDate() + 30)
+
+  const copy = await withQuoteNumber((quoteNumber) => prisma.quote.create({
+    data: {
+      quoteNumber,
+      title: `${orig.title} (kopie)`,
+      notes: orig.notes,
+      introText: orig.introText,
+      includedItems: orig.includedItems,
+      termsText: orig.termsText,
+      reservationOptionEnabled: orig.reservationOptionEnabled,
+      status: 'DRAFT',
+      validUntil,
+      discountAmount: orig.discountAmount,
+      subtotal: orig.subtotal,
+      vatTotal: orig.vatTotal,
+      total: orig.total,
+      customerId: orig.customerId,
+      createdById: session.userId,
+      assignedToId: orig.assignedToId,
+      // Energieprofiel meekopiëren
+      currentMonthlyBill: orig.currentMonthlyBill,
+      electricityUsageKwh: orig.electricityUsageKwh,
+      hasSolarPanels: orig.hasSolarPanels,
+      solarPanelKwp: orig.solarPanelKwp,
+      electricityFeedbackKwh: orig.electricityFeedbackKwh,
+      gasUsageM3: orig.gasUsageM3,
+      hasHeatPump: orig.hasHeatPump,
+      houseType: orig.houseType,
+      numPersons: orig.numPersons,
+      electricityTariff: orig.electricityTariff,
+      feedbackTariff: orig.feedbackTariff,
+      includeBatteryAdvice: orig.includeBatteryAdvice,
+      lines: {
+        create: orig.lines.map((l) => ({
+          sortOrder: l.sortOrder,
+          name: l.name,
+          description: l.description,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+          vatRate: l.vatRate,
+          lineTotal: l.lineTotal,
+          productId: l.productId,
+        })),
+      },
+    },
+  }))
+
+  revalidatePath('/quotes')
+  redirect(`/quotes/${copy.id}/edit`)
+}
+
+// ── Geldigheid verlengen ─────────────────────────────────────────────────────
+
+export async function extendQuoteValidity(quoteId: string, days = 30) {
+  const session = await verifySession()
+  const quote = await prisma.quote.findFirst({ where: { id: quoteId, ...quoteAccessFilter(session) }, select: { validUntil: true } })
+  if (!quote) throw new Error('Offerte niet gevonden of geen toegang')
+  const base = quote.validUntil && quote.validUntil > new Date() ? quote.validUntil : new Date()
+  const newDate = new Date(base)
+  newDate.setDate(newDate.getDate() + days)
+  await prisma.quote.update({ where: { id: quoteId }, data: { validUntil: newDate } })
+  revalidatePath(`/quotes/${quoteId}`)
+}
+
+// ── Herinnering ──────────────────────────────────────────────────────────────
+
+export async function setReminderDays(quoteId: string, days: number | null) {
+  const session = await verifySession()
+  const result = await prisma.quote.updateMany({
+    where: { id: quoteId, ...quoteAccessFilter(session) },
+    // Bij wijzigen reset de "verzonden"-markering zodat de herinnering opnieuw kan afgaan
+    data: { reminderDays: days && days > 0 ? Math.round(days) : null, reminderSentAt: null },
+  })
+  if (result.count === 0) throw new Error('Offerte niet gevonden of geen toegang')
+  revalidatePath(`/quotes/${quoteId}`)
+}
+
+// Stuurt nu direct een herinnering naar de klant (handmatig vanaf de knop).
+export async function sendQuoteReminder(quoteId: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const session = await verifySession()
+    const sender = await prisma.user.findUnique({ where: { id: session.userId }, select: { name: true, email: true } })
+    const quote = await prisma.quote.findFirst({ where: { id: quoteId, ...quoteAccessFilter(session) }, include: { customer: true } })
+    if (!quote) return { ok: false, error: 'Offerte niet gevonden' }
+    if (!quote.customer.email) return { ok: false, error: 'Klant heeft geen e-mailadres' }
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return { ok: false, error: 'E-mail niet geconfigureerd' }
+
+    const { sendQuoteReminderEmail } = await import('@/lib/email')
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
+    await sendQuoteReminderEmail({
+      to: quote.customer.email,
+      cc: sender?.email ?? undefined,
+      customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
+      quoteTitle: quote.title,
+      quoteNumber: quote.quoteNumber,
+      quoteUrl: `${baseUrl}/offerte/${quote.publicToken}`,
+    })
+    await prisma.quote.update({ where: { id: quoteId }, data: { reminderSentAt: new Date() } })
+    revalidatePath(`/quotes/${quoteId}`)
+    return { ok: true }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Versturen mislukt' }
+  }
+}

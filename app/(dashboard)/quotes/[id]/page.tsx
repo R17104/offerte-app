@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { updateQuoteStatus, archiveQuote, unarchiveQuote, deleteQuote } from '@/lib/actions/quote.actions'
+import { updateQuoteStatus, archiveQuote, unarchiveQuote, deleteQuote, duplicateQuote, extendQuoteValidity } from '@/lib/actions/quote.actions'
 import {
   PageContainer, PageHeader, Card, CardHeader, SecondaryButton,
   Badge, Table, Thead, Tbody, Tr, Th, Td, Divider,
@@ -11,6 +11,8 @@ import {
 import ConfirmButton from '@/components/ui/ConfirmButton'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 import SendEmailButton from '@/components/quotes/SendEmailButton'
+import QuoteWhatsAppButton from '@/components/quotes/QuoteWhatsAppButton'
+import QuoteReminder from '@/components/quotes/QuoteReminder'
 import { formatDate, formatCurrency, STATUS_META } from '@/lib/utils'
 import { verifySession } from '@/lib/dal'
 
@@ -47,8 +49,17 @@ export default async function QuoteDetailPage({ params }: Props) {
   const meta = STATUS_META[quote.status] ?? STATUS_META.DRAFT
   const actions = TRANSITIONS[quote.status] ?? []
   const publicUrl = `/offerte/${quote.publicToken}`
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
+  const absolutePublicUrl = `${baseUrl}${publicUrl}`
   const isArchived = !!quote.archivedAt
   const isAccepted = quote.status === 'ACCEPTED'
+
+  // Geldigheid: aantal dagen tot validUntil
+  const msPerDay = 86400000
+  const nowMs = new Date().getTime()
+  const daysLeft = quote.validUntil ? Math.ceil((new Date(quote.validUntil).getTime() - nowMs) / msPerDay) : null
+  const validityLabel = daysLeft == null ? null : daysLeft < 0 ? 'verlopen' : daysLeft === 0 ? 'verloopt vandaag' : `verloopt over ${daysLeft} ${daysLeft === 1 ? 'dag' : 'dagen'}`
+  const validityColor = daysLeft == null ? 'var(--text-tertiary)' : daysLeft < 0 ? 'var(--danger)' : daysLeft <= 5 ? '#d97706' : 'var(--text-tertiary)'
 
   return (
     <PageContainer>
@@ -263,6 +274,25 @@ export default async function QuoteDetailPage({ params }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Versturen</p>
               <SendEmailButton quoteId={quote.id} customerEmail={quote.customer.email ?? null} />
+              <QuoteWhatsAppButton
+                phone={quote.customer.phone ?? null}
+                firstName={quote.customer.firstName}
+                quoteNumber={quote.quoteNumber}
+                url={absolutePublicUrl}
+              />
+            </div>
+
+            <Divider />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Herinnering</p>
+              <QuoteReminder
+                quoteId={quote.id}
+                reminderDays={quote.reminderDays ?? null}
+                reminderSentAt={quote.reminderSentAt ? quote.reminderSentAt.toISOString() : null}
+                sentAt={quote.sentAt ? quote.sentAt.toISOString() : null}
+                hasEmail={!!quote.customer.email}
+              />
             </div>
 
             <Divider />
@@ -318,6 +348,20 @@ export default async function QuoteDetailPage({ params }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>Beheer</p>
 
+              <form action={duplicateQuote.bind(null, id)}>
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%', padding: '7px 12px', borderRadius: 8,
+                    background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)',
+                    color: 'var(--text-primary)', fontSize: 13, cursor: 'pointer',
+                    fontFamily: 'var(--font-sans)', textAlign: 'left',
+                  }}
+                >
+                  Dupliceren
+                </button>
+              </form>
+
               {isArchived ? (
                 <ConfirmButton
                   action={unarchiveQuote.bind(null, id)}
@@ -368,6 +412,21 @@ export default async function QuoteDetailPage({ params }: Props) {
                   )}
                 </div>
               ))}
+
+              {/* Geldigheid: verloopt over X dagen + verlengen */}
+              {validityLabel && !isAccepted && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, fontSize: 12.5, marginTop: 2 }}>
+                  <span style={{ color: validityColor, fontWeight: 600 }}>{validityLabel}</span>
+                  <form action={extendQuoteValidity.bind(null, id, 30)}>
+                    <button
+                      type="submit"
+                      style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
+                    >
+                      +30 dagen
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
           </Card>
 
