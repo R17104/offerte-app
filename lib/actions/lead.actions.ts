@@ -57,26 +57,67 @@ export type LeadImportRow = {
   source?: string
 }
 
-export async function importLeads(rows: LeadImportRow[], source: string) {
+export type ImportDuplicate = {
+  firstName: string
+  lastName: string
+  email?: string
+  phone?: string
+  reason: string
+}
+export type ImportResult = { imported: number; duplicates: ImportDuplicate[] }
+
+export async function importLeads(rows: LeadImportRow[], source: string): Promise<ImportResult> {
   const { userId } = await verifySession()
-  await prisma.lead.createMany({
-    data: rows.map((r) => ({
-      firstName:   r.firstName,
-      lastName:    r.lastName,
-      email:       r.email    || null,
-      phone:       r.phone    || null,
-      street:      r.street   || null,
-      houseNumber: r.houseNumber || null,
-      postalCode:  r.postalCode  || null,
-      city:        r.city        || null,
-      source:      r.source || source,
-      createdById:  userId,
-      assignedToId: userId, // geïmporteerde leads blijven op het account dat ze importeerde
-    })),
-    skipDuplicates: false,
-  })
+  const normPhone = (p?: string | null) => (p ?? '').replace(/\D/g, '')
+
+  // Bestaande leads ophalen om dubbele e-mails/telefoons te herkennen
+  const existing = await prisma.lead.findMany({ where: { archivedAt: null }, select: { email: true, phone: true } })
+  const existEmails = new Set(existing.map((l) => (l.email ?? '').toLowerCase()).filter(Boolean))
+  const existPhones = new Set(existing.map((l) => normPhone(l.phone)).filter(Boolean))
+
+  const seenEmails = new Set<string>()
+  const seenPhones = new Set<string>()
+  const toCreate: LeadImportRow[] = []
+  const duplicates: ImportDuplicate[] = []
+
+  for (const r of rows) {
+    const email = (r.email ?? '').toLowerCase()
+    const phone = normPhone(r.phone)
+    const dupEmail = !!email && (existEmails.has(email) || seenEmails.has(email))
+    const dupPhone = !!phone && (existPhones.has(phone) || seenPhones.has(phone))
+    if (dupEmail || dupPhone) {
+      duplicates.push({
+        firstName: r.firstName, lastName: r.lastName, email: r.email, phone: r.phone,
+        reason: dupEmail && dupPhone ? 'e-mail én telefoon bestaan al' : dupEmail ? 'e-mail bestaat al' : 'telefoon bestaat al',
+      })
+      continue
+    }
+    if (email) seenEmails.add(email)
+    if (phone) seenPhones.add(phone)
+    toCreate.push(r)
+  }
+
+  if (toCreate.length) {
+    await prisma.lead.createMany({
+      data: toCreate.map((r) => ({
+        firstName:   r.firstName,
+        lastName:    r.lastName,
+        email:       r.email    || null,
+        phone:       r.phone    || null,
+        street:      r.street   || null,
+        houseNumber: r.houseNumber || null,
+        postalCode:  r.postalCode  || null,
+        city:        r.city        || null,
+        source:      r.source || source,
+        createdById:  userId,
+        assignedToId: userId, // geïmporteerde leads blijven op het account dat ze importeerde
+      })),
+    })
+  }
+
   revalidatePath('/leads')
   revalidatePath('/dashboard')
+  return { imported: toCreate.length, duplicates }
 }
 
 export async function updateLeadStatus(leadId: string, status: LeadStatus) {

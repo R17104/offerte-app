@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { importLeads, type LeadImportRow } from '@/lib/actions/lead.actions'
+import { importLeads, type LeadImportRow, type ImportDuplicate } from '@/lib/actions/lead.actions'
 
 const FIELD_MAP: Record<string, keyof LeadImportRow> = {
   voornaam: 'firstName', firstname: 'firstName', first_name: 'firstName',
@@ -106,16 +106,33 @@ function parseCSV(text: string): LeadImportRow[] {
   })
 }
 
+type Result =
+  | { ok: true; imported: number; duplicates: ImportDuplicate[] }
+  | { ok: false; error: string }
+
+function downloadDuplicatesCSV(dups: ImportDuplicate[]) {
+  const headers = ['Voornaam', 'Achternaam', 'E-mail', 'Telefoon', 'Reden']
+  const rows = dups.map((d) => [d.firstName, d.lastName, d.email ?? '', d.phone ?? '', d.reason])
+  const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a'); a.href = url
+  a.download = `duplicaten-${new Date().toISOString().slice(0, 10)}.csv`
+  a.click(); URL.revokeObjectURL(url)
+}
+
 export default function LeadImportButton() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ ok: boolean; count?: number; error?: string } | null>(null)
+  const [result, setResult] = useState<Result | null>(null)
+  const [showDups, setShowDups] = useState(false)
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     setLoading(true)
     setResult(null)
+    setShowDups(false)
     try {
       const text = await file.text()
       const rows = parseCSV(text)
@@ -123,8 +140,8 @@ export default function LeadImportButton() {
         setResult({ ok: false, error: 'Geen geldige rijen gevonden in het CSV bestand.' })
         return
       }
-      await importLeads(rows, file.name)
-      setResult({ ok: true, count: rows.length })
+      const res = await importLeads(rows, file.name)
+      setResult({ ok: true, imported: res.imported, duplicates: res.duplicates })
     } catch {
       setResult({ ok: false, error: 'Upload mislukt. Probeer opnieuw.' })
     } finally {
@@ -134,35 +151,76 @@ export default function LeadImportButton() {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <input
-        ref={fileRef}
-        type="file"
-        accept=".csv,.txt"
-        style={{ display: 'none' }}
-        onChange={handleFile}
-      />
-      <button
-        onClick={() => fileRef.current?.click()}
-        disabled={loading}
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 7,
-          padding: '7px 14px', borderRadius: 8,
-          background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)',
-          color: 'var(--text-primary)', fontSize: 13.5, fontWeight: 500,
-          cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
-        }}
-      >
-        <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
-          <path d="M7 1v8M4 5l3-4 3 4M2 11h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        {loading ? 'Importeren…' : 'CSV importeren'}
-      </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <input ref={fileRef} type="file" accept=".csv,.txt" style={{ display: 'none' }} onChange={handleFile} />
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={loading}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '7px 14px', borderRadius: 8,
+            background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)',
+            color: 'var(--text-primary)', fontSize: 13.5, fontWeight: 500,
+            cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
+          }}
+        >
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
+            <path d="M7 1v8M4 5l3-4 3 4M2 11h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          {loading ? 'Importeren…' : 'CSV importeren'}
+        </button>
 
-      {result && (
-        <span style={{ fontSize: 13, color: result.ok ? '#16a34a' : '#dc2626' }}>
-          {result.ok ? `✓ ${result.count} leads geïmporteerd` : result.error}
-        </span>
+        {result?.ok === false && (
+          <span style={{ fontSize: 13, color: '#dc2626' }}>{result.error}</span>
+        )}
+        {result?.ok === true && (
+          <span style={{ fontSize: 13, color: '#16a34a' }}>
+            ✓ {result.imported} geïmporteerd
+            {result.duplicates.length > 0 && (
+              <>
+                {' · '}
+                <button
+                  onClick={() => setShowDups((v) => !v)}
+                  style={{ background: 'none', border: 'none', color: '#d97706', fontWeight: 700, cursor: 'pointer', fontSize: 13, padding: 0, fontFamily: 'inherit' }}
+                >
+                  {result.duplicates.length} dubbel {showDups ? '▲' : '▼'}
+                </button>
+              </>
+            )}
+          </span>
+        )}
+      </div>
+
+      {/* Duplicaten-overzicht */}
+      {result?.ok === true && result.duplicates.length > 0 && showDups && (
+        <div style={{
+          background: 'var(--bg-surface)', border: '1px solid var(--border-strong)', borderRadius: 10,
+          padding: 14, maxWidth: 560, boxShadow: '0 8px 28px rgba(0,0,0,0.12)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+              {result.duplicates.length} dubbele leads overgeslagen (al aanwezig)
+            </p>
+            <button
+              onClick={() => downloadDuplicatesCSV(result.duplicates)}
+              style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)', background: 'none', border: '1px solid var(--border-strong)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              ↓ Download CSV
+            </button>
+          </div>
+          <div style={{ maxHeight: 260, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {result.duplicates.map((d, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 12.5, padding: '6px 8px', borderRadius: 6, background: 'var(--bg-elevated)' }}>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+                  {d.firstName} {d.lastName}
+                  <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}> · {d.email || d.phone || '—'}</span>
+                </span>
+                <span style={{ color: '#d97706', flexShrink: 0 }}>{d.reason}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

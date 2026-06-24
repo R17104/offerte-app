@@ -1186,13 +1186,13 @@ export default function LandingPage({ products = [] }: { products?: ShopProduct[
       <Header />
       <HeroSection />
       <TrustBar />
+      <Voorlichting />
       <FeaturedBatteries products={products} />
       <RekentoolsBand />
       <ThuisbatterijInfo />
       <Diensten />
       <Werkwijze />
       <InstallationGallery />
-      <Voorlichting />
       {SHOW_REVIEWS && <ReviewsSection />}
       <FAQ />
       <ContactForm />
