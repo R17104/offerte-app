@@ -30,6 +30,19 @@ function splitFullName(full: string): { firstName: string; lastName: string } {
   return { firstName: parts[0] ?? '', lastName: parts.slice(1).join(' ') }
 }
 
+// Nederlandse telefoonnummers normaliseren (leidende 0 toevoegen waar nodig)
+function normPhone(raw?: string): string | undefined {
+  const d = (raw ?? '').replace(/[^\d]/g, '')
+  if (!d) return undefined
+  if (d.startsWith('0031')) return '0' + d.slice(4)
+  if (d.startsWith('31') && d.length === 11) return '0' + d.slice(2)
+  if (d.length === 9) return '0' + d          // mobiel/vast zonder leidende 0
+  return d                                     // 10 cijfers (met 0) of overig
+}
+
+const isEmail = (s: string) => /.+@.+\..+/.test(s)
+const isPostcode = (s: string) => /^\d{4}\s?[a-z]{2}$/i.test(s)
+
 function parseCSV(text: string): LeadImportRow[] {
   const lines = text.trim().split(/\r?\n/).filter((l) => l.trim())
   if (lines.length === 0) return []
@@ -48,17 +61,36 @@ function parseCSV(text: string): LeadImportRow[] {
       const cols = splitLine(line, sep)
       const row: Partial<LeadImportRow> = {}
       mapped.forEach((field, i) => { if (field && cols[i]) row[field] = cols[i] })
+      if (row.phone) row.phone = normPhone(row.phone)
       if (!row.firstName && !row.lastName) return []
       return [{ firstName: row.firstName ?? '', lastName: row.lastName ?? '', ...row }]
     })
   }
 
-  // Positional format (no header):
-  // col0=product/bron, col1=volledige naam, col2=email, col3=telefoon,
-  // col4=postcode, col5=huisnummer, col6=stad, col7=provincie (ignored), col8=datum (ignored)
-  return lines.flatMap((line) => {
+  // Geen kopregel: herken eerst het 'Friesland'-export-formaat, anders het
+  // oude positionele formaat.
+  return lines.flatMap((line): LeadImportRow[] => {
     const cols = splitLine(line, sep)
     if (cols.length < 2) return []
+
+    // Friesland-export: voornaam, achternaam, geb.datum, email, straat,
+    // huisnr, postcode, plaats, eigenaar, woningtype, telefoon
+    if (cols.length >= 11 && isEmail(cols[3] ?? '') && isPostcode(cols[6] ?? '')) {
+      if (!cols[0] && !cols[1]) return []
+      return [{
+        firstName:   cols[0] || '',
+        lastName:    cols[1] || '',
+        email:       cols[3] || undefined,
+        street:      cols[4] || undefined,
+        houseNumber: cols[5] || undefined,
+        postalCode:  cols[6] || undefined,
+        city:        cols[7] || undefined,
+        phone:       normPhone(cols[10]),
+      }]
+    }
+
+    // Oud positioneel formaat: bron, volledige naam, email, telefoon,
+    // postcode, huisnummer, stad
     const { firstName, lastName } = splitFullName(cols[1] ?? '')
     if (!firstName) return []
     return [{
@@ -66,7 +98,7 @@ function parseCSV(text: string): LeadImportRow[] {
       firstName,
       lastName,
       email:       cols[2] || undefined,
-      phone:       cols[3] || undefined,
+      phone:       normPhone(cols[3]),
       postalCode:  cols[4] || undefined,
       houseNumber: cols[5] || undefined,
       city:        cols[6] || undefined,
