@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner, logWhatsAppContact } from '@/lib/actions/lead.actions'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner, logWhatsAppContact, logVoicemail } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
@@ -94,7 +94,7 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
   function waLink(): string {
     const d = (lead.phone ?? '').replace(/\D/g, '')
     const intl = d.startsWith('0031') ? d.slice(2) : d.startsWith('31') ? d : d.startsWith('0') ? '31' + d.slice(1) : '31' + d
-    const text = `Hallo ${lead.firstName}, met Bespaarhulp Friesland. Ik neem contact met je op over besparen op je energierekening met zonnepanelen of een thuisbatterij. Heb je een momentje?`
+    const text = `Hallo ${lead.firstName}, met Bespaarhulp Friesland. Je hebt al zonnepanelen — met een thuisbatterij sla je je eigen stroom op en gebruik je hem 's avonds, juist nu de salderingsregeling verdwijnt. Heb je een momentje om te kijken wat dat voor jou oplevert?`
     return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
   }
 
@@ -104,6 +104,15 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
       setNotes((prev) => [{ id: Date.now().toString(), content: '📱 WhatsApp-bericht gestuurd', createdAt: new Date(), author: { name: 'Jij' } }, ...prev])
     })
   }
+
+  function handleVoicemail() {
+    startTransition(async () => {
+      await logVoicemail(lead.id)
+      setNotes((prev) => [{ id: Date.now().toString(), content: '📞 Voicemail ingesproken (belpoging)', createdAt: new Date(), author: { name: 'Jij' } }, ...prev])
+    })
+  }
+
+  const voicemailCount = notes.filter((n) => n.content.startsWith('📞 Voicemail')).length
 
   return (
     <div className="r-grid-detail" style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
@@ -136,6 +145,21 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
             <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
               Contactgegevens
             </p>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={handleVoicemail}
+              disabled={isPending}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '7px 12px', borderRadius: 8, background: 'transparent',
+                color: '#d97706', border: '1px solid #f59e0b66',
+                fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+                cursor: isPending ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              📞 Voicemail{voicemailCount > 0 ? ` (${voicemailCount})` : ''}
+            </button>
             {lead.phone && (
               <a
                 href={waLink()}
@@ -155,6 +179,7 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
                 App {lead.firstName}
               </a>
             )}
+            </div>
           </div>
           {row('E-mail', lead.email)}
           {row('Telefoon', lead.phone)}

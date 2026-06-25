@@ -153,6 +153,20 @@ export async function logWhatsAppContact(leadId: string) {
   revalidatePath(`/leads/${leadId}`)
 }
 
+// Logt een belpoging / voicemail bij de lead (om belpogingen te tellen).
+export async function logVoicemail(leadId: string) {
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
+    data: {},
+  })
+  if (result.count === 0) return
+  await prisma.leadNote.create({
+    data: { content: '📞 Voicemail ingesproken (belpoging)', leadId, authorId: session.userId },
+  })
+  revalidatePath(`/leads/${leadId}`)
+}
+
 export async function deleteLeadNote(noteId: string, leadId: string) {
   const session = await verifySession()
   // Auteur mag eigen notities verwijderen; admin mag alle notities verwijderen.
