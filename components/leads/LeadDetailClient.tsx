@@ -41,6 +41,15 @@ type Lead = {
   appointmentPlannedBy: SalesUser | null
 }
 
+// Datum naar lokale 'YYYY-MM-DDTHH:mm' voor een datetime-local input
+function toLocalDatetimeInput(d: Date | string | null): string {
+  if (!d) return ''
+  const dt = new Date(d)
+  if (isNaN(dt.getTime())) return ''
+  const local = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000)
+  return local.toISOString().slice(0, 16)
+}
+
 const row = (label: string, value: string | null) =>
   value ? (
     <div key={label} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 13.5 }}>
@@ -308,11 +317,11 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
         {/* Follow-up */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px' }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
-            Follow-up datum
+            Follow-up datum &amp; tijd
           </p>
           <input
-            type="date"
-            defaultValue={lead.followUpAt ? new Date(lead.followUpAt).toISOString().slice(0, 10) : ''}
+            type="datetime-local"
+            defaultValue={toLocalDatetimeInput(lead.followUpAt)}
             onChange={(e) => startTransition(() => updateFollowUp(lead.id, e.target.value || null))}
             style={{
               width: '100%', padding: '7px 10px', borderRadius: 8,

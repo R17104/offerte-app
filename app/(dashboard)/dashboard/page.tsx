@@ -151,7 +151,7 @@ export default async function DashboardPage() {
                     <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-primary)' }}>{lead.firstName} {lead.lastName}</p>
                     {lead.followUpAt && (
                       <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>
-                        Opvolgen: {new Date(lead.followUpAt).toLocaleDateString('nl-NL')}
+                        Opvolgen: {new Date(lead.followUpAt).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </p>
                     )}
                   </div>
