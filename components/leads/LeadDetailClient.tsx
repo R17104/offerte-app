@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner, logWhatsAppContact, logVoicemail } from '@/lib/actions/lead.actions'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner, logWhatsAppContact, logVoicemail, writeOffInvalidNumber } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
@@ -114,6 +114,11 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
 
   const voicemailCount = notes.filter((n) => n.content.startsWith('📞 Voicemail')).length
 
+  function handleWriteOff() {
+    if (!confirm(`Lead "${lead.firstName} ${lead.lastName}" afboeken wegens foutief nummer?\n\nDe lead wordt op "Verloren" gezet en gearchiveerd (uit de actieve lijst).`)) return
+    startTransition(() => writeOffInvalidNumber(lead.id))
+  }
+
   return (
     <div className="r-grid-detail" style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
 
@@ -159,6 +164,20 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
               }}
             >
               📞 Voicemail{voicemailCount > 0 ? ` (${voicemailCount})` : ''}
+            </button>
+            <button
+              type="button"
+              onClick={handleWriteOff}
+              disabled={isPending}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '7px 12px', borderRadius: 8, background: 'transparent',
+                color: '#dc2626', border: '1px solid #dc262644',
+                fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+                cursor: isPending ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              📵 Foutief nummer
             </button>
             {lead.phone && (
               <a

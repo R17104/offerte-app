@@ -153,6 +153,22 @@ export async function logWhatsAppContact(leadId: string) {
   revalidatePath(`/leads/${leadId}`)
 }
 
+// Boekt een lead af wegens een foutief/niet-werkend telefoonnummer:
+// status -> Verloren, notitie met reden, en uit de actieve lijst (gearchiveerd).
+export async function writeOffInvalidNumber(leadId: string) {
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
+    data: { status: 'LOST', archivedAt: new Date() },
+  })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
+  await prisma.leadNote.create({
+    data: { content: '📵 Foutief nummer (niet in gebruik) — afgeboekt', leadId, authorId: session.userId },
+  })
+  revalidatePath('/leads')
+  redirect('/leads')
+}
+
 // Logt een belpoging / voicemail bij de lead (om belpogingen te tellen).
 export async function logVoicemail(leadId: string) {
   const session = await verifySession()
