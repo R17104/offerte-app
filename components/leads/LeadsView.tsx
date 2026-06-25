@@ -20,6 +20,7 @@ const STATUS_CONFIG = [
   { key: 'INSTALLATIE_GEDAAN',  label: 'Installatie gedaan',  color: '#059669', bg: 'rgba(5,150,105,0.08)' },
   { key: 'BETALING_100',        label: '100% betaald',        color: '#065f46', bg: 'rgba(6,95,70,0.08)' },
   { key: 'LOST',                label: 'Verloren',            color: '#9ca3af', bg: 'rgba(156,163,175,0.08)' },
+  { key: 'FOUTIEF_NUMMER',      label: 'Foutief nummer',      color: '#b91c1c', bg: 'rgba(185,28,28,0.08)' },
 ]
 
 type LeadRow = {

@@ -67,6 +67,7 @@ enum LeadStatus {
   BETALING_100
   WON                 // legacy → migrated to BETALING_100
   LOST
+  FOUTIEF_NUMMER      // afgeboekt: telefoonnummer niet in gebruik
 }
 
 enum AppointmentStatus {

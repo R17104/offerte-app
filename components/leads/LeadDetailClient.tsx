@@ -16,6 +16,7 @@ const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
   { value: 'INSTALLATIE_GEDAAN', label: 'Installatie gedaan',   color: '#059669' },
   { value: 'BETALING_100',       label: '100% betaald',         color: '#065f46' },
   { value: 'LOST',               label: 'Verloren',             color: '#9ca3af' },
+  { value: 'FOUTIEF_NUMMER',     label: 'Foutief nummer',       color: '#b91c1c' },
 ]
 
 type Note = { id: string; content: string; createdAt: Date; author: { name: string | null } }

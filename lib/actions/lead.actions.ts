@@ -159,7 +159,8 @@ export async function writeOffInvalidNumber(leadId: string) {
   const session = await verifySession()
   const result = await prisma.lead.updateMany({
     where: { id: leadId, ...leadAccessFilter(session) },
-    data: { status: 'LOST', archivedAt: new Date() },
+    // Eigen status zodat ze in de lijst onder "Foutief nummer" staan (niet archiveren)
+    data: { status: 'FOUTIEF_NUMMER' },
   })
   if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   await prisma.leadNote.create({
