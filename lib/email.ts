@@ -125,6 +125,7 @@ export async function sendLeadInfoEmail({ to, firstName, senderName }: { to: str
           <p style="margin:24px 0 0;">Groet,</p>
           <p style="margin:4px 0 0;font-weight:600;color:#111827;">${safeSender}</p>
           <p style="margin:0;color:#0a5c35;">BespaarhulpFriesland.nl</p>
+          <p style="margin:6px 0 0;color:#6b7280;font-size:13px;">📞 06 38 92 25 13 &nbsp;·&nbsp; ✉️ <a href="mailto:info@bespaarhulpfriesland.nl" style="color:#0a5c35;">info@bespaarhulpfriesland.nl</a></p>
         </td></tr>
         <tr><td style="background:#f9fafb;padding:18px 36px;border-top:1px solid #e5e7eb;">
           <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
@@ -141,6 +142,7 @@ export async function sendLeadInfoEmail({ to, firstName, senderName }: { to: str
   await transporter.sendMail({
     from,
     to,
+    replyTo: 'info@bespaarhulpfriesland.nl',
     subject: 'Informatie over het stoppen van de salderingsregeling',
     html,
   })

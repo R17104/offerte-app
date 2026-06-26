@@ -115,7 +115,9 @@ Zou je het prettig vinden als we hiervoor een afspraak inplannen? Dat kan gewoon
 Groet,
 
 ${senderName}
-BespaarhulpFriesland.nl`
+BespaarhulpFriesland.nl
+📞 06 38 92 25 13
+✉️ info@bespaarhulpfriesland.nl`
     return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
   }
 
