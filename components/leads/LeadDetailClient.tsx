@@ -104,7 +104,18 @@ export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead;
   function waLink(): string {
     const d = (lead.phone ?? '').replace(/\D/g, '')
     const intl = d.startsWith('0031') ? d.slice(2) : d.startsWith('31') ? d : d.startsWith('0') ? '31' + d.slice(1) : '31' + d
-    const text = `Hallo ${lead.firstName}, met Bespaarhulp Friesland. Je hebt al zonnepanelen — met een thuisbatterij sla je je eigen stroom op en gebruik je hem 's avonds, juist nu de salderingsregeling verdwijnt. Heb je een momentje om te kijken wat dat voor jou oplevert?`
+    const text = `Hallo ${lead.firstName},
+
+Ik stuur je even een bericht omdat veel huishoudens vragen hebben over het stoppen van de salderingsregeling.
+
+Wij geven momenteel vrijblijvend informatie over wat dit betekent en of een thuisbatterij in jouw situatie interessant kan zijn. Je ontvangt daarbij direct een persoonlijk advies en een berekening op maat.
+
+Zou je het prettig vinden als we hiervoor een afspraak inplannen? Dat kan gewoon vrijblijvend.
+
+Groet,
+
+Tom
+Bespaarhulp Friesland`
     return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
   }
 
