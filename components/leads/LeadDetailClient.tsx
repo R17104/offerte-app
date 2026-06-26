@@ -59,7 +59,7 @@ const row = (label: string, value: string | null) =>
     </div>
   ) : null
 
-export default function LeadDetailClient({ lead, users, isAdmin }: { lead: Lead; users: SalesUser[]; isAdmin: boolean }) {
+export default function LeadDetailClient({ lead, users, isAdmin, senderName }: { lead: Lead; users: SalesUser[]; isAdmin: boolean; senderName: string }) {
   const [status, setStatus] = useState<LeadStatus>(lead.status)
   const [notes, setNotes] = useState<Note[]>(lead.notes)
   const [noteText, setNoteText] = useState('')
@@ -114,7 +114,7 @@ Zou je het prettig vinden als we hiervoor een afspraak inplannen? Dat kan gewoon
 
 Groet,
 
-Tom
+${senderName}
 Bespaarhulp Friesland`
     return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
   }

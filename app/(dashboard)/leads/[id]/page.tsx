@@ -32,6 +32,8 @@ export default async function LeadDetailPage({ params }: Props) {
   if (!lead) notFound()
 
   const planner = await isPlanner(session)
+  const me = await prisma.user.findUnique({ where: { id: session.userId }, select: { name: true, email: true } })
+  const senderName = me?.name?.trim() || me?.email?.split('@')[0] || 'Bespaarhulp Friesland'
   const users = role === 'ADMIN'
     ? await prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } })
     : []
@@ -51,7 +53,7 @@ export default async function LeadDetailPage({ params }: Props) {
           </Link>
         ) : undefined}
       />
-      <LeadDetailClient lead={lead} users={users} isAdmin={role === 'ADMIN'} />
+      <LeadDetailClient lead={lead} users={users} isAdmin={role === 'ADMIN'} senderName={senderName} />
     </PageContainer>
   )
 }
