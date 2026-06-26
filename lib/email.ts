@@ -7,18 +7,34 @@ function escapeHtml(s: string): string {
     .replaceAll("'", '&#39;')
 }
 
-async function createTransporter() {
-  const user = process.env.GMAIL_USER
-  const pass = process.env.GMAIL_APP_PASSWORD
-  if (!user || !pass) throw new Error('GMAIL_USER en GMAIL_APP_PASSWORD zijn niet ingesteld in Vercel')
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Bespaarhulp Friesland <info@bespaarhulpfriesland.nl>'
+const DEFAULT_REPLY_TO = 'info@bespaarhulpfriesland.nl'
 
-  const nodemailer = (await import('nodemailer')).default
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: { user, pass },
-  })
+// Verstuurt e-mail via Resend (https://resend.com). Vereist RESEND_API_KEY in Vercel,
+// en een geverifieerd domein (bespaarhulpfriesland.nl). Houdt de oude
+// nodemailer-achtige interface aan (sendMail) zodat de mailfuncties ongewijzigd blijven.
+async function createTransporter() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) throw new Error('RESEND_API_KEY is niet ingesteld in Vercel')
+  return {
+    async sendMail(opts: { from?: string; to: string | string[]; cc?: string; replyTo?: string; subject: string; html: string }) {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: EMAIL_FROM,
+          to: Array.isArray(opts.to) ? opts.to : [opts.to],
+          subject: opts.subject,
+          html: opts.html,
+          reply_to: opts.replyTo || DEFAULT_REPLY_TO,
+          ...(opts.cc ? { cc: [opts.cc] } : {}),
+        }),
+      })
+      if (!res.ok) {
+        throw new Error(`Resend fout (${res.status}): ${await res.text().catch(() => '')}`)
+      }
+    },
+  }
 }
 
 export async function sendQuoteEmail({

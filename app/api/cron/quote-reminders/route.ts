@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 401 })
   }
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+  if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ ok: false, error: 'E-mail niet geconfigureerd' })
   }
 

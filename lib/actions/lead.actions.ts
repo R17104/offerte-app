@@ -37,7 +37,7 @@ async function sendTikTokLeadSafe(opts: { email?: string | null; phone?: string 
 // Bevestiging naar de aanvrager; mag de aanvraag zelf nooit laten falen.
 async function sendConfirmationSafe(to: string, name: string, quoteNumber?: string) {
   try {
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return
+    if (!process.env.RESEND_API_KEY) return
     const { sendLeadConfirmationEmail } = await import('@/lib/email')
     await sendLeadConfirmationEmail({ to, name, quoteNumber })
   } catch (e) {
@@ -175,8 +175,8 @@ export const MAILING_BATCH_LIMIT = 50
 // Verstuurt de informatiemail naar een selectie leads (max 50 per keer).
 export async function sendBulkLeadEmail(leadIds: string[]): Promise<{ sent: number; failed: number; skipped: number; error?: string }> {
   const session = await verifySession()
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-    return { sent: 0, failed: 0, skipped: 0, error: 'E-mail niet geconfigureerd (GMAIL_USER/GMAIL_APP_PASSWORD ontbreken in Vercel)' }
+  if (!process.env.RESEND_API_KEY) {
+    return { sent: 0, failed: 0, skipped: 0, error: 'E-mail niet geconfigureerd (RESEND_API_KEY ontbreekt in Vercel)' }
   }
   const ids = leadIds.slice(0, MAILING_BATCH_LIMIT)
   if (ids.length === 0) return { sent: 0, failed: 0, skipped: 0, error: 'Geen leads geselecteerd' }

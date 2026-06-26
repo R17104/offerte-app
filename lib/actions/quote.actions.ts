@@ -74,7 +74,7 @@ export type AcceptQuoteInput = {
 // de acceptatie/afwijzing zelf laten falen.
 async function notifyQuoteOutcome(quoteId: string, outcome: 'accepted' | 'rejected') {
   try {
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return
+    if (!process.env.RESEND_API_KEY) return
 
     const quote = await prisma.quote.findUnique({
       where: { id: quoteId },
@@ -111,7 +111,7 @@ async function notifyQuoteOutcome(quoteId: string, outcome: 'accepted' | 'reject
 // als die nog ontbreken. Mag de acceptatie nooit laten falen.
 async function notifyCustomerAccepted(quoteId: string, token: string) {
   try {
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return
+    if (!process.env.RESEND_API_KEY) return
     const quote = await prisma.quote.findUnique({
       where: { id: quoteId },
       select: {
@@ -455,7 +455,7 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
     })
     if (!quote) return { ok: false, error: 'Offerte niet gevonden' }
     if (!quote.customer.email) return { ok: false, error: 'Klant heeft geen e-mailadres' }
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return { ok: false, error: 'E-mail niet geconfigureerd, voeg GMAIL_USER en GMAIL_APP_PASSWORD toe in Vercel' }
+    if (!process.env.RESEND_API_KEY) return { ok: false, error: 'E-mail niet geconfigureerd (RESEND_API_KEY ontbreekt in Vercel)' }
 
     const { sendQuoteEmail } = await import('@/lib/email')
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
@@ -575,7 +575,7 @@ export async function sendQuoteReminder(quoteId: string): Promise<{ ok: boolean;
     const quote = await prisma.quote.findFirst({ where: { id: quoteId, ...quoteAccessFilter(session) }, include: { customer: true } })
     if (!quote) return { ok: false, error: 'Offerte niet gevonden' }
     if (!quote.customer.email) return { ok: false, error: 'Klant heeft geen e-mailadres' }
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return { ok: false, error: 'E-mail niet geconfigureerd' }
+    if (!process.env.RESEND_API_KEY) return { ok: false, error: 'E-mail niet geconfigureerd' }
 
     const { sendQuoteReminderEmail } = await import('@/lib/email')
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
