@@ -98,6 +98,54 @@ export async function sendQuoteEmail({
   })
 }
 
+// ── Informatiemail naar leads (bulk mailing) ─────────────────────────────────
+
+export async function sendLeadInfoEmail({ to, firstName, senderName }: { to: string; firstName: string; senderName: string }) {
+  const transporter = await createTransporter()
+  const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
+  const safeName = escapeHtml(firstName || 'daar')
+  const safeSender = escapeHtml(senderName)
+
+  const html = `
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:'DM Sans',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <tr><td style="background:#0a5c35;padding:24px 36px;">
+          <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">Bespaarhulp Friesland</p>
+        </td></tr>
+        <tr><td style="padding:32px 36px 28px;font-size:14px;color:#374151;line-height:1.7;">
+          <p style="margin:0 0 16px;">Hallo ${safeName},</p>
+          <p style="margin:0 0 16px;">Ik stuur je even een bericht omdat veel huishoudens vragen hebben over het stoppen van de salderingsregeling.</p>
+          <p style="margin:0 0 16px;">Wij geven momenteel vrijblijvend informatie over wat dit betekent in jouw situatie. Je ontvangt daarbij direct een persoonlijk advies en een berekening op maat.</p>
+          <p style="margin:0 0 16px;">Zou je het prettig vinden als we hiervoor een afspraak inplannen? Dat kan gewoon vrijblijvend.</p>
+          <p style="margin:24px 0 0;">Groet,</p>
+          <p style="margin:4px 0 0;font-weight:600;color:#111827;">${safeSender}</p>
+          <p style="margin:0;color:#0a5c35;">BespaarhulpFriesland.nl</p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;padding:18px 36px;border-top:1px solid #e5e7eb;">
+          <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
+            Bespaarhulp Friesland · KVK 71128174 · Actief in heel Friesland<br>
+            Liever geen e-mail meer ontvangen? Antwoord met &quot;afmelden&quot; en we halen u uit onze lijst.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject: 'Informatie over het stoppen van de salderingsregeling',
+    html,
+  })
+}
+
 // ── Herinnering: offerte nog niet getekend ────────────────────────────────────
 
 export async function sendQuoteReminderEmail({

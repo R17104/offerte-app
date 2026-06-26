@@ -108,14 +108,14 @@ export default function LeadDetailClient({ lead, users, isAdmin, senderName }: {
 
 Ik stuur je even een bericht omdat veel huishoudens vragen hebben over het stoppen van de salderingsregeling.
 
-Wij geven momenteel vrijblijvend informatie over wat dit betekent en of een thuisbatterij in jouw situatie interessant kan zijn. Je ontvangt daarbij direct een persoonlijk advies en een berekening op maat.
+Wij geven momenteel vrijblijvend informatie over wat dit betekent in jouw situatie. Je ontvangt daarbij direct een persoonlijk advies en een berekening op maat.
 
 Zou je het prettig vinden als we hiervoor een afspraak inplannen? Dat kan gewoon vrijblijvend.
 
 Groet,
 
 ${senderName}
-Bespaarhulp Friesland`
+BespaarhulpFriesland.nl`
     return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
   }
 

@@ -30,6 +30,7 @@ const nav: { label: string; items: NavItem[] }[] = [
       { href: '/seo-leads', label: 'SEO Leads', icon: IconGlobe, adminOnly: true },
       { href: '/tiktok-leads', label: 'TikTok Leads', icon: IconTikTok, adminOnly: true },
       { href: '/leads', label: 'Alle leads', icon: IconLeads },
+      { href: '/lead-mailing', label: 'Lead mailing', icon: IconMail },
     ],
   },
 ]
@@ -271,6 +272,15 @@ function IconCalendar({ size = 16, color = 'currentColor' }) {
     <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
       <rect x="2" y="3" width="12" height="11" rx="2" stroke={color} strokeWidth="1.3" />
       <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconMail({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} fill="none" viewBox="0 0 16 16">
+      <rect x="1.5" y="3" width="13" height="10" rx="2" stroke={color} strokeWidth="1.3" />
+      <path d="M2 4.5l6 4 6-4" stroke={color} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

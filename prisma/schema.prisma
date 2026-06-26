@@ -305,6 +305,7 @@ model Lead {
   updatedAt   DateTime   @updatedAt
 
   followUpAt  DateTime?
+  lastMailedAt DateTime?   // laatste keer dat deze lead een (bulk)mailing kreeg
 
   quoteId String? @unique
   quote   Quote?  @relation(fields: [quoteId], references: [id])

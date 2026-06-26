@@ -170,6 +170,46 @@ export async function writeOffInvalidNumber(leadId: string) {
   redirect('/leads')
 }
 
+export const MAILING_BATCH_LIMIT = 50
+
+// Verstuurt de informatiemail naar een selectie leads (max 50 per keer).
+export async function sendBulkLeadEmail(leadIds: string[]): Promise<{ sent: number; failed: number; skipped: number; error?: string }> {
+  const session = await verifySession()
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    return { sent: 0, failed: 0, skipped: 0, error: 'E-mail niet geconfigureerd (GMAIL_USER/GMAIL_APP_PASSWORD ontbreken in Vercel)' }
+  }
+  const ids = leadIds.slice(0, MAILING_BATCH_LIMIT)
+  if (ids.length === 0) return { sent: 0, failed: 0, skipped: 0, error: 'Geen leads geselecteerd' }
+
+  const me = await prisma.user.findUnique({ where: { id: session.userId }, select: { name: true, email: true } })
+  const senderName = me?.name?.trim() || me?.email?.split('@')[0] || 'Bespaarhulp Friesland'
+
+  const leads = await prisma.lead.findMany({
+    where: { id: { in: ids }, ...leadAccessFilter(session) },
+    select: { id: true, firstName: true, email: true },
+  })
+
+  const { sendLeadInfoEmail } = await import('@/lib/email')
+  let sent = 0, failed = 0, skipped = 0
+
+  for (const lead of leads) {
+    if (!lead.email || !isValidEmail(lead.email)) { skipped++; continue }
+    try {
+      await sendLeadInfoEmail({ to: lead.email, firstName: lead.firstName, senderName })
+      await prisma.lead.update({ where: { id: lead.id }, data: { lastMailedAt: new Date() } })
+      await prisma.leadNote.create({ data: { content: '📧 Informatiemail verstuurd', leadId: lead.id, authorId: session.userId } })
+      sent++
+    } catch (e) {
+      console.error('Mailing mislukt voor lead', lead.id, e)
+      failed++
+    }
+  }
+
+  revalidatePath('/lead-mailing')
+  revalidatePath('/leads')
+  return { sent, failed, skipped }
+}
+
 // Logt een belpoging / voicemail bij de lead (om belpogingen te tellen).
 export async function logVoicemail(leadId: string) {
   const session = await verifySession()
