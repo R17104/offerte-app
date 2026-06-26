@@ -70,6 +70,9 @@ export type AcceptQuoteInput = {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+// Dummy-accounts (@offerte.app) hebben geen echt postvak → nooit naar mailen.
+const isRealEmail = (e?: string | null): e is string => !!e && !e.endsWith('@offerte.app')
+
 // Stuurt een interne notificatie naar maker + toegewezen verkoper. Mag nooit
 // de acceptatie/afwijzing zelf laten falen.
 async function notifyQuoteOutcome(quoteId: string, outcome: 'accepted' | 'rejected') {
@@ -89,7 +92,8 @@ async function notifyQuoteOutcome(quoteId: string, outcome: 'accepted' | 'reject
     })
     if (!quote) return
 
-    const to = [...new Set([quote.createdBy.email, quote.assignedTo?.email].filter((e): e is string => !!e))]
+    const to = [...new Set([quote.createdBy.email, quote.assignedTo?.email].filter(isRealEmail))]
+    if (to.length === 0) return
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
 
     const { sendQuoteStatusNotification } = await import('@/lib/email')
@@ -462,7 +466,7 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
 
     await sendQuoteEmail({
       to: quote.customer.email,
-      cc: sender?.email ?? undefined,
+      cc: isRealEmail(sender?.email) ? sender!.email : undefined,
       customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
       senderName: sender?.name ?? sender?.email ?? 'Bespaarhulp Friesland',
       quoteTitle: quote.title,
@@ -581,7 +585,7 @@ export async function sendQuoteReminder(quoteId: string): Promise<{ ok: boolean;
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://bespaarhulpfriesland.nl'
     await sendQuoteReminderEmail({
       to: quote.customer.email,
-      cc: sender?.email ?? undefined,
+      cc: isRealEmail(sender?.email) ? sender!.email : undefined,
       customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
       quoteTitle: quote.title,
       quoteNumber: quote.quoteNumber,
