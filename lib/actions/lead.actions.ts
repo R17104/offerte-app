@@ -194,7 +194,7 @@ export async function sendBulkLeadEmail(leadIds: string[]): Promise<{ sent: numb
   for (const lead of leads) {
     if (!lead.email || !isValidEmail(lead.email)) { skipped++; continue }
     try {
-      await sendLeadInfoEmail({ to: lead.email, firstName: lead.firstName, senderName })
+      await sendLeadInfoEmail({ to: lead.email, firstName: lead.firstName, senderName, salesEmail: isValidEmail(me?.email ?? '') ? me!.email! : undefined })
       await prisma.lead.update({ where: { id: lead.id }, data: { lastMailedAt: new Date() } })
       await prisma.leadNote.create({ data: { content: '📧 Informatiemail verstuurd', leadId: lead.id, authorId: session.userId } })
       sent++

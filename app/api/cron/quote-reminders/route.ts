@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
       await sendQuoteReminderEmail({
         to: q.customer.email,
         cc,
+        salesEmail: cc,
         customerName: `${q.customer.firstName} ${q.customer.lastName}`,
         quoteTitle: q.title,
         quoteNumber: q.quoteNumber,

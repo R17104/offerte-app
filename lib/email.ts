@@ -10,6 +10,15 @@ function escapeHtml(s: string): string {
 const EMAIL_FROM = process.env.EMAIL_FROM || 'Bespaarhulp Friesland <info@bespaarhulpfriesland.nl>'
 const DEFAULT_REPLY_TO = 'info@bespaarhulpfriesland.nl'
 
+// Bouwt de reply-to: standaard info@, maar als een (echte) saler de mail stuurt,
+// gaat een antwoord van de klant ook rechtstreeks naar de saler.
+function replyToWith(salesEmail?: string | null): string | string[] {
+  if (salesEmail && salesEmail !== DEFAULT_REPLY_TO && !salesEmail.endsWith('@offerte.app')) {
+    return [DEFAULT_REPLY_TO, salesEmail]
+  }
+  return DEFAULT_REPLY_TO
+}
+
 // Verstuurt e-mail via Resend (https://resend.com). Vereist RESEND_API_KEY in Vercel,
 // en een geverifieerd domein (bespaarhulpfriesland.nl). Houdt de oude
 // nodemailer-achtige interface aan (sendMail) zodat de mailfuncties ongewijzigd blijven.
@@ -17,7 +26,7 @@ async function createTransporter() {
   const key = process.env.RESEND_API_KEY
   if (!key) throw new Error('RESEND_API_KEY is niet ingesteld in Vercel')
   return {
-    async sendMail(opts: { from?: string; to: string | string[]; cc?: string; replyTo?: string; subject: string; html: string }) {
+    async sendMail(opts: { from?: string; to: string | string[]; cc?: string; replyTo?: string | string[]; subject: string; html: string }) {
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
@@ -40,6 +49,7 @@ async function createTransporter() {
 export async function sendQuoteEmail({
   to,
   cc,
+  salesEmail,
   customerName,
   senderName,
   quoteTitle,
@@ -48,6 +58,7 @@ export async function sendQuoteEmail({
 }: {
   to: string
   cc?: string
+  salesEmail?: string
   customerName: string
   senderName: string
   quoteTitle: string
@@ -109,6 +120,7 @@ export async function sendQuoteEmail({
     from,
     to,
     ...(cc ? { cc } : {}),
+    replyTo: replyToWith(salesEmail),
     subject,
     html,
   })
@@ -116,7 +128,7 @@ export async function sendQuoteEmail({
 
 // ── Informatiemail naar leads (bulk mailing) ─────────────────────────────────
 
-export async function sendLeadInfoEmail({ to, firstName, senderName }: { to: string; firstName: string; senderName: string }) {
+export async function sendLeadInfoEmail({ to, firstName, senderName, salesEmail }: { to: string; firstName: string; senderName: string; salesEmail?: string }) {
   const transporter = await createTransporter()
   const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
   const safeName = escapeHtml(firstName || 'daar')
@@ -158,7 +170,7 @@ export async function sendLeadInfoEmail({ to, firstName, senderName }: { to: str
   await transporter.sendMail({
     from,
     to,
-    replyTo: 'info@bespaarhulpfriesland.nl',
+    replyTo: replyToWith(salesEmail),
     subject: 'Informatie over het stoppen van de salderingsregeling',
     html,
   })
@@ -167,10 +179,11 @@ export async function sendLeadInfoEmail({ to, firstName, senderName }: { to: str
 // ── Herinnering: offerte nog niet getekend ────────────────────────────────────
 
 export async function sendQuoteReminderEmail({
-  to, cc, customerName, quoteTitle, quoteNumber, quoteUrl,
+  to, cc, salesEmail, customerName, quoteTitle, quoteNumber, quoteUrl,
 }: {
   to: string
   cc?: string
+  salesEmail?: string
   customerName: string
   quoteTitle: string
   quoteNumber: string
@@ -221,7 +234,7 @@ export async function sendQuoteReminderEmail({
 </body>
 </html>`
 
-  await transporter.sendMail({ from, to, ...(cc ? { cc } : {}), subject: `Herinnering: uw offerte ${safeNumber} van Bespaarhulp Friesland`, html })
+  await transporter.sendMail({ from, to, ...(cc ? { cc } : {}), replyTo: replyToWith(salesEmail), subject: `Herinnering: uw offerte ${safeNumber} van Bespaarhulp Friesland`, html })
 }
 
 // ── Bevestiging naar de aanvrager van een lead/offerte ────────────────────────
@@ -290,6 +303,7 @@ export async function sendSignedQuoteEmail({
   quoteTotal,
   quoteUrl,
   missingPhotos,
+  salesEmail,
 }: {
   to: string
   customerName: string
@@ -298,6 +312,7 @@ export async function sendSignedQuoteEmail({
   quoteTotal: string
   quoteUrl: string
   missingPhotos: string[] // bv. ['een foto van de meterkast']
+  salesEmail?: string
 }) {
   const transporter = await createTransporter()
   const from = `Bespaarhulp Friesland <${process.env.GMAIL_USER}>`
@@ -371,6 +386,7 @@ export async function sendSignedQuoteEmail({
   await transporter.sendMail({
     from,
     to,
+    replyTo: replyToWith(salesEmail),
     subject: `Uw getekende offerte (${safeNumber}) · Bespaarhulp Friesland`,
     html,
   })

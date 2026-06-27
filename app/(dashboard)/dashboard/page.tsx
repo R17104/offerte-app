@@ -40,16 +40,16 @@ export default async function DashboardPage() {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000)
 
   const [
-    closedDealsAgg,   // bedrijfsbreed (blijft zoals het was)
-    quotes30,         // bedrijfsbreed (blijft zoals het was)
+    closedDealsAgg,   // persoonlijk: alleen eigen geclosede deals
+    quotes30,         // persoonlijk: alleen eigen conversie
     assignedLeadsCount, assignedLeads,           // persoonlijk
     pipelineAgg,                                 // persoonlijk
     sentOpenAgg, sentOpenList,                   // persoonlijk
   ] = await Promise.all([
-    prisma.quote.aggregate({ _sum: { total: true }, where: { archivedAt: null, status: 'ACCEPTED' } }),
+    prisma.quote.aggregate({ _sum: { total: true }, where: { archivedAt: null, status: 'ACCEPTED', ...myQuotes } }),
     prisma.quote.groupBy({
       by: ['status'], _count: true,
-      where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo }, status: { in: ['SENT', 'ACCEPTED', 'REJECTED'] } },
+      where: { archivedAt: null, createdAt: { gte: thirtyDaysAgo }, status: { in: ['SENT', 'ACCEPTED', 'REJECTED'] }, ...myQuotes },
     }),
     // Toegewezen leads (persoonlijk)
     prisma.lead.count({ where: { archivedAt: null, assignedToId: userId } }),
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
 
   const closedValue = closedDealsAgg._sum.total ?? 0
 
-  // 30-daagse conversie (bedrijfsbreed)
+  // 30-daagse conversie (persoonlijk)
   const accepted30 = quotes30.find((r) => r.status === 'ACCEPTED')?._count ?? 0
   const sent30     = quotes30.find((r) => r.status === 'SENT')?._count ?? 0
   const rejected30 = quotes30.find((r) => r.status === 'REJECTED')?._count ?? 0
@@ -98,14 +98,14 @@ export default async function DashboardPage() {
       {/* KPI row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 28 }}>
         <StatCard
-          label="Geclosede deals"
+          label="Mijn geclosede deals"
           value={formatCurrency(closedValue)}
-          sub="totale waarde geaccepteerd"
+          sub="jouw geaccepteerde waarde"
           color="#16a34a"
           href="/quotes"
         />
         <StatCard
-          label="Conversie (30 dagen)"
+          label="Mijn conversie (30 dagen)"
           value={`${conv30}%`}
           sub={`${accepted30} gesloten van ${total30} verstuurd`}
           color="#2563eb"

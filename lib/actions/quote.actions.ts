@@ -125,9 +125,13 @@ async function notifyCustomerAccepted(quoteId: string, token: string) {
         meterkastPhotoUrl: true,
         batterijLocatiePhotoUrl: true,
         customer: { select: { firstName: true, lastName: true, email: true } },
+        createdBy: { select: { email: true } },
+        assignedTo: { select: { email: true } },
       },
     })
     if (!quote?.customer.email) return
+
+    const salesEmail = [quote.assignedTo?.email, quote.createdBy?.email].find(isRealEmail)
 
     const missingPhotos: string[] = []
     if (!quote.meterkastPhotoUrl) missingPhotos.push('een foto van de meterkast')
@@ -143,6 +147,7 @@ async function notifyCustomerAccepted(quoteId: string, token: string) {
       quoteTotal: new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(quote.total),
       quoteUrl: `${baseUrl}/offerte/${token}`,
       missingPhotos,
+      salesEmail,
     })
   } catch (e) {
     console.error('Klant-bevestigingsmail versturen mislukt:', e)
@@ -467,6 +472,7 @@ export async function sendQuoteByEmail(quoteId: string): Promise<{ ok: boolean; 
     await sendQuoteEmail({
       to: quote.customer.email,
       cc: isRealEmail(sender?.email) ? sender!.email : undefined,
+      salesEmail: isRealEmail(sender?.email) ? sender!.email : undefined,
       customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
       senderName: sender?.name ?? sender?.email ?? 'Bespaarhulp Friesland',
       quoteTitle: quote.title,
@@ -586,6 +592,7 @@ export async function sendQuoteReminder(quoteId: string): Promise<{ ok: boolean;
     await sendQuoteReminderEmail({
       to: quote.customer.email,
       cc: isRealEmail(sender?.email) ? sender!.email : undefined,
+      salesEmail: isRealEmail(sender?.email) ? sender!.email : undefined,
       customerName: `${quote.customer.firstName} ${quote.customer.lastName}`,
       quoteTitle: quote.title,
       quoteNumber: quote.quoteNumber,
