@@ -4,7 +4,7 @@ export const maxDuration = 60 // bulk-mailen kan even duren
 import { prisma } from '@/lib/db'
 import { verifySession, leadAccessFilter } from '@/lib/dal'
 import { PageContainer, PageHeader } from '@/components/ui'
-import { MAILING_BATCH_LIMIT } from '@/lib/actions/lead.actions'
+import { MAILING_BATCH_LIMIT } from '@/lib/constants'
 import LeadMailingView from '@/components/leads/LeadMailingView'
 
 export default async function LeadMailingPage() {

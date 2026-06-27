@@ -8,6 +8,7 @@ import { LeadStatus, HouseType } from '@prisma/client'
 import { calculateQuoteTotals } from '@/lib/utils'
 import { withQuoteNumber } from '@/lib/quote-number'
 import { checkPublicForm, isValidEmail } from '@/lib/public-form-guard'
+import { MAILING_BATCH_LIMIT } from '@/lib/constants'
 import { sendTikTokEvent } from '@/lib/tiktok-capi'
 import { headers, cookies } from 'next/headers'
 import crypto from 'crypto'
@@ -164,13 +165,11 @@ export async function writeOffInvalidNumber(leadId: string) {
   })
   if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
   await prisma.leadNote.create({
-    data: { content: '📵 Foutief nummer (niet in gebruik) — afgeboekt', leadId, authorId: session.userId },
+    data: { content: '📵 Foutief nummer (niet in gebruik), afgeboekt', leadId, authorId: session.userId },
   })
   revalidatePath('/leads')
   redirect('/leads')
 }
-
-export const MAILING_BATCH_LIMIT = 50
 
 // Verstuurt de informatiemail naar een selectie leads (max 50 per keer).
 export async function sendBulkLeadEmail(leadIds: string[]): Promise<{ sent: number; failed: number; skipped: number; error?: string }> {
