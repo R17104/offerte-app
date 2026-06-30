@@ -223,6 +223,20 @@ export async function logVoicemail(leadId: string) {
   revalidatePath(`/leads/${leadId}`)
 }
 
+// Logt dat er gebeld is (vanuit de Bellen-knop, telt mee als belpoging).
+export async function logCall(leadId: string) {
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
+    data: {},
+  })
+  if (result.count === 0) return
+  await prisma.leadNote.create({
+    data: { content: '📞 Gebeld (belpoging)', leadId, authorId: session.userId },
+  })
+  revalidatePath(`/leads/${leadId}`)
+}
+
 export async function deleteLeadNote(noteId: string, leadId: string) {
   const session = await verifySession()
   // Auteur mag eigen notities verwijderen; admin mag alle notities verwijderen.

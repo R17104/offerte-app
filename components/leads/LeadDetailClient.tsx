@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner, logWhatsAppContact, logVoicemail, writeOffInvalidNumber } from '@/lib/actions/lead.actions'
+import { updateLeadStatus, addLeadNote, deleteLeadNote, archiveLead, updateFollowUp, convertLeadToQuote, setAppointmentPlanner, logWhatsAppContact, logVoicemail, logCall, writeOffInvalidNumber } from '@/lib/actions/lead.actions'
 import { LeadStatus } from '@prisma/client'
 import AssignSalesperson from '@/components/ui/AssignSalesperson'
 
@@ -135,7 +135,22 @@ BespaarhulpFriesland.nl
     })
   }
 
+  // Klik-om-te-bellen: tel:-link opent de belapp; we loggen de belpoging.
+  function telLink(): string {
+    const d = (lead.phone ?? '').replace(/\D/g, '')
+    const intl = d.startsWith('0031') ? d.slice(2) : d.startsWith('31') ? d : d.startsWith('0') ? '31' + d.slice(1) : '31' + d
+    return `tel:+${intl}`
+  }
+
+  function handleCall() {
+    startTransition(async () => {
+      await logCall(lead.id)
+      setNotes((prev) => [{ id: Date.now().toString(), content: '📞 Gebeld (belpoging)', createdAt: new Date(), author: { name: 'Jij' } }, ...prev])
+    })
+  }
+
   const voicemailCount = notes.filter((n) => n.content.startsWith('📞 Voicemail')).length
+  const callCount = notes.filter((n) => n.content.startsWith('📞 Gebeld')).length
 
   function handleWriteOff() {
     if (!confirm(`Lead "${lead.firstName} ${lead.lastName}" afboeken wegens foutief nummer?\n\nDe lead wordt op "Verloren" gezet en gearchiveerd (uit de actieve lijst).`)) return
@@ -174,6 +189,22 @@ BespaarhulpFriesland.nl
               Contactgegevens
             </p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {lead.phone && (
+              <a
+                href={telLink()}
+                onClick={handleCall}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '7px 14px', borderRadius: 8, background: '#0a5c35', color: '#fff',
+                  fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M5.5 2.5l1.2 2.8-1.4 1.1a8 8 0 003.3 3.3l1.1-1.4 2.8 1.2v2.4c0 .6-.5 1.1-1.1 1A11.5 11.5 0 012.2 4.6c-.1-.6.4-1.1 1-1.1h2.3z" fill="#fff"/>
+                </svg>
+                Bellen{callCount > 0 ? ` (${callCount})` : ''}
+              </a>
+            )}
             <button
               type="button"
               onClick={handleVoicemail}
@@ -224,7 +255,12 @@ BespaarhulpFriesland.nl
             </div>
           </div>
           {row('E-mail', lead.email)}
-          {row('Telefoon', lead.phone)}
+          {lead.phone ? (
+            <div style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 13.5 }}>
+              <span style={{ width: 120, color: 'var(--text-tertiary)', flexShrink: 0 }}>Telefoon</span>
+              <a href={telLink()} onClick={handleCall} style={{ color: 'var(--text-link)', fontWeight: 600, textDecoration: 'none' }}>{lead.phone}</a>
+            </div>
+          ) : null}
           {row('Adres', lead.street && lead.houseNumber ? `${lead.street} ${lead.houseNumber}` : lead.street)}
           {row('Postcode', lead.postalCode)}
           {row('Stad', lead.city)}
