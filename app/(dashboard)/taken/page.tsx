@@ -31,6 +31,23 @@ export default async function TakenPage() {
     }),
   ])
 
+  // Laatste notitie per lead ophalen (voor een korte preview op de taak)
+  const leadIds = [
+    ...appointments.map((a) => a.lead?.id).filter((x): x is string => !!x),
+    ...followUpLeads.map((l) => l.id),
+  ]
+  const recentNotes = leadIds.length
+    ? await prisma.leadNote.findMany({
+        where: { leadId: { in: leadIds } },
+        orderBy: { createdAt: 'desc' },
+        select: { leadId: true, content: true },
+      })
+    : []
+  const lastNoteByLead = new Map<string, string>()
+  for (const n of recentNotes) {
+    if (!lastNoteByLead.has(n.leadId)) lastNoteByLead.set(n.leadId, n.content)
+  }
+
   const tasks: Task[] = [
     ...appointments.map((a): Task => ({
       kind: 'appointment',
@@ -41,6 +58,7 @@ export default async function TakenPage() {
       phone: a.lead?.phone ?? null,
       city: a.lead?.city ?? null,
       note: a.notes,
+      lastNote: a.lead?.id ? lastNoteByLead.get(a.lead.id) ?? null : null,
       owner: a.assignedTo?.name || a.assignedTo?.email?.split('@')[0] || null,
     })),
     ...followUpLeads.map((l): Task => ({
@@ -52,6 +70,7 @@ export default async function TakenPage() {
       phone: l.phone,
       city: l.city,
       note: null,
+      lastNote: lastNoteByLead.get(l.id) ?? null,
       owner: l.assignedTo?.name || l.assignedTo?.email?.split('@')[0] || null,
     })),
   ].sort((a, b) => a.when.localeCompare(b.when))

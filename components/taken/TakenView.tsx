@@ -14,6 +14,7 @@ export type Task = {
   phone: string | null
   city: string | null
   note: string | null
+  lastNote: string | null
   owner: string | null
 }
 
@@ -70,7 +71,7 @@ export default function TakenView({ tasks: initial }: { tasks: Task[] }) {
       setTasks((prev) => {
         const rest = prev.filter((x) => !(x.kind === t.kind && x.id === t.id))
         if (date) {
-          rest.push({ ...t, kind: 'followup', id: t.leadId ?? t.id, leadId: t.leadId ?? t.id, when: new Date(date).toISOString(), note: null })
+          rest.push({ ...t, kind: 'followup', id: t.leadId ?? t.id, leadId: t.leadId ?? t.id, when: new Date(date).toISOString(), note: null, lastNote: '✅ Opvolging afgehandeld, nieuwe opvolging gepland' })
         }
         return rest.sort((a, b) => a.when.localeCompare(b.when))
       })
@@ -140,6 +141,14 @@ export default function TakenView({ tasks: initial }: { tasks: Task[] }) {
                         {[t.city, t.owner && `→ ${t.owner}`].filter(Boolean).join(' · ')}
                         {t.note ? `${t.city || t.owner ? ' · ' : ''}${t.note}` : ''}
                       </p>
+                      {t.lastNote && (
+                        <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 3, display: 'flex', gap: 5, alignItems: 'baseline' }}>
+                          <span style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}>📝</span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 360, fontStyle: 'italic' }}>
+                            {t.lastNote.length > 90 ? t.lastNote.slice(0, 90) + '…' : t.lastNote}
+                          </span>
+                        </p>
+                      )}
                     </div>
 
                     {/* Acties */}
