@@ -138,6 +138,12 @@ export default function TakenView({ tasks: initial }: { tasks: Task[] }) {
                         <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t.name}</span>
                       )}
                       <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>
+                        {t.phone && (
+                          <>
+                            <a href={telLink(t.phone)} style={{ color: 'var(--text-link)', fontWeight: 600, textDecoration: 'none' }}>{t.phone}</a>
+                            {(t.city || t.owner || t.note) ? ' · ' : ''}
+                          </>
+                        )}
                         {[t.city, t.owner && `→ ${t.owner}`].filter(Boolean).join(' · ')}
                         {t.note ? `${t.city || t.owner ? ' · ' : ''}${t.note}` : ''}
                       </p>
