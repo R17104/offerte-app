@@ -64,6 +64,24 @@ export async function updateAppointmentStatus(id: string, status: AppointmentSta
   revalidatePath('/afspraken')
 }
 
+// Rondt een afspraak af vanaf de Taken-pagina: status -> COMPLETED, en zet
+// eventueel meteen een nieuwe opvolgdatum op de gekoppelde lead.
+export async function completeAppointment(id: string, newFollowUpAt: string | null) {
+  const session = await verifySession()
+  const appt = await prisma.appointment.findUnique({ where: { id }, select: { plannedById: true, assignedToId: true, leadId: true } })
+  if (!appt) throw new Error('Afspraak niet gevonden')
+  const allowed = (await isPlanner(session)) || appt.plannedById === session.userId || appt.assignedToId === session.userId
+  if (!allowed) throw new Error('Geen rechten')
+  await prisma.appointment.update({ where: { id }, data: { status: 'COMPLETED' } })
+  if (appt.leadId && newFollowUpAt) {
+    await prisma.lead.update({ where: { id: appt.leadId }, data: { followUpAt: new Date(newFollowUpAt) } }).catch(() => {})
+  }
+  revalidatePath('/taken')
+  revalidatePath('/afspraken')
+  revalidatePath('/leads')
+  revalidatePath('/dashboard')
+}
+
 export async function deleteAppointment(id: string) {
   const session = await verifySession()
   if (!(await isPlanner(session))) throw new Error('Geen rechten')

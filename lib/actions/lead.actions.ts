@@ -299,6 +299,27 @@ export async function updateFollowUp(leadId: string, date: string | null) {
   revalidatePath('/')
 }
 
+// Rondt een opvolging af vanaf de Taken-pagina: logt dat het is afgehandeld en
+// zet eventueel meteen een nieuwe opvolgdatum (anders verdwijnt de taak).
+export async function completeFollowUp(leadId: string, newFollowUpAt: string | null) {
+  const session = await verifySession()
+  const result = await prisma.lead.updateMany({
+    where: { id: leadId, ...leadAccessFilter(session) },
+    data: { followUpAt: newFollowUpAt ? new Date(newFollowUpAt) : null },
+  })
+  if (result.count === 0) throw new Error('Lead niet gevonden of geen toegang')
+  await prisma.leadNote.create({
+    data: {
+      content: newFollowUpAt ? '✅ Opvolging afgehandeld, nieuwe opvolging gepland' : '✅ Opvolging afgehandeld',
+      leadId,
+      authorId: session.userId,
+    },
+  })
+  revalidatePath('/taken')
+  revalidatePath(`/leads/${leadId}`)
+  revalidatePath('/dashboard')
+}
+
 export async function assignLead(leadId: string, assignedToId: string | null) {
   const session = await verifySession()
   const result = await prisma.lead.updateMany({
