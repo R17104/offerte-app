@@ -166,17 +166,20 @@ export default function AfsprakenView({
                     {open && a.status === 'PLANNED' && !isPlanner && (
                       <button onClick={() => run(() => claimAppointment(a.id))} disabled={pending} style={btnPrimary(pending)}>Neem over</button>
                     )}
-                    {/* Planner: (her)toewijzen */}
-                    {isPlanner && a.status !== 'CANCELLED' && (
-                      <select
-                        value={a.assignedTo?.id ?? ''}
-                        onChange={(e) => run(() => assignAppointment(a.id, e.target.value || null))}
-                        disabled={pending}
-                        style={{ ...inp, width: 'auto', fontSize: 12.5, padding: '6px 8px' }}
-                      >
-                        <option value="">Open — voor iedereen</option>
-                        {users.map((u) => <option key={u.id} value={u.id}>{userName(u)}</option>)}
-                      </select>
+                    {/* Doorverwijzen / (her)toewijzen — planner of eigenaar/toegewezen saler */}
+                    {mineToComplete && a.status !== 'CANCELLED' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>Doorverwijzen naar</span>
+                        <select
+                          value={a.assignedTo?.id ?? ''}
+                          onChange={(e) => run(() => assignAppointment(a.id, e.target.value || null))}
+                          disabled={pending}
+                          style={{ ...inp, width: 'auto', fontSize: 12.5, padding: '6px 8px' }}
+                        >
+                          <option value="">Open — voor iedereen</option>
+                          {users.map((u) => <option key={u.id} value={u.id}>{userName(u)}</option>)}
+                        </select>
+                      </div>
                     )}
                     {/* Status */}
                     {a.status === 'PLANNED' && mineToComplete && (

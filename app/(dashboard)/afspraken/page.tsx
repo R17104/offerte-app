@@ -30,16 +30,16 @@ export default async function AfsprakenPage({ searchParams }: { searchParams: Pr
     assignedTo: a.assignedTo,
   }))
 
-  const [leads, users] = planner
-    ? await Promise.all([
-        prisma.lead.findMany({
-          where: { archivedAt: null, ...leadAccessFilter(session) },
-          select: { id: true, firstName: true, lastName: true, city: true },
-          orderBy: { lastName: 'asc' },
-        }),
-        prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } }),
-      ])
-    : [[], []]
+  // Salers-lijst is altijd nodig (ook voor niet-planners) om afspraken door te verwijzen.
+  const users = await prisma.user.findMany({ select: { id: true, name: true, email: true }, orderBy: { name: 'asc' } })
+  // Leads-keuzelijst alleen voor het inplan-formulier (planners).
+  const leads = planner
+    ? await prisma.lead.findMany({
+        where: { archivedAt: null, ...leadAccessFilter(session) },
+        select: { id: true, firstName: true, lastName: true, city: true },
+        orderBy: { lastName: 'asc' },
+      })
+    : []
 
   return (
     <PageContainer>

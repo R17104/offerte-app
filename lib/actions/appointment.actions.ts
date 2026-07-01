@@ -39,9 +39,15 @@ export async function createAppointment(data: {
 
 export async function assignAppointment(id: string, assignedToId: string | null) {
   const session = await verifySession()
-  if (!(await isPlanner(session))) throw new Error('Geen rechten')
+  const appt = await prisma.appointment.findUnique({ where: { id }, select: { plannedById: true, assignedToId: true } })
+  if (!appt) throw new Error('Afspraak niet gevonden')
+  // Planner mag altijd; anders alleen wie de afspraak plande of aan wie hij is toegewezen
+  // (zo kan een saler zijn eigen afspraak doorverwijzen naar een collega).
+  const allowed = (await isPlanner(session)) || appt.plannedById === session.userId || appt.assignedToId === session.userId
+  if (!allowed) throw new Error('Je kunt alleen je eigen afspraken doorverwijzen')
   await prisma.appointment.update({ where: { id }, data: { assignedToId: assignedToId || null } })
   revalidatePath('/afspraken')
+  revalidatePath('/taken')
 }
 
 // Een open afspraak (zonder toegewezen saler) zelf oppakken
